@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<!-- Atelier Kinetik · Template 01 · Masked-Rise Hero — display-first hero with serif-italic counterline. Drop into any page. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kinetik Template — Hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#070709; --surface:#0D0D12; --elevated:#12121A; --ink:#F4F2EC; --muted:#8E8D8A;
+    --line:rgba(244,242,236,.10); --line-strong:rgba(244,242,236,.24); --flame:#FF3D00; --cyan:#00F0FF;
+    --snap:cubic-bezier(.16,1,.3,1); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html { -webkit-font-smoothing:antialiased; }
+  body { background:var(--bg); color:var(--ink); font-family:"Hanken Grotesk", system-ui, sans-serif; }
+  .f-display{font-family:"Syne",sans-serif;letter-spacing:-.035em}
+  .f-serif{font-family:"Instrument Serif", Georgia, serif; letter-spacing:-.01em}
+  .f-mono{font-family:"JetBrains Mono", ui-monospace, monospace}
+
+  .hero { position:relative; min-height:92svh; display:flex; flex-direction:column; justify-content:flex-end;
+    padding:clamp(5rem,12vh,8rem) clamp(1.25rem,5vw,4rem) clamp(2.5rem,6vh,4rem); overflow:hidden; }
+  .hero::before { content:""; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(58vw 48vh at 84% 16%, rgba(255,61,0,.13), transparent 70%),
+               radial-gradient(50vw 50vh at 8% 92%, rgba(124,155,255,.09), transparent 70%); }
+  /* decorative orbit rings (pure CSS) */
+  .orbit { position:absolute; top:8%; right:-6%; width:clamp(16rem,38vw,32rem); aspect-ratio:1; pointer-events:none; }
+  .orbit i { position:absolute; inset:0; border:1px solid var(--line-strong); border-radius:50%; }
+  .orbit i:nth-child(2){ inset:14%; border-color:var(--line); border-style:dashed; animation:spin 46s linear infinite; }
+  .orbit i:nth-child(3){ inset:30%; border-color:rgba(255,61,0,.5); animation:spin 32s linear infinite reverse; }
+  .orbit b { position:absolute; top:50%; left:50%; width:.7rem; height:.7rem; border-radius:50%;
+    background:var(--flame); box-shadow:0 0 18px rgba(255,61,0,.8); transform:translate(-50%,-50%); }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  .eyebrow { font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:var(--muted); margin-bottom:1.5rem; }
+  .eyebrow b { color:var(--flame); font-weight:500; }
+
+  h1 { font-size:clamp(2.6rem,9.5vw,7rem); line-height:.93; font-weight:800; text-transform:uppercase; position:relative; }
+  .mask { display:block; overflow:hidden; padding:.1em .06em .14em; margin:-.1em -.06em -.14em; }
+  .line { display:block; transform-origin:0 100%; animation:rise 1.15s var(--snap) both; }
+  .mask:nth-child(2) .line { animation-delay:.14s; }
+  .line.serif { font-family:"Instrument Serif",serif; font-weight:400; font-style:italic;
+    text-transform:none; color:var(--flame); letter-spacing:-.01em; }
+  @keyframes rise { from { transform:translateY(118%) rotate(3.5deg); } }
+
+  .row { display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between;
+    gap:2rem; margin-top:2.25rem; position:relative; }
+  .sub { max-width:34rem; color:var(--muted); font-size:clamp(1rem,1.4vw,1.15rem); line-height:1.6; }
+  .sub b { color:var(--ink); font-weight:600; }
+  .ctas { display:flex; gap:.75rem; flex-wrap:wrap; }
+  .btn { display:inline-flex; align-items:center; gap:.6rem; padding:1rem 1.6rem; border-radius:9999px;
+    font-weight:600; font-size:.95rem; text-decoration:none; border:1px solid transparent; transition:background-color .35s,color .35s,border-color .35s; }
+  .btn-flame { background:var(--flame); color:#fff; } .btn-flame:hover { background:#FF5A26; }
+  .btn-ghost { border-color:var(--line-strong); color:var(--ink); } .btn-ghost:hover { background:var(--ink); color:var(--bg); }
+  @media (prefers-reduced-motion: reduce) { .line, .orbit i { animation:none; } }
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="orbit" aria-hidden="true"><i></i><i></i><i></i><b></b></div>
+  <p class="eyebrow f-mono"><b>●</b>&nbsp; Design &amp; motion registry — v1.5</p>
+  <h1 class="f-display">
+    <span class="mask"><span class="line">Craft,</span></span>
+    <span class="mask"><span class="line serif">not defaults.</span></span>
+  </h1>
+  <div class="row">
+    <p class="sub">Copy-ready <b>tokens, type, motion and 60fps FX</b> — audited, zero-dependency, and readable by humans and AI agents alike.</p>
+    <div class="ctas">
+      <a class="btn btn-flame" href="#registry">Open the registry <span aria-hidden="true">→</span></a>
+      <a class="btn btn-ghost" href="/llms.txt">Read llms.txt</a>
+    </div>
+  </div>
+</header>
+</body>
+</html>

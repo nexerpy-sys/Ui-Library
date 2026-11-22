@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<!-- Atelier Kinetik · Template 06 · Testimonial Grid — six short quotes, Fraunces-free serif italics, hairline cells. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kinetik Template — Testimonials</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#070709; --surface:#0D0D12; --elevated:#12121A; --ink:#F4F2EC; --muted:#8E8D8A;
+    --line:rgba(244,242,236,.10); --line-strong:rgba(244,242,236,.24); --flame:#FF3D00; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--ink); font-family:"Hanken Grotesk", system-ui, sans-serif; -webkit-font-smoothing:antialiased; }
+  .f-display{font-family:"Syne",sans-serif;letter-spacing:-.03em}
+  .f-serif{font-family:"Instrument Serif", Georgia, serif}
+  .f-mono{font-family:"JetBrains Mono", ui-monospace, monospace}
+  section { max-width:1200px; margin:0 auto; padding:clamp(3rem,8vh,6rem) clamp(1.25rem,4vw,3rem); }
+  .kicker{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--flame);margin-bottom:1.25rem}
+  h2{font-size:clamp(1.8rem,4.5vw,3.2rem);line-height:.98;font-weight:800;text-transform:uppercase;margin-bottom:2.5rem}
+  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; }
+  @media (max-width:900px){ .grid{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:600px){ .grid{grid-template-columns:1fr} }
+  figure { background:var(--surface); border:1px solid var(--line); border-radius:1.1rem; padding:1.5rem;
+    display:flex; flex-direction:column; gap:1.1rem; transition:border-color .35s; }
+  figure:hover { border-color:var(--line-strong); }
+  blockquote { font-family:"Instrument Serif",serif; font-style:italic; font-size:1.18rem; line-height:1.35; color:#EDEBE4; }
+  figcaption { margin-top:auto; display:flex; align-items:center; gap:.75rem; }
+  .avatar { width:38px; height:38px; border-radius:50%; display:grid; place-items:center;
+    font-family:"JetBrains Mono",monospace; font-size:.72rem; color:#070709; background:linear-gradient(135deg,#FF6A21,#E5A93C); }
+  .who b { display:block; font-size:.85rem; } .who span { color:var(--muted); font-size:.78rem; }
+</style>
+</head>
+<body>
+<section aria-label="What builders say">
+  <p class="kicker f-mono">06 · Field Notes</p>
+  <h2 class="f-display">The agents<br><span class="f-serif" style="font-weight:400;font-style:italic;text-transform:none;color:var(--flame)">notice the difference.</span></h2>
+  <div class="grid">
+    <figure><blockquote>“Claude dropped our hero rebuild from three prompts to one — it just knew the scale.”</blockquote><figcaption><span class="avatar">MR</span><span class="who"><b>Maya R.</b><span>Design engineer, Lisbon</span></span></figcaption></figure>
+    <figure><blockquote>“The easing laws alone are worth it. Velocity whip on the drawer, Kinetic snap on the modal — done.”</blockquote><figcaption><span class="avatar">DK</span><span class="who"><b>Dev K.</b><span>Founder, dev-tooling</span></span></figcaption></figure>
+    <figure><blockquote>“First registry where the JSON audits are real. Our agent lints contrast straight from it.”</blockquote><figcaption><span class="avatar">AS</span><span class="who"><b>Ana S.</b><span>Accessibility lead, Berlin</span></span></figcaption></figure>
+    <figure><blockquote>“We iframe the dotted globe on our launch page. 60fps on a 2019 laptop. Wild.”</blockquote><figcaption><span class="avatar">JT</span><span class="who"><b>Jo T.</b><span>Marketing, infra startup</span></span></figcaption></figure>
+    <figure><blockquote>“24 pairings with leading rules — my typography arguments ended the same day.”</blockquote><figcaption><span class="avatar">PN</span><span class="who"><b>Priya N.</b><span>Brand designer, Mumbai</span></span></figcaption></figure>
+    <figure><blockquote>“ChatGPT read llms.txt and generated a page our designer couldn’t tell wasn’t hand-set.”</blockquote><figcaption><span class="avatar">OL</span><span class="who"><b>Owen L.</b><span>Product lead, fintech</span></span></figcaption></figure>
+  </div>
+</section>
+</body>
+</html>

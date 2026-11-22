@@ -10,13 +10,14 @@ of eight autonomous cursor agents drafts this page") with a live hero canvas, th
 Forge, the agent Pantheon, the copy-ready Registry, and the Motion Law easing studio.
 On mobile, tap the hamburger (top-right) for the fullscreen kinetic index menu.
 
-## What's inside (v1.5.0)
+## What's inside (v1.6.0)
 
 | Asset | Where | Contents |
 | --- | --- | --- |
 | LLM context index | `llms.txt` | Orientation for AI context windows — endpoints, conventions, anti-slop checklist |
-| Machine manifest | `registry.json` | 60 Google Fonts + css2 URLs · 24 pairings · 3 fluid `clamp()` scales (computed) · 6 WCAG-2.1-audited light/dark token systems · 50–950 hue-locked scales (measured contrast) · 12 named motion laws + springs · 12 micro-interaction snippets (code inline) · 16 FX entries |
+| Machine manifest | `registry.json` | 60 Google Fonts + css2 URLs · 24 pairings · 3 fluid `clamp()` scales (computed) · 6 WCAG-2.1-audited light/dark token systems · 50–950 hue-locked scales (measured contrast) · 12 named motion laws + springs · **24** micro-interaction snippets (code inline) · 8 templates · 16 FX entries |
 | 60fps canvas FX | `registry/fx/01..16-*.html` | Self-contained, DPR-capped, adaptive-quality, reduced-motion-safe hero backgrounds — **zero dependencies** |
+| Section templates | `registry/templates/01..08-*.html` | 8 drop-in, standalone sections (hero, bento, pricing, feature split, stats, testimonials, CTA, FAQ) — Kinetik tokens inline, Google Fonts only |
 | Interactive showcase | `index.html` | The human playground; embeds the same spec served at `/llms.txt` |
 
 ### Numbers that were measured, not asserted
@@ -48,5 +49,6 @@ Static output — point Vercel at the repo root, no build command, output dir `.
 
 - Grow FX to a full WebGL/three.js tier (heavy bundles permitted — deps are welcome).
 - Expand pairings to 60 and systems to 12 with full 50–950 coverage per system hue.
+- Ship the WebGL/three.js FX tier (heavy bundles permitted) and a GSAP motion-pack track.
 - Split `index.html`'s remaining inline payload (base64 artwork → CDN).
 - Replace CDN Tailwind with build-time atomic output.

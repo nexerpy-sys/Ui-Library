@@ -1,7 +1,7 @@
 {
   "$schema": "https://schemas.atelierkinetik.dev/registry.v1.json",
   "name": "Atelier Kinetik — AI-First Design & Motion Registry",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "released": "2026-11-22",
   "license": "Code MIT · Typography OFL (per-font, via Google Fonts) · Brand marks reserved",
   "summary": "60 curated Google Fonts, 24 studio pairings, 3 fluid clamp() type scales, 6 audited semantic light/dark token systems, hue-locked 50-950 WCAG 2.1 scales, 12 named motion laws, 12 production micro-interaction snippets and 16 dependency-free 60fps canvas hero backgrounds.",
@@ -14,7 +14,8 @@
     "interactive": "/index.html",
     "llmsTxt": "/llms.txt",
     "registryJson": "/registry.json",
-    "fxDirectory": "/registry/fx/"
+    "fxDirectory": "/registry/fx/",
+    "templatesDirectory": "/registry/templates/"
   },
   "usage": [
     "Fetch /llms.txt first for orientation, then pull only the assets you need from this manifest.",
@@ -2379,7 +2380,19 @@
       "conic-border-spin",
       "grain-overlay",
       "glass-hairline-panel",
-      "accordion-spring"
+      "accordion-spring",
+      "link-underline-sweep",
+      "dropdown-spring",
+      "tooltip-nudge",
+      "toast-action",
+      "count-up",
+      "typewriter-caret",
+      "gradient-text-pan",
+      "shimmer-load",
+      "shake-x",
+      "float-soft",
+      "ink-ripple",
+      "tab-glide"
     ]
   },
   "snippets": {
@@ -2478,6 +2491,102 @@
       "description": "Height animation via grid-template-rows 0fr→1fr — no measurement JS, spring easing, animates cleanly.",
       "language": "html",
       "code": "<div class=\"ak-acc\"><button class=\"ak-acc-toggle\" aria-expanded=\"false\">Motion laws <span aria-hidden=\"true\">+</span></button>\n  <div class=\"ak-acc-panel\"><div class=\"ak-acc-inner\">Kinetic snap governs entrances. Velocity whip governs exits.</div></div>\n</div>\n<style>\n  .ak-acc-toggle { width: 100%; display: flex; justify-content: space-between; gap: 1rem;\n    padding: 1rem 0; background: none; border: 0; color: #F4F2EC; cursor: pointer; text-align: left; }\n  .ak-acc-panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.5s cubic-bezier(0.16, 1, 0.3, 1); }\n  .ak-acc.open .ak-acc-panel { grid-template-rows: 1fr; }\n  .ak-acc-inner { overflow: hidden; min-height: 0; color: #8E8D8A; }\n  @media (prefers-reduced-motion: reduce) { .ak-acc-panel { transition: none; } }\n</style>\n<script>\n  document.querySelectorAll(\".ak-acc-toggle\").forEach((btn) => {\n    btn.addEventListener(\"click\", () => {\n      const item = btn.closest(\".ak-acc\");\n      item.classList.toggle(\"open\");\n      btn.setAttribute(\"aria-expanded\", String(item.classList.contains(\"open\")));\n    });\n  });\n</script>"
+    },
+    "link-underline-sweep": {
+      "id": "link-underline-sweep",
+      "name": "Link Underline Sweep",
+      "category": "typography",
+      "description": "Editorial link with a hairline that sweeps in from the left — for nav, footers, captions.",
+      "language": "css",
+      "code": ".ak-ulink {\n  position: relative; display: inline-block; color: inherit; text-decoration: none; padding-bottom: 2px;\n}\n.ak-ulink::after {\n  content: \"\"; position: absolute; left: 0; bottom: 0; height: 1.5px; width: 100%;\n  background: #FF3D00;\n  transform: scaleX(0); transform-origin: 100% 50%;\n  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);\n}\n.ak-ulink:hover::after, .ak-ulink:focus-visible::after { transform: scaleX(1); transform-origin: 0 50%; }\n@media (prefers-reduced-motion: reduce) { .ak-ulink::after { transition: none; } }"
+    },
+    "dropdown-spring": {
+      "id": "dropdown-spring",
+      "name": "Spring Dropdown",
+      "category": "navigation",
+      "description": "Menu that drops with a spring and staggered item fade — keyboard-dismissable with Escape.",
+      "language": "html",
+      "code": "<div class=\"ak-dd\">\n  <button class=\"ak-dd-toggle\" aria-expanded=\"false\" aria-haspopup=\"true\">Registry</button>\n  <div class=\"ak-dd-menu\" role=\"menu\">\n    <a role=\"menuitem\" href=\"#type\">Typography</a>\n    <a role=\"menuitem\" href=\"#color\">Color systems</a>\n    <a role=\"menuitem\" href=\"#motion\">Motion laws</a>\n  </div>\n</div>\n<style>\n  .ak-dd { position: relative; display: inline-block; }\n  .ak-dd-toggle { padding: 0.6rem 1rem; border: 1px solid rgba(244,242,236,0.24); border-radius: 0.6rem;\n    background: transparent; color: #F4F2EC; cursor: pointer; }\n  .ak-dd-menu {\n    position: absolute; top: calc(100% + 8px); left: 0; z-index: 70; min-width: 220px;\n    background: rgba(13,13,18,0.92); backdrop-filter: blur(14px);\n    border: 1px solid rgba(244,242,236,0.12); border-radius: 0.9rem; padding: 0.5rem;\n    opacity: 0; transform: translateY(-8px) scale(0.98); pointer-events: none;\n    transition: opacity 0.28s ease, transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);\n  }\n  .ak-dd.open .ak-dd-menu { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }\n  .ak-dd-menu a { display: block; padding: 0.55rem 0.75rem; border-radius: 0.55rem; color: #C9C7C0;\n    text-decoration: none; transition: background-color 0.2s, color 0.2s; }\n  .ak-dd-menu a:hover, .ak-dd-menu a:focus-visible { background: rgba(244,242,236,0.08); color: #F4F2EC; }\n  @media (prefers-reduced-motion: reduce) { .ak-dd-menu { transition: none; } }\n</style>\n<script>\n  document.querySelectorAll(\".ak-dd\").forEach((dd) => {\n    const toggle = dd.querySelector(\".ak-dd-toggle\");\n    const setOpen = (open) => { dd.classList.toggle(\"open\", open); toggle.setAttribute(\"aria-expanded\", String(open)); };\n    toggle.addEventListener(\"click\", () => setOpen(!dd.classList.contains(\"open\")));\n    document.addEventListener(\"click\", (e) => { if (!dd.contains(e.target)) setOpen(false); });\n    dd.addEventListener(\"keydown\", (e) => { if (e.key === \"Escape\") setOpen(false); });\n  });\n</script>"
+    },
+    "tooltip-nudge": {
+      "id": "tooltip-nudge",
+      "name": "Tooltip Nudge",
+      "category": "typography",
+      "description": "Hover/focus tooltip that nudges up into place — aria-describedby wired, keyboard visible.",
+      "language": "html",
+      "code": "<button class=\"ak-tip-host\" aria-describedby=\"ak-tip-1\">?</button>\n<span class=\"ak-tip\" role=\"tooltip\" id=\"ak-tip-1\">HSL ramp, hue-locked, WCAG-audited.</span>\n<style>\n  .ak-tip-host { width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(244,242,236,0.24);\n    background: transparent; color: #F4F2EC; cursor: help; }\n  .ak-tip {\n    position: absolute; z-index: 80; max-width: 240px; padding: 0.4rem 0.65rem;\n    background: #F4F2EC; color: #0E0E10; border-radius: 0.5rem; font-size: 12px; line-height: 1.35;\n    opacity: 0; transform: translateY(4px); pointer-events: none;\n    transition: opacity 0.2s ease, transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);\n  }\n  .ak-tip-host:hover + .ak-tip, .ak-tip-host:focus + .ak-tip, .ak-tip-host:focus-visible + .ak-tip { opacity: 1; transform: translateY(0); }\n  @media (prefers-reduced-motion: reduce) { .ak-tip { transition: none; } }\n</style>"
+    },
+    "toast-action": {
+      "id": "toast-action",
+      "name": "Toast with Action",
+      "category": "feedback",
+      "description": "Bottom toast with one action — token-copy confirmation pattern, queue-free, auto-dismiss.",
+      "language": "html",
+      "code": "<div class=\"ak-toast-zone\" aria-live=\"polite\"></div>\n<style>\n  .ak-toast-zone { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 120; display: grid; gap: 8px; }\n  .ak-toast { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0.6rem 0.6rem 1rem;\n    background: #F4F2EC; color: #0E0E10; border-radius: 0.8rem; font-size: 13px;\n    box-shadow: 0 10px 30px rgba(0,0,0,0.35); animation: ak-toast-in 0.35s cubic-bezier(0.34, 1.3, 0.64, 1); }\n  .ak-toast button { border: 0; background: #0E0E10; color: #F4F2EC; border-radius: 0.55rem;\n    padding: 0.35rem 0.7rem; cursor: pointer; font-size: 12px; }\n  @keyframes ak-toast-in { from { opacity: 0; transform: translateY(10px) scale(0.96); } }\n  @media (prefers-reduced-motion: reduce) { .ak-toast { animation: none; } }\n</style>\n<script>\n  function akToast(message, actionLabel, onAction) {\n    const zone = document.querySelector(\".ak-toast-zone\");\n    const el = document.createElement(\"div\");\n    el.className = \"ak-toast\";\n    const span = document.createElement(\"span\"); span.textContent = message; el.appendChild(span);\n    if (actionLabel) {\n      const btn = document.createElement(\"button\"); btn.textContent = actionLabel;\n      btn.addEventListener(\"click\", () => { onAction && onAction(); el.remove(); });\n      el.appendChild(btn);\n    }\n    zone.appendChild(el);\n    setTimeout(() => el.remove(), 4200);\n  }\n  // usage: akToast(\"llms.txt copied\", \"Undo\", () => restoreLast());\n</script>"
+    },
+    "count-up": {
+      "id": "count-up",
+      "name": "Count-Up on View",
+      "category": "scroll",
+      "description": "Numbers tally from 0 when scrolled into view — IntersectionObserver, ease-out, suffix support.",
+      "language": "html",
+      "code": "<span class=\"ak-count\" data-to=\"60\" data-suffix=\"+\">0</span>\n<script>\n  const easeOut = (t) => 1 - Math.pow(2, -10 * t);\n  const io = new IntersectionObserver((entries) => {\n    entries.forEach((entry) => {\n      if (!entry.isIntersecting) return;\n      const el = entry.target; io.unobserve(el);\n      const to = parseFloat(el.dataset.to || \"0\"), suffix = el.dataset.suffix || \"\", dur = 1400, t0 = performance.now();\n      const tick = (now) => {\n        const p = Math.min(1, (now - t0) / dur);\n        el.textContent = Math.round(to * (p >= 1 ? 1 : easeOut(p))) + suffix;\n        if (p < 1) requestAnimationFrame(tick);\n      };\n      if (matchMedia(\"(prefers-reduced-motion: reduce)\").matches) { el.textContent = to + suffix; return; }\n      requestAnimationFrame(tick);\n    });\n  }, { threshold: 0.6 });\n  document.querySelectorAll(\".ak-count\").forEach((el) => io.observe(el));\n</script>"
+    },
+    "typewriter-caret": {
+      "id": "typewriter-caret",
+      "name": "Typewriter Caret",
+      "category": "typography",
+      "description": "Character-by-character typing with a blinking block caret — reduced-motion renders instantly.",
+      "language": "html",
+      "code": "<span class=\"ak-type\" data-text=\"The agents never rest.\"></span><span class=\"ak-caret\" aria-hidden=\"true\"></span>\n<style>\n  .ak-caret { display: inline-block; width: 0.55em; height: 1.05em; background: #FF3D00;\n    vertical-align: -0.12em; margin-left: 2px; animation: ak-blink 1.05s steps(1) infinite; }\n  @keyframes ak-blink { 50% { opacity: 0; } }\n</style>\n<script>\n  document.querySelectorAll(\".ak-type\").forEach((el) => {\n    const text = el.dataset.text || \"\";\n    if (matchMedia(\"(prefers-reduced-motion: reduce)\").matches) { el.textContent = text; return; }\n    let i = 0;\n    const step = () => { el.textContent = text.slice(0, i++); if (i <= text.length) setTimeout(step, 42); };\n    step();\n  });\n</script>"
+    },
+    "gradient-text-pan": {
+      "id": "gradient-text-pan",
+      "name": "Gradient Text Pan",
+      "category": "typography",
+      "description": "Background-clip gradient that pans across display type — slow, cinematic, prefix-safe.",
+      "language": "css",
+      "code": ".ak-gradpan {\n  background-image: linear-gradient(110deg, #F4F2EC 0%, #F4F2EC 30%, #FF6A21 45%, #E5A93C 52%, #F4F2EC 64%, #F4F2EC 100%);\n  background-size: 280% 100%;\n  -webkit-background-clip: text; background-clip: text;\n  -webkit-text-fill-color: transparent; color: transparent;\n  animation: ak-gradpan 5.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;\n}\n@keyframes ak-gradpan { 0% { background-position: 120% 50%; } 55%, 100% { background-position: -20% 50%; } }\n@media (prefers-reduced-motion: reduce) { .ak-gradpan { animation: none; background-position: 50% 50%; } }"
+    },
+    "shimmer-load": {
+      "id": "shimmer-load",
+      "name": "Shimmer Skeleton",
+      "category": "feedback",
+      "description": "Skeleton shimmer for loading states — masked linear sweep over surface blocks.",
+      "language": "css",
+      "code": ".ak-skel {\n  position: relative; overflow: hidden; border-radius: 0.5rem;\n  background: #12121A;\n}\n.ak-skel::after {\n  content: \"\"; position: absolute; inset: 0; transform: translateX(-100%);\n  background: linear-gradient(100deg, transparent 20%, rgba(244,242,236,0.09) 50%, transparent 80%);\n  animation: ak-shimmer 1.35s infinite;\n}\n@keyframes ak-shimmer { to { transform: translateX(100%); } }\n@media (prefers-reduced-motion: reduce) { .ak-skel::after { animation: none; } }"
+    },
+    "shake-x": {
+      "id": "shake-x",
+      "name": "Error Shake",
+      "category": "feedback",
+      "description": "Horizontal shake for invalid input — one-shot, resets afterwards, reduced-motion safe.",
+      "language": "css",
+      "code": "@keyframes ak-shake {\n  10%, 90% { transform: translateX(-1px); }\n  20%, 80% { transform: translateX(2px); }\n  30%, 50%, 70% { transform: translateX(-4px); }\n  40%, 60% { transform: translateX(4px); }\n}\n.ak-shake { animation: ak-shake 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }\n@media (prefers-reduced-motion: reduce) { .ak-shake { animation: none; outline: 2px solid #F87171; } }"
+    },
+    "float-soft": {
+      "id": "float-soft",
+      "name": "Soft Float Idle",
+      "category": "decorative",
+      "description": "Gentle vertical idle float for decorative elements — ±6px, 4.2s, out-of-phase via delay.",
+      "language": "css",
+      "code": "@keyframes ak-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }\n.ak-float { animation: ak-float 4.2s ease-in-out infinite; }\n.ak-float-delay { animation-delay: -2.1s; }\n@media (prefers-reduced-motion: reduce) { .ak-float { animation: none; } }"
+    },
+    "ink-ripple": {
+      "id": "ink-ripple",
+      "name": "Ink Ripple Button",
+      "category": "control",
+      "description": "Click-position ink ripple — canvas-free, span + transform, auto-cleans itself.",
+      "language": "html",
+      "code": "<button class=\"ak-ripple\">Publish update</button>\n<style>\n  .ak-ripple { position: relative; overflow: hidden; padding: 0.9rem 1.8rem; border: 0; border-radius: 0.75rem;\n    background: #FF3D00; color: #fff; font-weight: 600; cursor: pointer; }\n  .ak-ripple span.ak-rip {\n    position: absolute; border-radius: 50%; background: rgba(255,255,255,0.5);\n    transform: scale(0); animation: ak-rip 0.55s ease-out forwards; pointer-events: none;\n  }\n  @keyframes ak-rip { to { transform: scale(2.6); opacity: 0; } }\n  @media (prefers-reduced-motion: reduce) { .ak-ripple span.ak-rip { animation: none; display: none; } }\n</style>\n<script>\n  document.querySelectorAll(\".ak-ripple\").forEach((btn) => {\n    btn.addEventListener(\"pointerdown\", (e) => {\n      if (matchMedia(\"(prefers-reduced-motion: reduce)\").matches) return;\n      const r = btn.getBoundingClientRect();\n      const d = Math.max(r.width, r.height);\n      const rip = document.createElement(\"span\");\n      rip.className = \"ak-rip\";\n      rip.style.width = rip.style.height = d + \"px\";\n      rip.style.left = (e.clientX - r.left - d / 2) + \"px\";\n      rip.style.top = (e.clientY - r.top - d / 2) + \"px\";\n      btn.appendChild(rip);\n      rip.addEventListener(\"animationend\", () => rip.remove());\n    });\n  });\n</script>"
+    },
+    "tab-glide": {
+      "id": "tab-glide",
+      "name": "Gliding Tab Indicator",
+      "category": "navigation",
+      "description": "Segmented tabs with a sliding pill indicator — measures with offsetLeft/Width, no layout thrash.",
+      "language": "html",
+      "code": "<div class=\"ak-tabs\" role=\"tablist\">\n  <span class=\"ak-tabs-pill\" aria-hidden=\"true\"></span>\n  <button role=\"tab\" aria-selected=\"true\" class=\"ak-tab is-active\">Type</button>\n  <button role=\"tab\" aria-selected=\"false\" class=\"ak-tab\">Color</button>\n  <button role=\"tab\" aria-selected=\"false\" class=\"ak-tab\">Motion</button>\n</div>\n<style>\n  .ak-tabs { position: relative; display: inline-flex; gap: 2px; padding: 4px; border-radius: 9999px;\n    background: #0D0D12; border: 1px solid rgba(244,242,236,0.10); }\n  .ak-tab { position: relative; z-index: 1; border: 0; background: transparent; color: #8E8D8A;\n    padding: 0.45rem 1.1rem; border-radius: 9999px; cursor: pointer; transition: color 0.25s; }\n  .ak-tab.is-active { color: #070709; }\n  .ak-tabs-pill { position: absolute; top: 4px; left: 4px; height: calc(100% - 8px); border-radius: 9999px;\n    background: #F4F2EC; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), width 0.4s cubic-bezier(0.16, 1, 0.3, 1); }\n  @media (prefers-reduced-motion: reduce) { .ak-tabs-pill { transition: none; } }\n</style>\n<script>\n  document.querySelectorAll(\".ak-tabs\").forEach((tabs) => {\n    const pill = tabs.querySelector(\".ak-tabs-pill\");\n    const move = (tab) => { pill.style.width = tab.offsetWidth + \"px\"; pill.style.transform = \"translateX(\" + (tab.offsetLeft - 4) + \"px)\"; };\n    tabs.querySelectorAll(\".ak-tab\").forEach((tab) => {\n      tab.addEventListener(\"click\", () => {\n        tabs.querySelectorAll(\".ak-tab\").forEach((t) => { t.classList.toggle(\"is-active\", t === tab); t.setAttribute(\"aria-selected\", String(t === tab)); });\n        move(tab);\n      });\n    });\n    move(tabs.querySelector(\".ak-tab.is-active\"));\n  });\n</script>"
     }
   },
   "fx": [
@@ -2735,6 +2844,64 @@
       "fps": 60,
       "adaptiveQuality": true,
       "reducedMotionSafe": true,
+      "dependencies": "none"
+    }
+  ],
+  "templates": [
+    {
+      "id": "hero-masked-rise",
+      "name": "Masked-Rise Hero",
+      "file": "registry/templates/01-hero-masked-rise.html",
+      "bestFor": "Display-first heroes — giant Syne line + serif-italic counterline, dual CTA, pure CSS orbit rings",
+      "dependencies": "none (Google Fonts only)"
+    },
+    {
+      "id": "bento-grid",
+      "name": "Bento Grid",
+      "file": "registry/templates/02-bento-grid.html",
+      "bestFor": "Feature overview sections — 6/12-col bento, radial spotlight hover, responsive collapse",
+      "dependencies": "none (Google Fonts only)"
+    },
+    {
+      "id": "pricing-tiers",
+      "name": "Pricing Tiers",
+      "file": "registry/templates/03-pricing-tiers.html",
+      "bestFor": "3-tier pricing with gold 'most chosen' crest column and mono feature lists",
+      "dependencies": "none (Google Fonts only)"
+    },
+    {
+      "id": "feature-split",
+      "name": "Feature Split (Doctrine)",
+      "file": "registry/templates/04-feature-split.html",
+      "bestFor": "Editorial 50/50 — serif manifesto + checklist vs mono spec sheet card",
+      "dependencies": "none (Google Fonts only)"
+    },
+    {
+      "id": "stats-bar",
+      "name": "Stats Bar",
+      "file": "registry/templates/05-stats-bar.html",
+      "bestFor": "Four-metric strip with IntersectionObserver ease-out count-up, hairline-divided",
+      "dependencies": "none"
+    },
+    {
+      "id": "testimonial-grid",
+      "name": "Testimonial Grid",
+      "file": "registry/templates/06-testimonial-grid.html",
+      "bestFor": "Six short quotes in hairline cells — serif italics, mono avatars",
+      "dependencies": "none (Google Fonts only)"
+    },
+    {
+      "id": "cta-band",
+      "name": "CTA Band",
+      "file": "registry/templates/07-cta-band.html",
+      "bestFor": "Full-bleed obsidian band with flame radial glows — one decision, one button",
+      "dependencies": "none (Google Fonts only)"
+    },
+    {
+      "id": "faq-accordion",
+      "name": "FAQ Accordion",
+      "file": "registry/templates/08-faq-accordion.html",
+      "bestFor": "Accessible FAQ — button/aria-expanded, grid-rows height animation, keyboard friendly",
       "dependencies": "none"
     }
   ],

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<!-- Atelier Kinetik · Template 07 · CTA Band — full-bleed flame-on-obsidian call to action. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kinetik Template — CTA Band</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#070709; --ink:#F4F2EC; --muted:#8E8D8A; --flame:#FF3D00; --line-strong:rgba(244,242,236,.24); --snap:cubic-bezier(.16,1,.3,1); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); font-family:"Hanken Grotesk", system-ui, sans-serif; -webkit-font-smoothing:antialiased; }
+  .f-display{font-family:"Syne",sans-serif;letter-spacing:-.03em}
+  .f-serif{font-family:"Instrument Serif", Georgia, serif}
+  .f-mono{font-family:"JetBrains Mono", ui-monospace, monospace}
+  .band { position:relative; overflow:hidden; padding:clamp(3.5rem,10vh,6rem) clamp(1.25rem,5vw,4rem);
+    border-top:1px solid var(--line-strong); border-bottom:1px solid var(--line-strong); }
+  .band::before { content:""; position:absolute; inset:0;
+    background:radial-gradient(70% 120% at 15% 50%, rgba(255,61,0,.22), transparent 55%),
+               radial-gradient(60% 120% at 90% 50%, rgba(229,169,60,.12), transparent 55%); }
+  .inner { position:relative; max-width:1200px; margin:0 auto; display:flex; flex-wrap:wrap;
+    align-items:center; justify-content:space-between; gap:2rem; }
+  h2 { font-size:clamp(2.2rem,6.5vw,4.6rem); line-height:.95; font-weight:800; text-transform:uppercase; color:var(--ink); }
+  h2 .serif { font-family:"Instrument Serif",serif; font-weight:400; font-style:italic; text-transform:none; color:var(--flame); }
+  .k { font-size:10px; letter-spacing:.22em; text-transform:uppercase; color:var(--muted); margin-bottom:1rem; }
+  .cta { display:inline-flex; align-items:center; gap:.8rem; background:var(--flame); color:#fff; text-decoration:none;
+    font-weight:600; font-size:1.05rem; padding:1.15rem 2rem; border-radius:9999px; white-space:nowrap;
+    transition:background-color .35s, box-shadow .35s; }
+  .cta:hover { background:#FF5A26; box-shadow:0 0 0 6px rgba(255,61,0,.18), 0 18px 50px -12px rgba(255,61,0,.7); }
+  .cta svg { transition:transform .4s var(--snap); } .cta:hover svg { transform:translate(3px,3px); }
+  .note { position:relative; margin-top:1.5rem; color:var(--muted); font-size:.8rem; }
+</style>
+</head>
+<body>
+<div class="band" role="region" aria-label="Call to action">
+  <div class="inner">
+    <div>
+      <p class="k f-mono">Begin the draft</p>
+      <h2 class="f-display">Ship slop-free<br><span class="serif">tonight.</span></h2>
+      <p class="note">Free. Open. One fetch — /llms.txt — and your agent knows the whole studio.</p>
+    </div>
+    <a class="cta" href="/llms.txt">Copy the manifest
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+    </a>
+  </div>
+</div>
+</body>
+</html>

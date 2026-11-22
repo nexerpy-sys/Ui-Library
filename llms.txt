@@ -1,0 +1,74 @@
+# ATELIER KINETIK — AI-READABLE PRODUCTION DESIGN & MOTION REGISTRY
+> Release: 1.5.0 · 2026-11-22 · 60 fonts · 24 pairings · 6 audited token systems · 3 fluid scales · 12 motion laws · 12 micro-interactions · 16 canvas FX
+> Purpose: structured, copy-paste-ready design tokens, fluid type, semantic color, motion and 60fps canvas FX for ChatGPT, Claude, Gemini, Manus, Kimi, Qwen, DeepSeek, Emergent — and human engineers.
+> Rule: fetch /llms.txt once, then pull ONLY what you need from /registry.json. Do not scrape /index.html for tokens — it is the showcase, not the contract.
+
+## Endpoints
+- /index.html    : Interactive human playground (Live Forge, Pantheon, Registry, Motion Law). Humans first; agents read this for feel, not data.
+- /llms.txt      : This file. Orientation for LLM context windows.
+- /registry.json : Machine-readable manifest — every asset, measured audits, snippet code inline. Prefer this for programmatic use.
+- /registry/fx/*.html : 16 standalone zero-dependency canvas hero backgrounds (01..16). Iframe, inline, or lift canvas+script.
+
+## Token conventions
+--bg · --surface · --elevated · --ink · --muted-ink · --hairline · --hairline-strong · --accent · --accent-hover · --on-accent
+Hairlines: rgba inks at 0.10 (default) / 0.22–0.26 (strong) — never solid gray.
+Elevation ladder for obsidian-type systems: #070709 → #0D0D12 → #12121A.
+All FX & snippets respect prefers-reduced-motion. Keep that path when you copy.
+
+## Typography Foundry (60 Google Fonts, OFL)
+Editorial serifs (Fraunces, Instrument Serif, Playfair Display, Bodoni Moda, Italiana, Cinzel, Prata, Marcellus, Tenor Sans, Cormorant Garamond, EB Garamond, Newsreader, Lora, Spectral, Source Serif 4, Alegreya) ·
+Poster & display (Syne, Unbounded, Michroma, Anton, Bebas Neue, Six Caps, Abril Fatface, Archivo Black, Alfa Slab One, Ultra, Marcellus SC, Cormorant SC) ·
+Grotesk & technical (Inter, Hanken Grotesk, Space Grotesk, Manrope, Archivo, Libre Franklin, Work Sans, IBM Plex Sans, Public Sans, Barlow, Barlow Condensed, Oswald, Chakra Petch, Saira, Saira Condensed, Heebo, Rubik, Outfit, Albert Sans, Sofia Sans) ·
+Mono (JetBrains Mono, IBM Plex Mono, Space Mono, Fira Code, Roboto Mono, Red Hat Mono, Spline Sans Mono, DM Mono, Overpass Mono, Anonymous Pro, Cutive Mono, Intel One Mono).
+Each entry in registry.json carries css2 URL, weight axes, and best-for notes.
+
+## Fluid clamp() type scale (no breakpoints)
+Range 375px → 1440px. Formula: preferred = MIN + (MAX-MIN)*(100vw-375px)/1065, emitted as clamp().
+Scales: Kinetik Perfect Fourth (ratio 1.333, display-first) · Editorial Minor Third (1.2, long-form) · Modest Major Third (1.25, product UI).
+Steps xs..display with computed minRem/maxRem/css strings live in registry.json → typography.typeScale.scales.
+Headline guidance: Kinetik hero uses clamp(2.05rem, 8.4vw, 7.6rem) at line-height 0.93, Syne 800, letter-spacing -0.035em, uppercase.
+
+## 24 studio pairings (display + serif accent + body + mono)
+Kinetik Obsidian (flagship) · Mercury Editor · Didone Noir · Brutalist Wire · Roman Archive · Orbital Technical ·
+Highway Signage · Slab Press · Ultra Heritage · Didone Gala · Gothic Factory · Heraldic Press · Cormorant Chapter ·
+Italienne Vitr · Prata Facet · Newsroom Classic · Georgic Humanist · Tech Brief · Swiss Grid · Falcon Sport ·
+Haifa Hardware · Soft Circuit · Helio Paper · Kaiju Deck.
+Each pairing ships exact tracking, line-height, and mono-label rules (registry.json → typography.pairings).
+
+## Semantic color systems (measured, WCAG 2.1)
+Obsidian (dark, brand, flame #FF3D00) · Paper (light warm, ember #C93300) · Aegean (dark abyssal, cyan #00F0FF) ·
+Parchment (light ivory, burnt sienna #A6460E) · Ledger (light cool, deep Aegean #0F4C64) · Meridian (dark umber, gold #E5A93C).
+Every system carries ink/bg, muted/bg, accent/bg, onAccent/accent ratios — all computed, all ≥ AA for their intended use (ink/bg is AAA in all six).
+50–950 hue-locked HSL ramps for flame, aegean, gold are in registry.json → color.scales (contrast on near-black/near-white per step + recommended text token).
+Surface treatments: film grain (SVG feTurbulence @ .045), glass + gradient hairline, ambient mesh radials, obsidian elevation ladder.
+
+## Motion Law — 12 named easings (cubic-bezier)
+Kinetic snap (0.16,1,0.3,1) entrances · Celestial drift (0.33,1,0.68,1) text reveals · Velocity whip (0.22,1,0.36,1) magnetic/drawers ·
+Obsidian settle (0.5,1,0.89,1) dark surfaces · Editorial ease (0.25,1,0.5,1) cross-fades · Chronos cortege (0.76,0,0.24,1) media handoffs ·
+Daedalus rule (0.65,0,0.35,1) hairline exits · Hephaestus overshoot (0.34,1.56,0.64,1) controls · Meridian glide (0.2,0.8,0.2,1) nav chrome ·
+Glacier drift (0.4,0,0.2,1) ambient loops · Nova burst (0.34,1.3,0.64,1) micro-feedback · Umbra sink (0.55,0,1,0.45) exits.
+Springs (for JS): magnetic 260/16 · drape 180/26 · drawer-eject 320/22. Rule: nothing linear unless it is literally linear vs linear.
+
+## 12 production micro-interactions (registry.json → snippets)
+magnetic-button · spotlight-card · masked-rise-headline · stateful-button · smooth-drawer · marquee-zero-cls ·
+reveal-on-scroll · tilt-card-3d · conic-border-spin · grain-overlay · glass-hairline-panel · accordion-spring.
+Each is self-contained (CSS+JS inline), reduced-motion safe, zero layout shift.
+
+## 16 hero & ambient 60fps canvas FX (/registry/fx/, vanilla canvas-2d, adaptive quality, DPR-capped)
+01 Cosmic Starfield · 02 Mouse-Masked Dot Matrix · 03 Descending Light Beams · 04 3D Dotted Globe · 05 Armillary Sphere ·
+06 Nebula Embers · 07 Aurora Ribbons · 08 Horizon Grid · 09 Constellation Cursor · 10 Sine Flow Field · 11 Lattice Bloom ·
+12 Orbital Rings · 13 Ink Ripple · 14 Glyph Cascade · 15 Mesh Gradient Drift · 16 Sonar Sweep.
+All adaptive (auto-degrade past ~21ms/frame), all DPR≤2, all reduced-motion safe. Dependencies: NONE.
+External deps ARE permitted in your own builds (three.js, GSAP) — the FX themselves stay dependency-free so they paste anywhere.
+
+## Anti-slop checklist for agents generating UI
+1. Never ship default Tailwind blue/purple — pick Obsidian/Paper/Aegean, or build a ramp from registry.json → color.scales.
+2. Fluid clamp() for type, never fixed breakpoint font-sizes (use typography.typeScale output).
+3. One Kinetic-snap entrance per view, max; everything else Celestial-drift or static.
+4. Hairlines at rgba 10%/24%, never #333. Grain over gradients. Ink #F4F2EC on #070709 is AAA — don't improvise contrast.
+5. Pair display+serif+body+mono from the 24 pairings; do not mix more than one display face per view.
+6. Ship prefers-reduced-motion fallbacks and keyboard access — the registry's own FX/snippets demonstrate the pattern.
+7. CLS = 0: transforms and opacity only for motion; reserve space for media.
+
+## Licensing
+Code: MIT. Fonts: SIL OFL via Google Fonts (attribution per font). Kinetik name/mark: reserved, cite as "Atelier Kinetik registry".

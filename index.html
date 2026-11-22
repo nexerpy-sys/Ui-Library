@@ -110,6 +110,232 @@
       color: var(--ink);
       background-color: rgba(244, 242, 236, 0.08);
     }
+
+    /* ---- Stylish hamburger + fullscreen kinetic index menu ---- */
+    html.menu-open, html.menu-open body { overflow: hidden; }
+
+    .icon-menu-btn {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      flex-shrink: 0;
+      border-radius: 9999px;
+      border: 1px solid var(--line-strong);
+      background: rgba(13, 13, 18, 0.55);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: var(--ink);
+      cursor: pointer;
+      transition: border-color 0.35s, color 0.35s, background-color 0.35s;
+    }
+    .icon-menu-btn:hover { border-color: var(--flame); color: var(--flame); }
+    .icon-menu-btn:focus-visible { outline: 2px solid var(--flame); outline-offset: 3px; }
+    .icon-menu-btn[aria-expanded="true"] {
+      border-color: var(--flame);
+      color: var(--flame);
+      background: rgba(255, 61, 0, 0.09);
+    }
+    .menu-lines { position: relative; display: block; width: 18px; height: 14px; }
+    .menu-lines span {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 1.6px;
+      border-radius: 2px;
+      background: currentColor;
+      transform-origin: center;
+      transition: transform 0.55s var(--snap), opacity 0.28s ease, top 0.55s var(--snap);
+    }
+    .menu-lines span:nth-child(1) { top: 0;      transform: rotate(0deg) scaleX(1); }
+    .menu-lines span:nth-child(2) { top: 6.2px;  transform: rotate(0deg) scaleX(0.66); }
+    .menu-lines span:nth-child(3) { top: 12.4px; transform: rotate(0deg) scaleX(0.4); }
+    .icon-menu-btn[aria-expanded="true"] .menu-lines span:nth-child(1) { top: 6.2px; transform: rotate(45deg) scaleX(1); }
+    .icon-menu-btn[aria-expanded="true"] .menu-lines span:nth-child(2) { top: 6.2px; transform: rotate(0deg) scaleX(0); opacity: 0; }
+    .icon-menu-btn[aria-expanded="true"] .menu-lines span:nth-child(3) { top: 6.2px; transform: rotate(-45deg) scaleX(1); }
+
+    .site-menu {
+      position: fixed;
+      inset: 0;
+      z-index: 40; /* under the glass header (50), above page content (10) */
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.4s ease, visibility 0s linear 0.4s;
+    }
+    .site-menu.open {
+      visibility: visible;
+      opacity: 1;
+      transition: opacity 0.45s var(--snap), visibility 0s linear 0s;
+    }
+    .menu-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(110% 70% at 88% -12%, rgba(255, 61, 0, 0.17), transparent 55%),
+        radial-gradient(90% 70% at -12% 112%, rgba(124, 155, 255, 0.13), transparent 58%),
+        rgba(7, 7, 9, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    .menu-bg::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(to right, var(--line) 1px, transparent 1px);
+      background-size: 25% 100%;
+      opacity: 0.55;
+      mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent);
+      -webkit-mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 86%, transparent);
+    }
+    .menu-watermark {
+      position: absolute;
+      right: clamp(0.4rem, 2.5vw, 2rem);
+      top: 50%;
+      transform: translateY(-50%);
+      writing-mode: vertical-rl;
+      font-family: "Syne", sans-serif;
+      font-weight: 800;
+      font-size: clamp(3rem, 12vh, 6.5rem);
+      line-height: 1;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(244, 242, 236, 0.16);
+      user-select: none;
+      pointer-events: none;
+      display: none;
+    }
+    @media (min-width: 480px) { .menu-watermark { display: block; } }
+    @media (min-width: 768px) { .site-menu { display: none; } }
+
+    .menu-inner {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 5rem 1.25rem 1.5rem;
+    }
+    @media (min-width: 640px) { .menu-inner { padding: 5.5rem 2.5rem 2rem; } }
+
+    .menu-meta-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px solid var(--line-strong);
+    }
+    .menu-meta-label {
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      color: var(--muted);
+    }
+    .menu-meta-label strong { color: var(--flame); font-weight: 500; }
+
+    .menu-nav { display: flex; flex-direction: column; }
+    .menu-link {
+      position: relative;
+      display: flex;
+      align-items: baseline;
+      gap: clamp(0.85rem, 4vw, 2rem);
+      padding: clamp(0.7rem, 2.1vh, 1.3rem) 0.25rem;
+      border-bottom: 1px solid var(--line);
+      text-decoration: none;
+      color: var(--ink);
+      border-radius: 4px;
+    }
+    .menu-link:focus-visible { outline: 2px solid var(--flame); outline-offset: -2px; }
+    .menu-link-num {
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--flame);
+      flex-shrink: 0;
+    }
+    .menu-link-title {
+      display: block;
+      font-family: "Syne", sans-serif;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: -0.03em;
+      line-height: 0.98;
+      font-size: clamp(1.9rem, 8.6vw, 3.6rem);
+      transition: color 0.35s ease, transform 0.6s var(--snap);
+    }
+    .menu-link-note {
+      display: block;
+      margin-top: 0.35rem;
+      font-family: "Instrument Serif", Georgia, serif;
+      font-style: italic;
+      color: var(--muted);
+      font-size: clamp(0.78rem, 2.5vw, 0.95rem);
+      transition: color 0.35s ease;
+    }
+    .menu-link-arrow {
+      margin-left: auto;
+      align-self: center;
+      flex-shrink: 0;
+      color: var(--muted);
+      transition: transform 0.5s var(--snap), color 0.35s ease;
+    }
+    .menu-link:hover .menu-link-title,
+    .menu-link:focus-visible .menu-link-title { color: var(--flame); transform: translateX(clamp(0.35rem, 2vw, 1.1rem)); }
+    .menu-link:hover .menu-link-note,
+    .menu-link:focus-visible .menu-link-note { color: var(--ink); }
+    .menu-link:hover .menu-link-arrow,
+    .menu-link:focus-visible .menu-link-arrow { color: var(--flame); transform: translate(6px, -6px); }
+
+    /* Staggered reveal — transform/opacity only, zero CLS */
+    .site-menu .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.5s ease, transform 0.85s var(--snap);
+      transition-delay: 0ms;
+    }
+    .site-menu.open .reveal {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: calc(90ms + var(--i, 0) * 75ms);
+    }
+
+    .menu-actions { display: flex; flex-wrap: wrap; gap: 0.65rem; margin-top: auto; padding-top: 1.35rem; }
+    .menu-endpoints {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      margin-top: 1.1rem;
+      border-top: 1px solid var(--line-strong);
+      padding-top: 1rem;
+      gap: 0.75rem;
+    }
+    .menu-endpoint + .menu-endpoint { border-left: 1px solid var(--line); padding-left: 0.75rem; }
+    .menu-endpoint-k {
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 8.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+    }
+    .menu-endpoint-v {
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 10.5px;
+      color: var(--ink);
+      margin-top: 0.3rem;
+      word-break: break-word;
+    }
+    .menu-endpoint-v em { color: var(--flame); font-style: normal; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .site-menu, .site-menu .reveal, .menu-link-title, .menu-link-arrow, .menu-link-num, .menu-lines span {
+        transition: none !important;
+      }
+    }
     .btn-flame {
       background: var(--flame);
       color: #fff;
@@ -319,8 +545,93 @@
         </svg>
         <span>Replay<span class="hidden sm:inline"> genesis</span></span>
       </button>
+
+      <!-- Stylish hamburger — mobile &lt;md only (desktop uses the glass pill) -->
+      <button type="button" id="menu-toggle" data-build="box" class="icon-menu-btn md:hidden" aria-expanded="false" aria-controls="site-menu" aria-label="Open menu">
+        <span class="menu-lines" aria-hidden="true"><span></span><span></span><span></span></span>
+      </button>
     </div>
   </header>
+
+  <!-- Fullscreen kinetic index menu -->
+  <div id="site-menu" class="site-menu" role="dialog" aria-modal="true" aria-label="Site index" aria-hidden="true">
+    <div class="menu-bg" aria-hidden="true"></div>
+    <div class="menu-watermark" aria-hidden="true">Kinetik</div>
+    <div class="menu-inner mx-auto w-full max-w-[1440px]">
+
+      <div class="menu-meta-top reveal" style="--i: 0">
+        <span class="menu-meta-label">Atelier <strong>Kinetik</strong> — Index</span>
+        <span class="menu-meta-label flex items-center gap-2"><span class="live-dot" aria-hidden="true"></span> Live registry</span>
+      </div>
+
+      <nav class="menu-nav" aria-label="Sections">
+        <a href="#forge" data-scroll="#forge" class="menu-link reveal" style="--i: 1">
+          <span class="menu-link-num">01</span>
+          <span class="menu-link-body">
+            <span class="menu-link-title">The Forge</span>
+            <span class="menu-link-note">Live UI, built, dissolved &amp; rebuilt in real time</span>
+          </span>
+          <svg class="menu-link-arrow h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M7 17 17 7" /><path d="M8 7h9v9" />
+          </svg>
+        </a>
+
+        <a href="#pantheon" data-scroll="#pantheon" class="menu-link reveal" style="--i: 2">
+          <span class="menu-link-num">02</span>
+          <span class="menu-link-body">
+            <span class="menu-link-title">Pantheon</span>
+            <span class="menu-link-note">Eight autonomous agents, zero HUD, zero CLS</span>
+          </span>
+          <svg class="menu-link-arrow h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M7 17 17 7" /><path d="M8 7h9v9" />
+          </svg>
+        </a>
+
+        <a href="#registry" data-scroll="#registry" class="menu-link reveal" style="--i: 3">
+          <span class="menu-link-num">03</span>
+          <span class="menu-link-body">
+            <span class="menu-link-title">Registry</span>
+            <span class="menu-link-note">Copy-ready tokens, type scales &amp; WCAG color systems</span>
+          </span>
+          <svg class="menu-link-arrow h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M7 17 17 7" /><path d="M8 7h9v9" />
+          </svg>
+        </a>
+
+        <a href="#easings" data-scroll="#easings" class="menu-link reveal" style="--i: 4">
+          <span class="menu-link-num">04</span>
+          <span class="menu-link-body">
+            <span class="menu-link-title">Motion Law</span>
+            <span class="menu-link-note">Three bezier curves that govern everything</span>
+          </span>
+          <svg class="menu-link-arrow h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M7 17 17 7" /><path d="M8 7h9v9" />
+          </svg>
+        </a>
+      </nav>
+
+      <div class="menu-actions reveal" style="--i: 5">
+        <button type="button" id="menu-copy-llms" class="chip f-mono rounded-full px-4 py-2.5 text-[10px] uppercase tracking-[0.16em]">⧉ Copy llms.txt for your agent</button>
+        <button type="button" id="menu-replay" class="chip f-mono rounded-full px-4 py-2.5 text-[10px] uppercase tracking-[0.16em]">↻ Replay genesis</button>
+      </div>
+
+      <div class="menu-endpoints reveal" style="--i: 6" aria-label="AI-readable endpoints">
+        <div class="menu-endpoint">
+          <p class="menu-endpoint-k">LLM index</p>
+          <p class="menu-endpoint-v">/llms<em>.txt</em></p>
+        </div>
+        <div class="menu-endpoint">
+          <p class="menu-endpoint-k">Manifest</p>
+          <p class="menu-endpoint-v">/registry<em>.json</em></p>
+        </div>
+        <div class="menu-endpoint">
+          <p class="menu-endpoint-k">Easing</p>
+          <p class="menu-endpoint-v">cubic-bezier(.16,1,.3,1)</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
 
   <main class="relative z-10">
     <!-- ========================================================== 00 HERO -->
@@ -741,19 +1052,79 @@ interactions: 180 · hero scenes: 16</pre>
       }
 
       const LLMS_SPEC = `# ATELIER KINETIK — AI-READABLE PRODUCTION DESIGN & MOTION REGISTRY
-> Release: 1.4.0 (414 Production Assets · Zero Control HUD)
-> Purpose: Structured, zero-dependency design tokens, fluid typography scales, semantic color systems, 180 UI micro-interactions, and 16 hero backgrounds for ChatGPT, Claude, Gemini, and human engineers.
+> Release: 1.5.0 · 2026-11-22 · 60 fonts · 24 pairings · 6 audited token systems · 3 fluid scales · 12 motion laws · 12 micro-interactions · 16 canvas FX
+> Purpose: structured, copy-paste-ready design tokens, fluid type, semantic color, motion and 60fps canvas FX for ChatGPT, Claude, Gemini, Manus, Kimi, Qwen, DeepSeek, Emergent — and human engineers.
+> Rule: fetch /llms.txt once, then pull ONLY what you need from /registry.json. Do not scrape /index.html for tokens — it is the showcase, not the contract.
 
 ## Endpoints
-- /index.html    : Interactive human + AI registry
-- /llms.txt      : Concise Markdown guide for LLM context windows
-- /registry.json : Machine-readable JSON manifest
+- /index.html    : Interactive human playground (Live Forge, Pantheon, Registry, Motion Law). Humans first; agents read this for feel, not data.
+- /llms.txt      : This file. Orientation for LLM context windows.
+- /registry.json : Machine-readable manifest — every asset, measured audits, snippet code inline. Prefer this for programmatic use.
+- /registry/fx/*.html : 16 standalone zero-dependency canvas hero backgrounds (01..16). Iframe, inline, or lift canvas+script.
 
-## Inventory Summary
-- Typography Foundry: 60 Curated Google Fonts + Fluid clamp() CSS Type Scale Compiler + 24 Studio Pairings
-- Semantic Color Systems: 60 Light & Dark Token Sets + 30 Subtle Production Surfaces + 50-950 WCAG 2.1 Contrast Auditor
-- Production UI Motion: 180 Real UI Micro-Interactions + 44 Editorial & Scroll Primitives + Cubic-Bezier Studio
-- Hero & Ambient FX: 16 Lightweight 60fps Hero Backgrounds (3D Dotted Globe, Mouse-Masked Dot Matrix, Descending Light Beams)`;
+## Token conventions
+--bg · --surface · --elevated · --ink · --muted-ink · --hairline · --hairline-strong · --accent · --accent-hover · --on-accent
+Hairlines: rgba inks at 0.10 (default) / 0.22–0.26 (strong) — never solid gray.
+Elevation ladder for obsidian-type systems: #070709 → #0D0D12 → #12121A.
+All FX & snippets respect prefers-reduced-motion. Keep that path when you copy.
+
+## Typography Foundry (60 Google Fonts, OFL)
+Editorial serifs (Fraunces, Instrument Serif, Playfair Display, Bodoni Moda, Italiana, Cinzel, Prata, Marcellus, Tenor Sans, Cormorant Garamond, EB Garamond, Newsreader, Lora, Spectral, Source Serif 4, Alegreya) ·
+Poster & display (Syne, Unbounded, Michroma, Anton, Bebas Neue, Six Caps, Abril Fatface, Archivo Black, Alfa Slab One, Ultra, Marcellus SC, Cormorant SC) ·
+Grotesk & technical (Inter, Hanken Grotesk, Space Grotesk, Manrope, Archivo, Libre Franklin, Work Sans, IBM Plex Sans, Public Sans, Barlow, Barlow Condensed, Oswald, Chakra Petch, Saira, Saira Condensed, Heebo, Rubik, Outfit, Albert Sans, Sofia Sans) ·
+Mono (JetBrains Mono, IBM Plex Mono, Space Mono, Fira Code, Roboto Mono, Red Hat Mono, Spline Sans Mono, DM Mono, Overpass Mono, Anonymous Pro, Cutive Mono, Intel One Mono).
+Each entry in registry.json carries css2 URL, weight axes, and best-for notes.
+
+## Fluid clamp() type scale (no breakpoints)
+Range 375px → 1440px. Formula: preferred = MIN + (MAX-MIN)*(100vw-375px)/1065, emitted as clamp().
+Scales: Kinetik Perfect Fourth (ratio 1.333, display-first) · Editorial Minor Third (1.2, long-form) · Modest Major Third (1.25, product UI).
+Steps xs..display with computed minRem/maxRem/css strings live in registry.json → typography.typeScale.scales.
+Headline guidance: Kinetik hero uses clamp(2.05rem, 8.4vw, 7.6rem) at line-height 0.93, Syne 800, letter-spacing -0.035em, uppercase.
+
+## 24 studio pairings (display + serif accent + body + mono)
+Kinetik Obsidian (flagship) · Mercury Editor · Didone Noir · Brutalist Wire · Roman Archive · Orbital Technical ·
+Highway Signage · Slab Press · Ultra Heritage · Didone Gala · Gothic Factory · Heraldic Press · Cormorant Chapter ·
+Italienne Vitr · Prata Facet · Newsroom Classic · Georgic Humanist · Tech Brief · Swiss Grid · Falcon Sport ·
+Haifa Hardware · Soft Circuit · Helio Paper · Kaiju Deck.
+Each pairing ships exact tracking, line-height, and mono-label rules (registry.json → typography.pairings).
+
+## Semantic color systems (measured, WCAG 2.1)
+Obsidian (dark, brand, flame #FF3D00) · Paper (light warm, ember #C93300) · Aegean (dark abyssal, cyan #00F0FF) ·
+Parchment (light ivory, burnt sienna #A6460E) · Ledger (light cool, deep Aegean #0F4C64) · Meridian (dark umber, gold #E5A93C).
+Every system carries ink/bg, muted/bg, accent/bg, onAccent/accent ratios — all computed, all ≥ AA for their intended use (ink/bg is AAA in all six).
+50–950 hue-locked HSL ramps for flame, aegean, gold are in registry.json → color.scales (contrast on near-black/near-white per step + recommended text token).
+Surface treatments: film grain (SVG feTurbulence @ .045), glass + gradient hairline, ambient mesh radials, obsidian elevation ladder.
+
+## Motion Law — 12 named easings (cubic-bezier)
+Kinetic snap (0.16,1,0.3,1) entrances · Celestial drift (0.33,1,0.68,1) text reveals · Velocity whip (0.22,1,0.36,1) magnetic/drawers ·
+Obsidian settle (0.5,1,0.89,1) dark surfaces · Editorial ease (0.25,1,0.5,1) cross-fades · Chronos cortege (0.76,0,0.24,1) media handoffs ·
+Daedalus rule (0.65,0,0.35,1) hairline exits · Hephaestus overshoot (0.34,1.56,0.64,1) controls · Meridian glide (0.2,0.8,0.2,1) nav chrome ·
+Glacier drift (0.4,0,0.2,1) ambient loops · Nova burst (0.34,1.3,0.64,1) micro-feedback · Umbra sink (0.55,0,1,0.45) exits.
+Springs (for JS): magnetic 260/16 · drape 180/26 · drawer-eject 320/22. Rule: nothing linear unless it is literally linear vs linear.
+
+## 12 production micro-interactions (registry.json → snippets)
+magnetic-button · spotlight-card · masked-rise-headline · stateful-button · smooth-drawer · marquee-zero-cls ·
+reveal-on-scroll · tilt-card-3d · conic-border-spin · grain-overlay · glass-hairline-panel · accordion-spring.
+Each is self-contained (CSS+JS inline), reduced-motion safe, zero layout shift.
+
+## 16 hero & ambient 60fps canvas FX (/registry/fx/, vanilla canvas-2d, adaptive quality, DPR-capped)
+01 Cosmic Starfield · 02 Mouse-Masked Dot Matrix · 03 Descending Light Beams · 04 3D Dotted Globe · 05 Armillary Sphere ·
+06 Nebula Embers · 07 Aurora Ribbons · 08 Horizon Grid · 09 Constellation Cursor · 10 Sine Flow Field · 11 Lattice Bloom ·
+12 Orbital Rings · 13 Ink Ripple · 14 Glyph Cascade · 15 Mesh Gradient Drift · 16 Sonar Sweep.
+All adaptive (auto-degrade past ~21ms/frame), all DPR≤2, all reduced-motion safe. Dependencies: NONE.
+External deps ARE permitted in your own builds (three.js, GSAP) — the FX themselves stay dependency-free so they paste anywhere.
+
+## Anti-slop checklist for agents generating UI
+1. Never ship default Tailwind blue/purple — pick Obsidian/Paper/Aegean, or build a ramp from registry.json → color.scales.
+2. Fluid clamp() for type, never fixed breakpoint font-sizes (use typography.typeScale output).
+3. One Kinetic-snap entrance per view, max; everything else Celestial-drift or static.
+4. Hairlines at rgba 10%/24%, never #333. Grain over gradients. Ink #F4F2EC on #070709 is AAA — don't improvise contrast.
+5. Pair display+serif+body+mono from the 24 pairings; do not mix more than one display face per view.
+6. Ship prefers-reduced-motion fallbacks and keyboard access — the registry's own FX/snippets demonstrate the pattern.
+7. CLS = 0: transforms and opacity only for motion; reserve space for media.
+
+## Licensing
+Code: MIT. Fonts: SIL OFL via Google Fonts (attribution per font). Kinetik name/mark: reserved, cite as "Atelier Kinetik registry".`
 
       /* ==============================================================
          3. POPULATE DYNAMIC DOM BEFORE SWARM SCANS
@@ -2369,6 +2740,71 @@ interactions: 180 · hero scenes: 16</pre>
       document.getElementById("nav-replay-btn").addEventListener("click", replayGenesis);
       document.getElementById("hero-replay-btn").addEventListener("click", replayGenesis);
       document.getElementById("footer-replay-btn").addEventListener("click", replayGenesis);
+
+      // Stylish hamburger — fullscreen kinetic index menu
+      const menuToggle = document.getElementById("menu-toggle");
+      const siteMenu = document.getElementById("site-menu");
+      let menuLastFocus = null;
+
+      function setMenu(open) {
+        siteMenu.classList.toggle("open", open);
+        menuToggle.setAttribute("aria-expanded", String(open));
+        menuToggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+        siteMenu.setAttribute("aria-hidden", String(!open));
+        document.documentElement.classList.toggle("menu-open", open);
+        if (open) {
+          menuLastFocus = document.activeElement;
+          const first = siteMenu.querySelector(".menu-link");
+          if (first) first.focus({ preventScroll: true });
+        } else if (menuLastFocus && menuLastFocus.focus) {
+          menuLastFocus.focus({ preventScroll: true });
+        }
+      }
+
+      menuToggle.addEventListener("click", () => {
+        setMenu(!siteMenu.classList.contains("open"));
+      });
+
+      // Close on backdrop click or on any in-menu section link (scroll is handled by the [data-scroll] delegator)
+      siteMenu.addEventListener("click", (e) => {
+        if (e.target === siteMenu || e.target.classList.contains("menu-bg")) setMenu(false);
+        else if (e.target.closest("[data-scroll]")) setMenu(false);
+      });
+
+      document.addEventListener("keydown", (e) => {
+        const isOpen = siteMenu.classList.contains("open");
+        if (e.key === "Escape" && isOpen) {
+          setMenu(false);
+          return;
+        }
+        if (e.key === "Tab" && isOpen) {
+          const focusables = [menuToggle, ...siteMenu.querySelectorAll("a[href], button")];
+          const first = focusables[0];
+          const last = focusables[focusables.length - 1];
+          if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      });
+
+      // Never leave the overlay stranded if the viewport crosses into desktop (md+) while open
+      const menuMq = window.matchMedia("(min-width: 768px)");
+      const onMenuMq = () => { if (menuMq.matches) setMenu(false); };
+      if (menuMq.addEventListener) menuMq.addEventListener("change", onMenuMq);
+      else if (menuMq.addListener) menuMq.addListener(onMenuMq);
+
+      document.getElementById("menu-copy-llms").addEventListener("click", () => {
+        copyText(LLMS_SPEC, "llms.txt");
+        setMenu(false);
+      });
+      document.getElementById("menu-replay").addEventListener("click", () => {
+        setMenu(false);
+        replayGenesis();
+      });
 
       // Copy llms.txt handlers
       document.getElementById("copy-llms-btn").addEventListener("click", () => copyText(LLMS_SPEC, "llms.txt"));

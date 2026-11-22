@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<!-- Atelier Kinetik · FX 16 · Sonar Sweep — radar with fading trail + persistent blips. Zero dependencies. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kinetik FX — Sonar Sweep</title>
+<style>html,body{margin:0;height:100%;background:#040A08;overflow:hidden}canvas{display:block;width:100vw;height:100vh}</style>
+</head>
+<body>
+<canvas id="c" aria-hidden="true"></canvas>
+<script>
+(() => {
+  const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W = 0, H = 0, CX = 0, CY = 0, RAD = 0, blips = [];
+  let fpsAcc = 0, fpsN = 0, degraded = false, blipTimer = 0, lastSweep = 0;
+  const TAU = Math.PI * 2;
+  const rand = (a, b) => a + Math.random() * (b - a);
+
+  function govern(dtMs) {
+    if (degraded) return;
+    fpsAcc += dtMs; fpsN++;
+    if (fpsN >= 120) { if (fpsAcc / fpsN > 21) degraded = true; fpsAcc = 0; fpsN = 0; }
+  }
+  function resize() {
+    const dpr = Math.min(2, devicePixelRatio || 1);
+    W = innerWidth; H = innerHeight; CX = W / 2; CY = H / 2; RAD = Math.min(W, H) * 0.36;
+    cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (RM) draw(0, 0);
+  }
+  function addBlip(angleNow) {
+    const a = angleNow + rand(-0.35, 0.35), d = Math.pow(Math.random(), 0.6) * RAD * 0.88;
+    blips.push({ x: CX + Math.cos(a) * d, y: CY + Math.sin(a) * d, life: 1 });
+    if (blips.length > 26) blips.shift();
+  }
+  function draw(t, dt) {
+    ctx.fillStyle = '#040A08'; ctx.fillRect(0, 0, W, H);
+    // range rings + cross
+    ctx.strokeStyle = 'rgba(52,211,153,0.16)'; ctx.lineWidth = 1;
+    [0.33, 0.66, 1].forEach(f => { ctx.beginPath(); ctx.arc(CX, CY, RAD * f, 0, TAU); ctx.stroke(); });
+    ctx.beginPath(); ctx.moveTo(CX - RAD, CY); ctx.lineTo(CX + RAD, CY); ctx.moveTo(CX, CY - RAD); ctx.lineTo(CX, CY + RAD); ctx.stroke();
+    // degree ticks
+    for (let deg = 0; deg < 360; deg += 15) {
+      const a = (deg * Math.PI) / 180, long = deg % 45 === 0;
+      ctx.strokeStyle = 'rgba(52,211,153,' + (long ? 0.5 : 0.22) + ')';
+      ctx.beginPath();
+      ctx.moveTo(CX + Math.cos(a) * (RAD - (long ? 12 : 6)), CY + Math.sin(a) * (RAD - (long ? 12 : 6)));
+      ctx.lineTo(CX + Math.cos(a) * RAD, CY + Math.sin(a) * RAD);
+      ctx.stroke();
+    }
+    // sweep wedge with fading trail
+    const angle = RM ? 0.9 : t * 0.0011;
+    for (let i = 0; i < 46; i++) {
+      const a0 = angle - i * 0.028;
+      const alpha = Math.pow(1 - i / 46, 2.1) * 0.34;
+      ctx.fillStyle = 'rgba(52,211,153,' + alpha.toFixed(3) + ')';
+      ctx.beginPath(); ctx.moveTo(CX, CY); ctx.arc(CX, CY, RAD, a0 - 0.028, a0); ctx.closePath(); ctx.fill();
+    }
+    ctx.strokeStyle = 'rgba(167,255,214,0.9)'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(CX, CY); ctx.lineTo(CX + Math.cos(angle) * RAD, CY + Math.sin(angle) * RAD); ctx.stroke();
+    // spawn blips when the leading edge passes
+    if (!RM) {
+      if (angle - lastSweep > 2.4) { addBlip(angle); addBlip(angle + Math.PI); lastSweep = angle; }
+      blipTimer -= dt;
+      if (blipTimer <= 0) { addBlip(angle); blipTimer = 1.4 + Math.random() * 2.2; }
+    } else { addBlip(angle); addBlip(angle + 2.2); addBlip(angle + 4.1); }
+    blips = blips.filter(b => b.life > 0.02);
+    blips.forEach(b => {
+      b.life -= RM ? 0 : dt * 0.11;
+      const a = Math.max(0, Math.min(1, b.life));
+      ctx.fillStyle = 'rgba(167,255,214,' + (a * 0.9).toFixed(3) + ')';
+      ctx.beginPath(); ctx.arc(b.x, b.y, 2.4, 0, TAU); ctx.fill();
+      ctx.strokeStyle = 'rgba(167,255,214,' + (a * 0.35).toFixed(3) + ')'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(b.x, b.y, 2.4 + (1 - a) * 14, 0, TAU); ctx.stroke();
+    });
+  }
+  let prev = 0;
+  function frame(t) {
+    const dt = Math.min(0.05, (t - prev) / 1000 || 0.016);
+    govern(t - prev); prev = t;
+    draw(t, dt);
+    if (!RM) requestAnimationFrame(frame);
+  }
+  resize(); addEventListener('resize', resize);
+  if (RM) draw(0, 0); else requestAnimationFrame((t) => { prev = t; frame(t); });
+})();
+</script>
+</body>
+</html>

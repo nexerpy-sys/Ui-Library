@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<!-- Atelier Kinetik · FX 09 · Constellation Cursor — drifting stars linked to the pointer. Zero dependencies. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kinetik FX — Constellation Cursor</title>
+<style>html,body{margin:0;height:100%;background:#070709;overflow:hidden}canvas{display:block;width:100vw;height:100vh;cursor:crosshair}</style>
+</head>
+<body>
+<canvas id="c" aria-hidden="true"></canvas>
+<script>
+(() => {
+  const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W = 0, H = 0, quality = 1, nodes = [];
+  let fpsAcc = 0, fpsN = 0, degraded = false;
+  const rand = (a, b) => a + Math.random() * (b - a);
+  const pointer = { x: -9999, y: -9999, on: false };
+
+  function govern(dtMs) {
+    if (degraded) return;
+    fpsAcc += dtMs; fpsN++;
+    if (fpsN >= 120) { if (fpsAcc / fpsN > 21) { degraded = true; quality *= 0.6; build(); } fpsAcc = 0; fpsN = 0; }
+  }
+  function build() {
+    nodes = [];
+    const n = Math.max(30, Math.round(95 * quality));
+    for (let i = 0; i < n; i++) nodes.push({ x: Math.random() * W, y: Math.random() * H, vx: rand(-9, 9), vy: rand(-9, 9), r: rand(0.7, 1.9) });
+  }
+  function resize() {
+    const dpr = Math.min(2, devicePixelRatio || 1);
+    W = innerWidth; H = innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    build();
+  }
+  addEventListener('pointermove', (e) => { pointer.x = e.clientX; pointer.y = e.clientY; pointer.on = true; });
+  addEventListener('pointerleave', () => { pointer.on = false; });
+
+  function draw(t, dt) {
+    ctx.fillStyle = 'rgba(7,7,9,0.5)'; ctx.fillRect(0, 0, W, H);
+    nodes.forEach(n => {
+      n.x += n.vx * dt; n.y += n.vy * dt;
+      if (n.x < -8) n.x = W + 8; if (n.x > W + 8) n.x = -8;
+      if (n.y < -8) n.y = H + 8; if (n.y > H + 8) n.y = -8;
+    });
+    // node-node links
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const a = nodes[i], b = nodes[j];
+        const d = Math.hypot(a.x - b.x, a.y - b.y);
+        if (d < 92) {
+          ctx.strokeStyle = 'rgba(244,242,236,' + (0.16 * (1 - d / 92)).toFixed(3) + ')';
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+        }
+      }
+    }
+    // pointer links
+    if (pointer.on) {
+      nodes.forEach(n => {
+        const d = Math.hypot(n.x - pointer.x, n.y - pointer.y);
+        if (d < 190) {
+          ctx.strokeStyle = 'rgba(255,97,38,' + (0.55 * (1 - d / 190)).toFixed(3) + ')';
+          ctx.lineWidth = 1.1;
+          ctx.beginPath(); ctx.moveTo(n.x, n.y); ctx.lineTo(pointer.x, pointer.y); ctx.stroke();
+        }
+      });
+      const g = ctx.createRadialGradient(pointer.x, pointer.y, 0, pointer.x, pointer.y, 26);
+      g.addColorStop(0, 'rgba(255,97,38,0.5)'); g.addColorStop(1, 'rgba(255,97,38,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(pointer.x, pointer.y, 26, 0, Math.PI * 2); ctx.fill();
+    }
+    nodes.forEach(n => {
+      ctx.fillStyle = '#F4F2EC';
+      ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2); ctx.fill();
+    });
+  }
+  let prev = 0;
+  function frame(t) {
+    const dt = Math.min(0.05, (t - prev) / 1000 || 0.016);
+    govern(t - prev); prev = t;
+    draw(t, dt);
+    if (!RM) requestAnimationFrame(frame);
+  }
+  resize(); addEventListener('resize', resize);
+  if (RM) { ctx.fillStyle = '#070709'; ctx.fillRect(0, 0, W, H); nodes.forEach(n => { ctx.fillStyle = '#F4F2EC'; ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2); ctx.fill(); }); }
+  else requestAnimationFrame((t) => { prev = t; frame(t); });
+})();
+</script>
+</body>
+</html>

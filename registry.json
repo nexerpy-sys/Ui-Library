@@ -1,0 +1,2745 @@
+{
+  "$schema": "https://schemas.atelierkinetik.dev/registry.v1.json",
+  "name": "Atelier Kinetik — AI-First Design & Motion Registry",
+  "version": "1.5.0",
+  "released": "2026-11-22",
+  "license": "Code MIT · Typography OFL (per-font, via Google Fonts) · Brand marks reserved",
+  "summary": "60 curated Google Fonts, 24 studio pairings, 3 fluid clamp() type scales, 6 audited semantic light/dark token systems, hue-locked 50-950 WCAG 2.1 scales, 12 named motion laws, 12 production micro-interaction snippets and 16 dependency-free 60fps canvas hero backgrounds.",
+  "audience": [
+    "humans in a browser",
+    "AI coding agents (ChatGPT, Claude, Gemini, Manus, Kimi, Qwen, DeepSeek, Emergent)",
+    "build systems via fetch()"
+  ],
+  "endpoints": {
+    "interactive": "/index.html",
+    "llmsTxt": "/llms.txt",
+    "registryJson": "/registry.json",
+    "fxDirectory": "/registry/fx/"
+  },
+  "usage": [
+    "Fetch /llms.txt first for orientation, then pull only the assets you need from this manifest.",
+    "Every snippet in snippets{} is copy-paste ready and self-contained (CSS+JS inline).",
+    "Every FX in fx[] is a standalone .html — iframe it, inline it, or lift the <canvas> + <script> into your build.",
+    "Token convention: --bg, --surface, --elevated, --ink, --muted-ink, --hairline, --hairline-strong, --accent, --on-accent.",
+    "Respect prefers-reduced-motion: every Kinetik asset ships an opt-out path. Keep it when you copy."
+  ],
+  "typography": {
+    "fonts": [
+      {
+        "name": "Fraunces",
+        "category": "serif",
+        "weights": "100..900",
+        "italic": true,
+        "bestFor": "Variable optical-size serif with soft/ Wonk axes — editorial display, luxury commerce",
+        "tags": [
+          "editorial",
+          "variable",
+          "luxury"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,100..900;1,100..900&display=swap"
+      },
+      {
+        "name": "Instrument Serif",
+        "category": "serif",
+        "weights": "400",
+        "italic": true,
+        "bestFor": "High-drama italic accents, fashion microcopy, em-dash asides",
+        "tags": [
+          "editorial",
+          "accent"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital,wght@0,400;1,400&display=swap"
+      },
+      {
+        "name": "Playfair Display",
+        "category": "serif",
+        "weights": "400..900",
+        "italic": true,
+        "bestFor": "Didone headlines, magazine covers, luxe product pages",
+        "tags": [
+          "editorial",
+          "didone"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+      },
+      {
+        "name": "Bodoni Moda",
+        "category": "serif",
+        "weights": "400..900",
+        "italic": true,
+        "bestFor": "Extreme contrast Didone — campaign posters, high-fashion hero type",
+        "tags": [
+          "editorial",
+          "didone",
+          "display"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400..900;1,400..900&display=swap"
+      },
+      {
+        "name": "Italiana",
+        "category": "serif",
+        "weights": "400",
+        "italic": false,
+        "bestFor": "Hairline luxury caps — perfume, ateliers, galleries",
+        "tags": [
+          "luxury",
+          "display"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Italiana:wght@400&display=swap"
+      },
+      {
+        "name": "Cinzel",
+        "category": "serif",
+        "weights": "400..900",
+        "italic": false,
+        "bestFor": "Trajan inscriptional caps — awards, hotels, institutions",
+        "tags": [
+          "luxury",
+          "inscriptional"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Cinzel:wght@400..900&display=swap"
+      },
+      {
+        "name": "Prata",
+        "category": "serif",
+        "weights": "400",
+        "italic": false,
+        "bestFor": "Refined Didone with Venetian warmth — jewellery, editorial",
+        "tags": [
+          "luxury",
+          "editorial"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Prata:wght@400&display=swap"
+      },
+      {
+        "name": "Marcellus",
+        "category": "serif",
+        "weights": "400",
+        "italic": false,
+        "bestFor": "Inscriptional elegance, softer than Cinzel — museums, editorial",
+        "tags": [
+          "luxury",
+          "inscriptional"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Marcellus:wght@400&display=swap"
+      },
+      {
+        "name": "Tenor Sans",
+        "category": "sans",
+        "weights": "400",
+        "italic": false,
+        "bestFor": "Humanist caps with Trajan DNA — luxury body-adjacent caps",
+        "tags": [
+          "luxury",
+          "caps"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Tenor+Sans:wght@400&display=swap"
+      },
+      {
+        "name": "Cormorant Garamond",
+        "category": "serif",
+        "weights": "300..700",
+        "italic": true,
+        "bestFor": "Feather-light Garamond for glass, quiet luxury, long captions",
+        "tags": [
+          "luxury",
+          "text"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&display=swap"
+      },
+      {
+        "name": "EB Garamond",
+        "category": "serif",
+        "weights": "400..800",
+        "italic": true,
+        "bestFor": "Scholarly text serif — books, long-form, essays",
+        "tags": [
+          "text",
+          "editorial"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&display=swap"
+      },
+      {
+        "name": "Newsreader",
+        "category": "serif",
+        "weights": "400..800",
+        "italic": true,
+        "bestFor": "Mercury-inspired text face built for screen — articles, prose",
+        "tags": [
+          "text",
+          "editorial"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400..800;1,400..800&display=swap"
+      },
+      {
+        "name": "Lora",
+        "category": "serif",
+        "weights": "400..700",
+        "italic": true,
+        "bestFor": "Balanced calligraphic serif — blogs, docs, wine-country warmth",
+        "tags": [
+          "text"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap"
+      },
+      {
+        "name": "Spectral",
+        "category": "serif",
+        "weights": "300..800",
+        "italic": true,
+        "bestFor": "Screen-first serif, generous x-height — technical prose, docs",
+        "tags": [
+          "text",
+          "technical"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300..800;1,300..800&display=swap"
+      },
+      {
+        "name": "Source Serif 4",
+        "category": "serif",
+        "weights": "400..900",
+        "italic": true,
+        "bestFor": "Adobe Source text serif — product UI reading, whitepapers",
+        "tags": [
+          "text",
+          "technical"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400..900;1,400..900&display=swap"
+      },
+      {
+        "name": "Alegreya",
+        "category": "serif",
+        "weights": "400..900",
+        "italic": true,
+        "bestFor": "Calligraphic rhythm for humanist prose — essays, culture",
+        "tags": [
+          "text",
+          "humanist"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..900;1,400..900&display=swap"
+      },
+      {
+        "name": "Syne",
+        "category": "display",
+        "weights": "400..800",
+        "italic": false,
+        "bestFor": "Avant-garde grotesque — Kinetik's own display voice, gallery-grade",
+        "tags": [
+          "display",
+          "avant-garde"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Syne:wght@400..800&display=swap"
+      },
+      {
+        "name": "Unbounded",
+        "category": "display",
+        "weights": "200..900",
+        "italic": false,
+        "bestFor": "Ultra-wide futurist display — hero stats, Web3-adjacent launches",
+        "tags": [
+          "display",
+          "futurist"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Unbounded:wght@200..900&display=swap"
+      },
+      {
+        "name": "Michroma",
+        "category": "display",
+        "weights": "400",
+        "italic": false,
+        "bestFor": "Wide technical display — instrument panels, motion graphics caps",
+        "tags": [
+          "display",
+          "technical"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Michroma:wght@400&display=swap"
+      },
+      {
+        "name": "Anton",
+        "category": "display",
+        "weights": "400",
+        "italic": false,
+        "bestFor": "Ultra-condensed workhorse — posters, sports, loud hero lines",
+        "tags": [
+          "display",
+          "condensed"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Anton:wght@400&display=swap"
+      },
+      {
+        "name": "Bebas Neue",
+        "category": "display",
+        "weights": "400",
+        "italic": false,
+        "bestFor": "All-caps condensed classic — labels, scores, kinetic type walls",
+        "tags": [
+          "display",
+          "condensed"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400&display=swap"
+      },
+      {
+        "name": "Six Caps",
+        "category": "display",
+        "weights": "400",
+        "italic": false,
+        "bestFor": "Razor-condensed caps — editorial kickers, minimal posters",
+        "tags": [
+          "display",
+          "condensed"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Six+Caps:wght@400&display=swap"
+      },
+      {
+        "name": "Abril Fatface",
+        "category": "display",
+        "weights": "400",
+        "italic": false,
+        "bestFor": "Fat Didone drama — restaurant menus, editorial features",
+        "tags": [
+          "display",
+          "didone"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Abril+Fatface:wght@400&display=swap"
+      },
+      {
+        "name": "Archivo Black",
+        "category": "display",
+        "weights": "400",
+        "italic": false,
+        "bestFor": "Grotesk black weight — brutalist blocks, default-bold heroes",
+        "tags": [
+          "display",
+          "grotesque"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Archivo+Black:wght@400&display=swap"
+      },
+      {
+        "name": "Alfa Slab One",
+        "category": "display",
+        "weights": "400",
+        "italic": false,
+        "bestFor": "Heavy slab — retro-editorial, bold packaging moments",
+        "tags": [
+          "display",
+          "slab"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Alfa+Slab+One:wght@400&display=swap"
+      },
+      {
+        "name": "Ultra",
+        "category": "display",
+        "weights": "400",
+        "italic": false,
+        "bestFor": "Ultra-bold slab serif — posters, print-adjacent commerce",
+        "tags": [
+          "display",
+          "slab"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Ultra:wght@400&display=swap"
+      },
+      {
+        "name": "Marcellus SC",
+        "category": "display",
+        "weights": "400",
+        "italic": false,
+        "bestFor": "Small-caps inscription set — diplomas, heritage brand lockups",
+        "tags": [
+          "display",
+          "luxury"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Marcellus+SC:wght@400&display=swap"
+      },
+      {
+        "name": "Cormorant SC",
+        "category": "display",
+        "weights": "300..700",
+        "italic": false,
+        "bestFor": "Small caps feather Garamond — chapter titles, wine labels",
+        "tags": [
+          "display",
+          "luxury"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@300..700&display=swap"
+      },
+      {
+        "name": "Inter",
+        "category": "sans",
+        "weights": "100..900",
+        "italic": false,
+        "bestFor": "The universal product sans — UI, dashboards, dense data, system fallback",
+        "tags": [
+          "ui",
+          "workhorse"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
+      },
+      {
+        "name": "Hanken Grotesk",
+        "category": "sans",
+        "weights": "100..900",
+        "italic": false,
+        "bestFor": "Kinetik body face — warm neutral grotesk for product copy",
+        "tags": [
+          "ui",
+          "body"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@100..900&display=swap"
+      },
+      {
+        "name": "Space Grotesk",
+        "category": "sans",
+        "weights": "300..700",
+        "italic": false,
+        "bestFor": "Retro-technical grotesk — dev tools, indie launches, crypto-quiet",
+        "tags": [
+          "technical",
+          "indie"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap"
+      },
+      {
+        "name": "Manrope",
+        "category": "sans",
+        "weights": "200..800",
+        "italic": false,
+        "bestFor": "Rounded-geometric clarity — modern SaaS, onboarding flows",
+        "tags": [
+          "ui",
+          "geometric"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap"
+      },
+      {
+        "name": "Archivo",
+        "category": "sans",
+        "weights": "100..900",
+        "italic": false,
+        "bestFor": "Variable width grotesque (wdth axis) — flexible hero & UI contrast",
+        "tags": [
+          "ui",
+          "variable"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Archivo:wght@100..900&display=swap"
+      },
+      {
+        "name": "Libre Franklin",
+        "category": "sans",
+        "weights": "100..900",
+        "italic": false,
+        "bestFor": "Franklin Gothic revival — editorial sans, newsroom DNA",
+        "tags": [
+          "editorial",
+          "grotesque"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@100..900&display=swap"
+      },
+      {
+        "name": "Work Sans",
+        "category": "sans",
+        "weights": "100..900",
+        "italic": false,
+        "bestFor": "Optical-size text sans — docs, reading-heavy product pages",
+        "tags": [
+          "text",
+          "ui"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Work+Sans:wght@100..900&display=swap"
+      },
+      {
+        "name": "IBM Plex Sans",
+        "category": "sans",
+        "weights": "100..700",
+        "italic": false,
+        "bestFor": "Plex superfamily workhorse — IBM-grade documentation & UI",
+        "tags": [
+          "technical",
+          "documentation"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@100..700&display=swap"
+      },
+      {
+        "name": "Public Sans",
+        "category": "sans",
+        "weights": "100..900",
+        "italic": false,
+        "bestFor": "USWDS open government sans — accessibility-first product UI",
+        "tags": [
+          "ui",
+          "accessible"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Public+Sans:wght@100..900&display=swap"
+      },
+      {
+        "name": "Barlow",
+        "category": "sans",
+        "weights": "100..900",
+        "italic": false,
+        "bestFor": "California-highway grotesque — dashboards, automotive, sport",
+        "tags": [
+          "ui",
+          "technical"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Barlow:wght@100..900&display=swap"
+      },
+      {
+        "name": "Barlow Condensed",
+        "category": "sans",
+        "weights": "100..900",
+        "italic": false,
+        "bestFor": "Condensed sibling — dense tables, stat callouts, labels",
+        "tags": [
+          "ui",
+          "condensed"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@100..900&display=swap"
+      },
+      {
+        "name": "Oswald",
+        "category": "sans",
+        "weights": "200..700",
+        "italic": false,
+        "bestFor": "Condensed re-cut Gothic — posters, sports, signage energy",
+        "tags": [
+          "display",
+          "condensed"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&display=swap"
+      },
+      {
+        "name": "Chakra Petch",
+        "category": "sans",
+        "weights": "300..700",
+        "italic": false,
+        "bestFor": "Thai-tech squareness — HUDs, esports, terminal aesthetics",
+        "tags": [
+          "technical",
+          "hud"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300..700&display=swap"
+      },
+      {
+        "name": "Saira",
+        "category": "sans",
+        "weights": "100..900",
+        "italic": false,
+        "bestFor": "Large-width technical sans — wayfinding, metrics, dense UI",
+        "tags": [
+          "ui",
+          "technical"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Saira:wght@100..900&display=swap"
+      },
+      {
+        "name": "Saira Condensed",
+        "category": "sans",
+        "weights": "100..900",
+        "italic": false,
+        "bestFor": "Condensed Saira — scoreboards, dense label systems",
+        "tags": [
+          "ui",
+          "condensed"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@100..900&display=swap"
+      },
+      {
+        "name": "Heebo",
+        "category": "sans",
+        "weights": "100..900",
+        "italic": false,
+        "bestFor": "Hebrew + Latin modern grotesque — bilingual surfaces",
+        "tags": [
+          "ui",
+          "multilingual"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Heebo:wght@100..900&display=swap"
+      },
+      {
+        "name": "Rubik",
+        "category": "sans",
+        "weights": "300..900",
+        "italic": false,
+        "bestFor": "Soft-square friendly geometry — fintech, consumer SaaS",
+        "tags": [
+          "ui",
+          "geometric"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Rubik:wght@300..900&display=swap"
+      },
+      {
+        "name": "Outfit",
+        "category": "sans",
+        "weights": "100..900",
+        "italic": false,
+        "bestFor": "Variable geometric — clean marketing pages, friendly prompts",
+        "tags": [
+          "ui",
+          "geometric"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap"
+      },
+      {
+        "name": "Albert Sans",
+        "category": "sans",
+        "weights": "100..900",
+        "italic": false,
+        "bestFor": "Modern grotesque with editorial manners — brand sites, docs",
+        "tags": [
+          "ui",
+          "brand"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Albert+Sans:wght@100..900&display=swap"
+      },
+      {
+        "name": "Sofia Sans",
+        "category": "sans",
+        "weights": "100..900",
+        "italic": false,
+        "bestFor": "Humanist with soft corners — approachable product marketing",
+        "tags": [
+          "ui",
+          "humanist"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Sofia+Sans:wght@100..900&display=swap"
+      },
+      {
+        "name": "JetBrains Mono",
+        "category": "mono",
+        "weights": "100..800",
+        "italic": true,
+        "bestFor": "Ergonomic code face — dev tools, tokens, specimen labels",
+        "tags": [
+          "code",
+          "ui"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap"
+      },
+      {
+        "name": "IBM Plex Mono",
+        "category": "mono",
+        "weights": "100..700",
+        "italic": false,
+        "bestFor": "Plex mono — terminal chrome, API docs, spec sheets",
+        "tags": [
+          "code",
+          "terminal"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@100..700&display=swap"
+      },
+      {
+        "name": "Space Mono",
+        "category": "mono",
+        "weights": "400;700",
+        "italic": true,
+        "bestFor": "Brutalist mono — posters, zines, anti-design specimen work",
+        "tags": [
+          "code",
+          "brutalist"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;700;1,400;700&display=swap"
+      },
+      {
+        "name": "Fira Code",
+        "category": "mono",
+        "weights": "300..700",
+        "italic": false,
+        "bestFor": "Ligature-happy code face — editors, changelogs, snippets",
+        "tags": [
+          "code",
+          "ligatures"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap"
+      },
+      {
+        "name": "Roboto Mono",
+        "category": "mono",
+        "weights": "100..700",
+        "italic": true,
+        "bestFor": "Neutral grotesk mono — Android-adjacent, long-read code",
+        "tags": [
+          "code",
+          "neutral"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+      },
+      {
+        "name": "Red Hat Mono",
+        "category": "mono",
+        "weights": "300..700",
+        "italic": true,
+        "bestFor": "Open-source grotesk mono — enterprise dev surfaces",
+        "tags": [
+          "code",
+          "enterprise"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Red+Hat+Mono:ital,wght@0,300..700;1,300..700&display=swap"
+      },
+      {
+        "name": "Spline Sans Mono",
+        "category": "mono",
+        "weights": "300..700",
+        "italic": false,
+        "bestFor": "Nudge-friendly rounded mono — playful dev tooling",
+        "tags": [
+          "code",
+          "rounded"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Spline+Sans+Mono:wght@300..700&display=swap"
+      },
+      {
+        "name": "DM Mono",
+        "category": "mono",
+        "weights": "300..500",
+        "italic": true,
+        "bestFor": "Text-optimised mono — captions, bylines, table figures",
+        "tags": [
+          "code",
+          "text"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300..500;1,300..500&display=swap"
+      },
+      {
+        "name": "Overpass Mono",
+        "category": "mono",
+        "weights": "300..700",
+        "italic": false,
+        "bestFor": "Highway-signage mono — infrastructure, CI dashboards",
+        "tags": [
+          "code",
+          "infrastructure"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Overpass+Mono:wght@300..700&display=swap"
+      },
+      {
+        "name": "Anonymous Pro",
+        "category": "mono",
+        "weights": "400;700",
+        "italic": true,
+        "bestFor": "Quiet bookish mono — long-read code, print manuals",
+        "tags": [
+          "code",
+          "book"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Anonymous+Pro:ital,wght@0,400;700;1,400;700&display=swap"
+      },
+      {
+        "name": "Cutive Mono",
+        "category": "mono",
+        "weights": "400",
+        "italic": false,
+        "bestFor": "Typewriter face — heritage motion, retro terminals",
+        "tags": [
+          "code",
+          "retro"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Cutive+Mono:wght@400&display=swap"
+      },
+      {
+        "name": "Intel One Mono",
+        "category": "mono",
+        "weights": "300..700",
+        "italic": true,
+        "bestFor": "Intel's legible-by-design mono — accessibility-tuned code",
+        "tags": [
+          "code",
+          "accessible"
+        ],
+        "css2": "https://fonts.googleapis.com/css2?family=Intel+One+Mono:ital,wght@0,300..700;1,300..700&display=swap"
+      }
+    ],
+    "pairings": [
+      {
+        "id": "kinetic-obsidian",
+        "name": "Kinetik Obsidian",
+        "use": "Flagship Kinetik lockup — gallery-grade product & registry pages",
+        "display": {
+          "family": "Syne",
+          "weight": 800,
+          "tracking": "-0.035em",
+          "lineHeight": 0.98,
+          "textTransform": "uppercase"
+        },
+        "serifAccent": {
+          "family": "Instrument Serif",
+          "style": "italic",
+          "weight": 400
+        },
+        "body": {
+          "family": "Hanken Grotesk",
+          "weight": 400,
+          "lineHeight": 1.6
+        },
+        "mono": {
+          "family": "JetBrains Mono",
+          "weight": 500,
+          "tracking": "0.22em",
+          "textTransform": "uppercase",
+          "size": "11px"
+        }
+      },
+      {
+        "id": "mercury-editor",
+        "name": "Mercury Editor",
+        "use": "Long-form journalism and editorial case studies",
+        "display": {
+          "family": "Fraunces",
+          "weight": 600,
+          "tracking": "-0.02em",
+          "lineHeight": 1.02,
+          "opticalSize": "144"
+        },
+        "serifAccent": {
+          "family": "Newsreader",
+          "style": "italic",
+          "weight": 400
+        },
+        "body": {
+          "family": "Newsreader",
+          "weight": 400,
+          "lineHeight": 1.7
+        },
+        "mono": {
+          "family": "IBM Plex Mono",
+          "weight": 400,
+          "tracking": "0.08em",
+          "size": "12px"
+        }
+      },
+      {
+        "id": "didone-noir",
+        "name": "Didone Noir",
+        "use": "High-fashion, perfume, private-client luxury commerce",
+        "display": {
+          "family": "Bodoni Moda",
+          "weight": 800,
+          "tracking": "-0.03em",
+          "lineHeight": 0.96
+        },
+        "serifAccent": {
+          "family": "Cormorant Garamond",
+          "style": "italic",
+          "weight": 400
+        },
+        "body": {
+          "family": "Manrope",
+          "weight": 400,
+          "lineHeight": 1.6
+        },
+        "mono": {
+          "family": "IBM Plex Mono",
+          "weight": 400,
+          "tracking": "0.2em",
+          "size": "11px"
+        }
+      },
+      {
+        "id": "brutalist-wire",
+        "name": "Brutalist Wire",
+        "use": "Poster walls, zine energy, deliberately loud type systems",
+        "display": {
+          "family": "Anton",
+          "weight": 400,
+          "tracking": "0.01em",
+          "lineHeight": 0.92,
+          "textTransform": "uppercase"
+        },
+        "serifAccent": {
+          "family": "Instrument Serif",
+          "style": "italic",
+          "weight": 400
+        },
+        "body": {
+          "family": "Archivo",
+          "weight": 400,
+          "lineHeight": 1.55
+        },
+        "mono": {
+          "family": "Roboto Mono",
+          "weight": 500,
+          "tracking": "0.14em",
+          "size": "11px"
+        }
+      },
+      {
+        "id": "roman-archive",
+        "name": "Roman Archive",
+        "use": "Institutions, awards, hotels, honours — Trajan authority",
+        "display": {
+          "family": "Cinzel",
+          "weight": 700,
+          "tracking": "0.12em",
+          "lineHeight": 1.1,
+          "textTransform": "uppercase"
+        },
+        "serifAccent": {
+          "family": "Tenor Sans",
+          "weight": 400
+        },
+        "body": {
+          "family": "Lora",
+          "weight": 400,
+          "lineHeight": 1.7
+        },
+        "mono": {
+          "family": "IBM Plex Mono",
+          "weight": 400,
+          "tracking": "0.18em",
+          "size": "10px"
+        }
+      },
+      {
+        "id": "orbital-technical",
+        "name": "Orbital Technical",
+        "use": "Dev tools, terminal-graphic landing pages, observatories",
+        "display": {
+          "family": "Michroma",
+          "weight": 400,
+          "tracking": "0.06em",
+          "lineHeight": 1.25,
+          "textTransform": "uppercase"
+        },
+        "serifAccent": {
+          "family": "Spectral",
+          "style": "italic",
+          "weight": 300
+        },
+        "body": {
+          "family": "Inter",
+          "weight": 400,
+          "lineHeight": 1.6
+        },
+        "mono": {
+          "family": "JetBrains Mono",
+          "weight": 400,
+          "tracking": "0.04em",
+          "size": "12px"
+        }
+      },
+      {
+        "id": "highway-signage",
+        "name": "Highway Signage",
+        "use": "Infrastructure, logistics, CI/CD dashboards, telemetry",
+        "display": {
+          "family": "Oswald",
+          "weight": 600,
+          "tracking": "0.02em",
+          "lineHeight": 1,
+          "textTransform": "uppercase"
+        },
+        "serifAccent": {
+          "family": "Spectral",
+          "style": "italic",
+          "weight": 400
+        },
+        "body": {
+          "family": "Inter",
+          "weight": 400,
+          "lineHeight": 1.6
+        },
+        "mono": {
+          "family": "Overpass Mono",
+          "weight": 400,
+          "tracking": "0.08em",
+          "size": "12px"
+        }
+      },
+      {
+        "id": "slab-press",
+        "name": "Slab Press",
+        "use": "Retro-editorial, packaging, print-adjacent commerce",
+        "display": {
+          "family": "Alfa Slab One",
+          "weight": 400,
+          "tracking": "0",
+          "lineHeight": 0.98
+        },
+        "serifAccent": {
+          "family": "Source Serif 4",
+          "style": "italic",
+          "weight": 400
+        },
+        "body": {
+          "family": "Archivo",
+          "weight": 400,
+          "lineHeight": 1.6
+        },
+        "mono": {
+          "family": "Space Mono",
+          "weight": 400,
+          "tracking": "0.04em",
+          "size": "12px"
+        }
+      },
+      {
+        "id": "ultra-heritage",
+        "name": "Ultra Heritage",
+        "use": "Heritage brands, annual reports, long-memory institutions",
+        "display": {
+          "family": "Ultra",
+          "weight": 400,
+          "tracking": "0",
+          "lineHeight": 1
+        },
+        "serifAccent": {
+          "family": "Alegreya",
+          "style": "italic",
+          "weight": 500
+        },
+        "body": {
+          "family": "Alegreya",
+          "weight": 400,
+          "lineHeight": 1.65
+        },
+        "mono": {
+          "family": "Cutive Mono",
+          "weight": 400,
+          "tracking": "0.06em",
+          "size": "12px"
+        }
+      },
+      {
+        "id": "didone-gala",
+        "name": "Didone Gala",
+        "use": "Restaurants, tasting menus, evening retail",
+        "display": {
+          "family": "Abril Fatface",
+          "weight": 400,
+          "tracking": "0",
+          "lineHeight": 0.98
+        },
+        "serifAccent": {
+          "family": "Newsreader",
+          "style": "italic",
+          "weight": 400
+        },
+        "body": {
+          "family": "Public Sans",
+          "weight": 400,
+          "lineHeight": 1.6
+        },
+        "mono": {
+          "family": "DM Mono",
+          "weight": 400,
+          "tracking": "0.1em",
+          "size": "11px"
+        }
+      },
+      {
+        "id": "gothic-factory",
+        "name": "Gothic Factory",
+        "use": "Industrial product pages, automotive, high-amperage brand",
+        "display": {
+          "family": "Archivo Black",
+          "weight": 400,
+          "tracking": "-0.01em",
+          "lineHeight": 0.95,
+          "textTransform": "uppercase"
+        },
+        "serifAccent": {
+          "family": "EB Garamond",
+          "style": "italic",
+          "weight": 400
+        },
+        "body": {
+          "family": "Work Sans",
+          "weight": 400,
+          "lineHeight": 1.6
+        },
+        "mono": {
+          "family": "Roboto Mono",
+          "weight": 400,
+          "tracking": "0.08em",
+          "size": "12px"
+        }
+      },
+      {
+        "id": "heraldic-press",
+        "name": "Heraldic Press",
+        "use": "Diplomacy, honours, small-caps institutional lockups",
+        "display": {
+          "family": "Marcellus SC",
+          "weight": 400,
+          "tracking": "0.1em",
+          "lineHeight": 1.1
+        },
+        "serifAccent": {
+          "family": "EB Garamond",
+          "style": "italic",
+          "weight": 400
+        },
+        "body": {
+          "family": "EB Garamond",
+          "weight": 400,
+          "lineHeight": 1.65
+        },
+        "mono": {
+          "family": "Space Mono",
+          "weight": 400,
+          "tracking": "0.14em",
+          "size": "11px"
+        }
+      },
+      {
+        "id": "cormorant-chapter",
+        "name": "Cormorant Chapter",
+        "use": "Chapter titles, rare-book shops, wine labels, quiet luxury",
+        "display": {
+          "family": "Cormorant SC",
+          "weight": 600,
+          "tracking": "0.08em",
+          "lineHeight": 1.15
+        },
+        "serifAccent": {
+          "family": "Cormorant Garamond",
+          "style": "italic",
+          "weight": 400
+        },
+        "body": {
+          "family": "Manrope",
+          "weight": 400,
+          "lineHeight": 1.6
+        },
+        "mono": {
+          "family": "IBM Plex Mono",
+          "weight": 400,
+          "tracking": "0.16em",
+          "size": "10px"
+        }
+      },
+      {
+        "id": "italienne-vitr",
+        "name": "Italienne Vitr",
+        "use": "Perfumeries, galleries, vitrines — hairline luxury caps",
+        "display": {
+          "family": "Italiana",
+          "weight": 400,
+          "tracking": "0.14em",
+          "lineHeight": 1.2,
+          "textTransform": "uppercase"
+        },
+        "serifAccent": {
+          "family": "Spectral",
+          "style": "italic",
+          "weight": 300
+        },
+        "body": {
+          "family": "Albert Sans",
+          "weight": 400,
+          "lineHeight": 1.6
+        },
+        "mono": {
+          "family": "Space Mono",
+          "weight": 400,
+          "tracking": "0.2em",
+          "size": "10px"
+        }
+      },
+      {
+        "id": "prata-facet",
+        "name": "Prata Facet",
+        "use": "Jewellery, skincare, boutique hotel collateral",
+        "display": {
+          "family": "Prata",
+          "weight": 400,
+          "tracking": "0.02em",
+          "lineHeight": 1.1
+        },
+        "serifAccent": {
+          "family": "Spectral",
+          "style": "italic",
+          "weight": 400
+        },
+        "body": {
+          "family": "Albert Sans",
+          "weight": 400,
+          "lineHeight": 1.6
+        },
+        "mono": {
+          "family": "Overpass Mono",
+          "weight": 400,
+          "tracking": "0.12em",
+          "size": "11px"
+        }
+      },
+      {
+        "id": "newsroom-classic",
+        "name": "Newsroom Classic",
+        "use": "Opinion sections, long reads, digital dailies",
+        "display": {
+          "family": "Playfair Display",
+          "weight": 800,
+          "tracking": "-0.02em",
+          "lineHeight": 1
+        },
+        "serifAccent": {
+          "family": "EB Garamond",
+          "style": "italic",
+          "weight": 400
+        },
+        "body": {
+          "family": "Work Sans",
+          "weight": 400,
+          "lineHeight": 1.6
+        },
+        "mono": {
+          "family": "Space Mono",
+          "weight": 400,
+          "tracking": "0.06em",
+          "size": "12px"
+        }
+      },
+      {
+        "id": "georgic-humanist",
+        "name": "Georgic Humanist",
+        "use": "Essays, culture criticism, independent publishing",
+        "display": {
+          "family": "Alegreya",
+          "weight": 800,
+          "tracking": "-0.015em",
+          "lineHeight": 1
+        },
+        "serifAccent": {
+          "family": "Source Serif 4",
+          "style": "italic",
+          "weight": 400
+        },
+        "body": {
+          "family": "Alegreya",
+          "weight": 400,
+          "lineHeight": 1.65
+        },
+        "mono": {
+          "family": "Anonymous Pro",
+          "weight": 400,
+          "tracking": "0.02em",
+          "size": "12px"
+        }
+      },
+      {
+        "id": "tech-brief",
+        "name": "Tech Brief",
+        "use": "Whitepapers, docs, RFCs, spec sheets with serif italics",
+        "display": {
+          "family": "Source Serif 4",
+          "weight": 800,
+          "tracking": "-0.015em",
+          "lineHeight": 1.05
+        },
+        "serifAccent": {
+          "family": "Spectral",
+          "style": "italic",
+          "weight": 400
+        },
+        "body": {
+          "family": "Inter",
+          "weight": 400,
+          "lineHeight": 1.62
+        },
+        "mono": {
+          "family": "IBM Plex Mono",
+          "weight": 400,
+          "tracking": "0.03em",
+          "size": "12px"
+        }
+      },
+      {
+        "id": "swiss-grid",
+        "name": "Swiss Grid",
+        "use": "International Typographic Style — systems, wayfinding, spec cards",
+        "display": {
+          "family": "Libre Franklin",
+          "weight": 800,
+          "tracking": "-0.025em",
+          "lineHeight": 0.98,
+          "textTransform": "uppercase"
+        },
+        "serifAccent": {
+          "family": "Lora",
+          "style": "italic",
+          "weight": 400
+        },
+        "body": {
+          "family": "Public Sans",
+          "weight": 400,
+          "lineHeight": 1.6
+        },
+        "mono": {
+          "family": "JetBrains Mono",
+          "weight": 400,
+          "tracking": "0.1em",
+          "size": "11px"
+        }
+      },
+      {
+        "id": "falcon-sport",
+        "name": "Falcon Sport",
+        "use": "Scores, standings, stadiums, race weekends",
+        "display": {
+          "family": "Anton",
+          "weight": 400,
+          "tracking": "0.015em",
+          "lineHeight": 0.92,
+          "textTransform": "uppercase"
+        },
+        "serifAccent": {
+          "family": "Lora",
+          "style": "italic",
+          "weight": 400
+        },
+        "body": {
+          "family": "Barlow Condensed",
+          "weight": 500,
+          "lineHeight": 1.35
+        },
+        "mono": {
+          "family": "JetBrains Mono",
+          "weight": 500,
+          "tracking": "0.1em",
+          "size": "11px"
+        }
+      },
+      {
+        "id": "haifa-hardware",
+        "name": "Haifa Hardware",
+        "use": "Bilingual Hebrew/Latin product surfaces, global launches",
+        "display": {
+          "family": "Heebo",
+          "weight": 800,
+          "tracking": "-0.02em",
+          "lineHeight": 0.98
+        },
+        "serifAccent": {
+          "family": "EB Garamond",
+          "style": "italic",
+          "weight": 400
+        },
+        "body": {
+          "family": "Work Sans",
+          "weight": 400,
+          "lineHeight": 1.6
+        },
+        "mono": {
+          "family": "IBM Plex Mono",
+          "weight": 400,
+          "tracking": "0.1em",
+          "size": "11px"
+        }
+      },
+      {
+        "id": "soft-circuit",
+        "name": "Soft Circuit",
+        "use": "Approachable SaaS, consumer fintech, friendly onboarding",
+        "display": {
+          "family": "Rubik",
+          "weight": 700,
+          "tracking": "-0.02em",
+          "lineHeight": 1
+        },
+        "serifAccent": {
+          "family": "Lora",
+          "style": "italic",
+          "weight": 400
+        },
+        "body": {
+          "family": "Manrope",
+          "weight": 400,
+          "lineHeight": 1.62
+        },
+        "mono": {
+          "family": "Spline Sans Mono",
+          "weight": 400,
+          "tracking": "0.06em",
+          "size": "12px"
+        }
+      },
+      {
+        "id": "helio-paper",
+        "name": "Helio Paper",
+        "use": "Marketing pages with warmth — marketing sites that don't feel SaaS-y",
+        "display": {
+          "family": "Outfit",
+          "weight": 700,
+          "tracking": "-0.025em",
+          "lineHeight": 1
+        },
+        "serifAccent": {
+          "family": "Newsreader",
+          "style": "italic",
+          "weight": 400
+        },
+        "body": {
+          "family": "Albert Sans",
+          "weight": 400,
+          "lineHeight": 1.6
+        },
+        "mono": {
+          "family": "DM Mono",
+          "weight": 400,
+          "tracking": "0.04em",
+          "size": "12px"
+        }
+      },
+      {
+        "id": "kaiju-deck",
+        "name": "Kaiju Deck",
+        "use": "Esports, HUDs, gaming launches, neon-noir decks",
+        "display": {
+          "family": "Chakra Petch",
+          "weight": 600,
+          "tracking": "0.02em",
+          "lineHeight": 1,
+          "textTransform": "uppercase"
+        },
+        "serifAccent": {
+          "family": "Spectral",
+          "style": "italic",
+          "weight": 300
+        },
+        "body": {
+          "family": "Saira",
+          "weight": 400,
+          "lineHeight": 1.55
+        },
+        "mono": {
+          "family": "Intel One Mono",
+          "weight": 400,
+          "tracking": "0.06em",
+          "size": "12px"
+        }
+      }
+    ],
+    "typeScale": {
+      "compiler": "clamp(MINrem, SLOPE vw + INTERCEPTrem, MAXrem) between 375px..1440px viewports — no breakpoints required",
+      "formula": "preferred = MIN + (MAX - MIN) * (100vw - 375px) / 1065px  → expressed as slope/intercept in rem/vw",
+      "scales": [
+        {
+          "id": "kinetic-fourth",
+          "name": "Kinetik Perfect Fourth",
+          "ratio": 1.333,
+          "viewportRange": "375px..1440px",
+          "use": "Display-first marketing and registry heroes",
+          "steps": {
+            "xs": {
+              "minRem": 0.5628,
+              "maxRem": 0.6331,
+              "css": "clamp(0.5628rem, 0.1056vw + 0.538rem, 0.6331rem)"
+            },
+            "sm": {
+              "minRem": 0.7502,
+              "maxRem": 0.844,
+              "css": "clamp(0.7502rem, 0.1409vw + 0.7172rem, 0.844rem)"
+            },
+            "body": {
+              "minRem": 1,
+              "maxRem": 1.125,
+              "css": "clamp(1rem, 0.1878vw + 0.956rem, 1.125rem)"
+            },
+            "lg": {
+              "minRem": 1.333,
+              "maxRem": 1.4996,
+              "css": "clamp(1.333rem, 0.2503vw + 1.2743rem, 1.4996rem)"
+            },
+            "xl": {
+              "minRem": 1.7769,
+              "maxRem": 1.999,
+              "css": "clamp(1.7769rem, 0.3337vw + 1.6987rem, 1.999rem)"
+            },
+            "2xl": {
+              "minRem": 2.3686,
+              "maxRem": 2.6647,
+              "css": "clamp(2.3686rem, 0.4448vw + 2.2643rem, 2.6647rem)"
+            },
+            "3xl": {
+              "minRem": 3.1573,
+              "maxRem": 3.552,
+              "css": "clamp(3.1573rem, 0.593vw + 3.0183rem, 3.552rem)"
+            },
+            "4xl": {
+              "minRem": 4.2087,
+              "maxRem": 4.7348,
+              "css": "clamp(4.2087rem, 0.7904vw + 4.0235rem, 4.7348rem)"
+            },
+            "5xl": {
+              "minRem": 5.6102,
+              "maxRem": 6.3115,
+              "css": "clamp(5.6102rem, 1.0536vw + 5.3633rem, 6.3115rem)"
+            },
+            "display": {
+              "minRem": 7.4784,
+              "maxRem": 8.4132,
+              "css": "clamp(7.4784rem, 1.4044vw + 7.1492rem, 8.4132rem)"
+            }
+          }
+        },
+        {
+          "id": "editorial-minor-third",
+          "name": "Editorial Minor Third",
+          "ratio": 1.2,
+          "viewportRange": "375px..1440px",
+          "use": "Long-form reading, articles, calm productivity UI",
+          "steps": {
+            "xs": {
+              "minRem": 0.6944,
+              "maxRem": 0.7813,
+              "css": "clamp(0.6944rem, 0.1306vw + 0.6638rem, 0.7813rem)"
+            },
+            "sm": {
+              "minRem": 0.8333,
+              "maxRem": 0.9375,
+              "css": "clamp(0.8333rem, 0.1565vw + 0.7966rem, 0.9375rem)"
+            },
+            "body": {
+              "minRem": 1,
+              "maxRem": 1.125,
+              "css": "clamp(1rem, 0.1878vw + 0.956rem, 1.125rem)"
+            },
+            "lg": {
+              "minRem": 1.2,
+              "maxRem": 1.35,
+              "css": "clamp(1.2rem, 0.2254vw + 1.1472rem, 1.35rem)"
+            },
+            "xl": {
+              "minRem": 1.44,
+              "maxRem": 1.62,
+              "css": "clamp(1.44rem, 0.2704vw + 1.3766rem, 1.62rem)"
+            },
+            "2xl": {
+              "minRem": 1.728,
+              "maxRem": 1.944,
+              "css": "clamp(1.728rem, 0.3245vw + 1.6519rem, 1.944rem)"
+            },
+            "3xl": {
+              "minRem": 2.0736,
+              "maxRem": 2.3328,
+              "css": "clamp(2.0736rem, 0.3894vw + 1.9823rem, 2.3328rem)"
+            },
+            "4xl": {
+              "minRem": 2.4883,
+              "maxRem": 2.7994,
+              "css": "clamp(2.4883rem, 0.4674vw + 2.3788rem, 2.7994rem)"
+            },
+            "5xl": {
+              "minRem": 2.986,
+              "maxRem": 3.3592,
+              "css": "clamp(2.986rem, 0.5607vw + 2.8546rem, 3.3592rem)"
+            },
+            "display": {
+              "minRem": 3.5832,
+              "maxRem": 4.0311,
+              "css": "clamp(3.5832rem, 0.6729vw + 3.4255rem, 4.0311rem)"
+            }
+          }
+        },
+        {
+          "id": "modest-major-third",
+          "name": "Modest Major Third",
+          "ratio": 1.25,
+          "viewportRange": "375px..1440px",
+          "use": "Balanced product UI — dashboards, settings, dense data",
+          "steps": {
+            "xs": {
+              "minRem": 0.64,
+              "maxRem": 0.72,
+              "css": "clamp(0.64rem, 0.1202vw + 0.6118rem, 0.72rem)"
+            },
+            "sm": {
+              "minRem": 0.8,
+              "maxRem": 0.9,
+              "css": "clamp(0.8rem, 0.1502vw + 0.7648rem, 0.9rem)"
+            },
+            "body": {
+              "minRem": 1,
+              "maxRem": 1.125,
+              "css": "clamp(1rem, 0.1878vw + 0.956rem, 1.125rem)"
+            },
+            "lg": {
+              "minRem": 1.25,
+              "maxRem": 1.4063,
+              "css": "clamp(1.25rem, 0.2348vw + 1.195rem, 1.4063rem)"
+            },
+            "xl": {
+              "minRem": 1.5625,
+              "maxRem": 1.7578,
+              "css": "clamp(1.5625rem, 0.2934vw + 1.4937rem, 1.7578rem)"
+            },
+            "2xl": {
+              "minRem": 1.9531,
+              "maxRem": 2.1973,
+              "css": "clamp(1.9531rem, 0.3669vw + 1.8671rem, 2.1973rem)"
+            },
+            "3xl": {
+              "minRem": 2.4414,
+              "maxRem": 2.7466,
+              "css": "clamp(2.4414rem, 0.4585vw + 2.3339rem, 2.7466rem)"
+            },
+            "4xl": {
+              "minRem": 3.0518,
+              "maxRem": 3.4332,
+              "css": "clamp(3.0518rem, 0.573vw + 2.9175rem, 3.4332rem)"
+            },
+            "5xl": {
+              "minRem": 3.8147,
+              "maxRem": 4.2915,
+              "css": "clamp(3.8147rem, 0.7163vw + 3.6468rem, 4.2915rem)"
+            },
+            "display": {
+              "minRem": 4.7684,
+              "maxRem": 5.3644,
+              "css": "clamp(4.7684rem, 0.8954vw + 4.5585rem, 5.3644rem)"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "color": {
+    "systems": [
+      {
+        "id": "obsidian",
+        "name": "Obsidian",
+        "mode": "dark",
+        "role": "Kinetik brand — cosmic obsidian with flame accent",
+        "tokens": {
+          "bg": "#070709",
+          "surface": "#0D0D12",
+          "elevated": "#12121A",
+          "ink": "#F4F2EC",
+          "mutedInk": "#8E8D8A",
+          "hairline": "rgba(244,242,236,0.10)",
+          "hairlineStrong": "rgba(244,242,236,0.24)",
+          "accent": "#FF3D00",
+          "accentHover": "#FF5A26",
+          "onAccent": "#160800",
+          "success": "#10B981",
+          "warning": "#E5A93C",
+          "danger": "#FF5A5A"
+        },
+        "audit": {
+          "inkOnBg": {
+            "ratio": 17.98,
+            "grade": "AAA"
+          },
+          "mutedOnBg": {
+            "ratio": 6.06,
+            "grade": "AA"
+          },
+          "inkOnSurface": {
+            "ratio": 17.31,
+            "grade": "AAA"
+          },
+          "accentOnBg": {
+            "ratio": 5.67,
+            "grade": "AA"
+          },
+          "accentOnSurface": {
+            "ratio": 5.46,
+            "grade": "AA"
+          },
+          "onAccentOnAccent": {
+            "ratio": 5.54,
+            "grade": "AA"
+          }
+        }
+      },
+      {
+        "id": "paper",
+        "name": "Paper",
+        "mode": "light",
+        "role": "Editorial warm light — gallery wall with ember accent",
+        "tokens": {
+          "bg": "#F4F2EC",
+          "surface": "#FBFAF7",
+          "elevated": "#FFFFFF",
+          "ink": "#0E0E10",
+          "mutedInk": "#66655F",
+          "hairline": "rgba(14,14,16,0.10)",
+          "hairlineStrong": "rgba(14,14,16,0.22)",
+          "accent": "#C93300",
+          "accentHover": "#A82C00",
+          "onAccent": "#FFFFFF",
+          "success": "#047857",
+          "warning": "#B45309",
+          "danger": "#DC2626"
+        },
+        "audit": {
+          "inkOnBg": {
+            "ratio": 17.23,
+            "grade": "AAA"
+          },
+          "mutedOnBg": {
+            "ratio": 5.22,
+            "grade": "AA"
+          },
+          "inkOnSurface": {
+            "ratio": 18.48,
+            "grade": "AAA"
+          },
+          "accentOnBg": {
+            "ratio": 4.74,
+            "grade": "AA"
+          },
+          "accentOnSurface": {
+            "ratio": 5.08,
+            "grade": "AA"
+          },
+          "onAccentOnAccent": {
+            "ratio": 5.31,
+            "grade": "AA"
+          }
+        }
+      },
+      {
+        "id": "aegean",
+        "name": "Aegean",
+        "mode": "dark",
+        "role": "Deep-sea dark — electric cyan over abyssal ink",
+        "tokens": {
+          "bg": "#06121A",
+          "surface": "#0D2430",
+          "elevated": "#123040",
+          "ink": "#E6F7FF",
+          "mutedInk": "#6FA3B8",
+          "hairline": "rgba(230,247,255,0.12)",
+          "hairlineStrong": "rgba(230,247,255,0.26)",
+          "accent": "#00F0FF",
+          "accentHover": "#4DF3FF",
+          "onAccent": "#06121A",
+          "success": "#34D399",
+          "warning": "#FBBF24",
+          "danger": "#F87171"
+        },
+        "audit": {
+          "inkOnBg": {
+            "ratio": 17.23,
+            "grade": "AAA"
+          },
+          "mutedOnBg": {
+            "ratio": 6.86,
+            "grade": "AA"
+          },
+          "inkOnSurface": {
+            "ratio": 14.57,
+            "grade": "AAA"
+          },
+          "accentOnBg": {
+            "ratio": 13.44,
+            "grade": "AAA"
+          },
+          "accentOnSurface": {
+            "ratio": 11.36,
+            "grade": "AAA"
+          },
+          "onAccentOnAccent": {
+            "ratio": 13.44,
+            "grade": "AAA"
+          }
+        }
+      },
+      {
+        "id": "parchment",
+        "name": "Parchment",
+        "mode": "light",
+        "role": "Ivory stationery — burnt-sienna accent, archival warmth",
+        "tokens": {
+          "bg": "#FAF6ED",
+          "surface": "#FFFDF6",
+          "elevated": "#FFFFFF",
+          "ink": "#1C1A15",
+          "mutedInk": "#6E6A5E",
+          "hairline": "rgba(28,26,21,0.12)",
+          "hairlineStrong": "rgba(28,26,21,0.24)",
+          "accent": "#A6460E",
+          "accentHover": "#8C3A0B",
+          "onAccent": "#FFFDF6",
+          "success": "#15803D",
+          "warning": "#A16207",
+          "danger": "#B91C1C"
+        },
+        "audit": {
+          "inkOnBg": {
+            "ratio": 16.12,
+            "grade": "AAA"
+          },
+          "mutedOnBg": {
+            "ratio": 5.01,
+            "grade": "AA"
+          },
+          "inkOnSurface": {
+            "ratio": 17.08,
+            "grade": "AAA"
+          },
+          "accentOnBg": {
+            "ratio": 5.56,
+            "grade": "AA"
+          },
+          "accentOnSurface": {
+            "ratio": 5.89,
+            "grade": "AA"
+          },
+          "onAccentOnAccent": {
+            "ratio": 5.89,
+            "grade": "AA"
+          }
+        }
+      },
+      {
+        "id": "ledger",
+        "name": "Ledger",
+        "mode": "light",
+        "role": "Cool accounting light — slate ink, deep Aegean-navy accent",
+        "tokens": {
+          "bg": "#F7F8FA",
+          "surface": "#FFFFFF",
+          "elevated": "#FFFFFF",
+          "ink": "#0F172A",
+          "mutedInk": "#5B6B84",
+          "hairline": "rgba(15,23,42,0.10)",
+          "hairlineStrong": "rgba(15,23,42,0.22)",
+          "accent": "#0F4C64",
+          "accentHover": "#0B3A4F",
+          "onAccent": "#FFFFFF",
+          "success": "#047857",
+          "warning": "#B45309",
+          "danger": "#DC2626"
+        },
+        "audit": {
+          "inkOnBg": {
+            "ratio": 16.8,
+            "grade": "AAA"
+          },
+          "mutedOnBg": {
+            "ratio": 5.09,
+            "grade": "AA"
+          },
+          "inkOnSurface": {
+            "ratio": 17.85,
+            "grade": "AAA"
+          },
+          "accentOnBg": {
+            "ratio": 8.83,
+            "grade": "AAA"
+          },
+          "accentOnSurface": {
+            "ratio": 9.38,
+            "grade": "AAA"
+          },
+          "onAccentOnAccent": {
+            "ratio": 9.38,
+            "grade": "AAA"
+          }
+        }
+      },
+      {
+        "id": "meridian",
+        "name": "Meridian",
+        "mode": "dark",
+        "role": "Smoked-umber dark — gilded gold accent, instrument-lacquer noir",
+        "tokens": {
+          "bg": "#12100C",
+          "surface": "#1B1812",
+          "elevated": "#242017",
+          "ink": "#F2EDE3",
+          "mutedInk": "#9A9382",
+          "hairline": "rgba(242,237,227,0.10)",
+          "hairlineStrong": "rgba(242,237,227,0.24)",
+          "accent": "#E5A93C",
+          "accentHover": "#F0BC55",
+          "onAccent": "#12100C",
+          "success": "#34D399",
+          "warning": "#FBBF24",
+          "danger": "#F87171"
+        },
+        "audit": {
+          "inkOnBg": {
+            "ratio": 16.29,
+            "grade": "AAA"
+          },
+          "mutedOnBg": {
+            "ratio": 6.22,
+            "grade": "AA"
+          },
+          "inkOnSurface": {
+            "ratio": 15.18,
+            "grade": "AAA"
+          },
+          "accentOnBg": {
+            "ratio": 9.11,
+            "grade": "AAA"
+          },
+          "accentOnSurface": {
+            "ratio": 8.49,
+            "grade": "AAA"
+          },
+          "onAccentOnAccent": {
+            "ratio": 9.11,
+            "grade": "AAA"
+          }
+        }
+      }
+    ],
+    "scales": {
+      "flame": {
+        "anchor": "#FF3D00",
+        "hue": 14,
+        "saturation": 100,
+        "method": "hue-locked HSL lightness ramp (96→12), WCAG 2.1 ratios computed",
+        "steps": {
+          "50": {
+            "hex": "#FFEFEB",
+            "contrastOnNearBlack": 17.26,
+            "contrastOnNearWhite": 1,
+            "recommendedText": "#0E0E10",
+            "aaNormal": true
+          },
+          "100": {
+            "hex": "#FFD4C7",
+            "contrastOnNearBlack": 14.23,
+            "contrastOnNearWhite": 1.21,
+            "recommendedText": "#0E0E10",
+            "aaNormal": true
+          },
+          "200": {
+            "hex": "#FFAD94",
+            "contrastOnNearBlack": 10.7,
+            "contrastOnNearWhite": 1.61,
+            "recommendedText": "#0E0E10",
+            "aaNormal": true
+          },
+          "300": {
+            "hex": "#FF8661",
+            "contrastOnNearBlack": 8.11,
+            "contrastOnNearWhite": 2.12,
+            "recommendedText": "#0E0E10",
+            "aaNormal": true
+          },
+          "400": {
+            "hex": "#FF6333",
+            "contrastOnNearBlack": 6.51,
+            "contrastOnNearWhite": 2.65,
+            "recommendedText": "#0E0E10",
+            "aaNormal": true
+          },
+          "500": {
+            "hex": "#FF3C00",
+            "contrastOnNearBlack": 5.42,
+            "contrastOnNearWhite": 3.18,
+            "recommendedText": "#0E0E10",
+            "aaNormal": true
+          },
+          "600": {
+            "hex": "#D63200",
+            "contrastOnNearBlack": 3.96,
+            "contrastOnNearWhite": 4.35,
+            "recommendedText": "#F4F2EC",
+            "aaNormal": false
+          },
+          "700": {
+            "hex": "#AD2800",
+            "contrastOnNearBlack": 2.83,
+            "contrastOnNearWhite": 6.09,
+            "recommendedText": "#F4F2EC",
+            "aaNormal": true
+          },
+          "800": {
+            "hex": "#8A2000",
+            "contrastOnNearBlack": 2.1,
+            "contrastOnNearWhite": 8.2,
+            "recommendedText": "#F4F2EC",
+            "aaNormal": true
+          },
+          "900": {
+            "hex": "#661800",
+            "contrastOnNearBlack": 1.56,
+            "contrastOnNearWhite": 11.06,
+            "recommendedText": "#F4F2EC",
+            "aaNormal": true
+          },
+          "950": {
+            "hex": "#3D0E00",
+            "contrastOnNearBlack": 1.16,
+            "contrastOnNearWhite": 14.87,
+            "recommendedText": "#F4F2EC",
+            "aaNormal": true
+          }
+        }
+      },
+      "aegean": {
+        "anchor": "#00F0FF",
+        "hue": 184,
+        "saturation": 100,
+        "method": "hue-locked HSL lightness ramp (96→12), WCAG 2.1 ratios computed",
+        "steps": {
+          "50": {
+            "hex": "#EBFEFF",
+            "contrastOnNearBlack": 18.51,
+            "contrastOnNearWhite": 1.07,
+            "recommendedText": "#0E0E10",
+            "aaNormal": true
+          },
+          "100": {
+            "hex": "#C7FBFF",
+            "contrastOnNearBlack": 17.15,
+            "contrastOnNearWhite": 1,
+            "recommendedText": "#0E0E10",
+            "aaNormal": true
+          },
+          "200": {
+            "hex": "#94F8FF",
+            "contrastOnNearBlack": 15.73,
+            "contrastOnNearWhite": 1.1,
+            "recommendedText": "#0E0E10",
+            "aaNormal": true
+          },
+          "300": {
+            "hex": "#61F4FF",
+            "contrastOnNearBlack": 14.59,
+            "contrastOnNearWhite": 1.18,
+            "recommendedText": "#0E0E10",
+            "aaNormal": true
+          },
+          "400": {
+            "hex": "#33F1FF",
+            "contrastOnNearBlack": 13.93,
+            "contrastOnNearWhite": 1.24,
+            "recommendedText": "#0E0E10",
+            "aaNormal": true
+          },
+          "500": {
+            "hex": "#00EEFF",
+            "contrastOnNearBlack": 13.47,
+            "contrastOnNearWhite": 1.28,
+            "recommendedText": "#0E0E10",
+            "aaNormal": true
+          },
+          "600": {
+            "hex": "#00C8D6",
+            "contrastOnNearBlack": 9.4,
+            "contrastOnNearWhite": 1.83,
+            "recommendedText": "#0E0E10",
+            "aaNormal": true
+          },
+          "700": {
+            "hex": "#00A2AD",
+            "contrastOnNearBlack": 6.22,
+            "contrastOnNearWhite": 2.77,
+            "recommendedText": "#0E0E10",
+            "aaNormal": true
+          },
+          "800": {
+            "hex": "#00818A",
+            "contrastOnNearBlack": 4.14,
+            "contrastOnNearWhite": 4.16,
+            "recommendedText": "#F4F2EC",
+            "aaNormal": false
+          },
+          "900": {
+            "hex": "#005F66",
+            "contrastOnNearBlack": 2.6,
+            "contrastOnNearWhite": 6.63,
+            "recommendedText": "#F4F2EC",
+            "aaNormal": true
+          },
+          "950": {
+            "hex": "#00393D",
+            "contrastOnNearBlack": 1.52,
+            "contrastOnNearWhite": 11.35,
+            "recommendedText": "#F4F2EC",
+            "aaNormal": true
+          }
+        }
+      },
+      "gold": {
+        "anchor": "#E5A93C",
+        "hue": 41,
+        "saturation": 79,
+        "method": "hue-locked HSL lightness ramp (96→12), WCAG 2.1 ratios computed",
+        "steps": {
+          "50": {
+            "hex": "#FDF8ED",
+            "contrastOnNearBlack": 18.21,
+            "contrastOnNearWhite": 1.06,
+            "recommendedText": "#0E0E10",
+            "aaNormal": true
+          },
+          "100": {
+            "hex": "#F9EBCD",
+            "contrastOnNearBlack": 16.34,
+            "contrastOnNearWhite": 1.05,
+            "recommendedText": "#0E0E10",
+            "aaNormal": true
+          },
+          "200": {
+            "hex": "#F4D99F",
+            "contrastOnNearBlack": 14.02,
+            "contrastOnNearWhite": 1.23,
+            "recommendedText": "#0E0E10",
+            "aaNormal": true
+          },
+          "300": {
+            "hex": "#EEC772",
+            "contrastOnNearBlack": 11.98,
+            "contrastOnNearWhite": 1.44,
+            "recommendedText": "#0E0E10",
+            "aaNormal": true
+          },
+          "400": {
+            "hex": "#EAB748",
+            "contrastOnNearBlack": 10.44,
+            "contrastOnNearWhite": 1.65,
+            "recommendedText": "#0E0E10",
+            "aaNormal": true
+          },
+          "500": {
+            "hex": "#E4A41B",
+            "contrastOnNearBlack": 8.84,
+            "contrastOnNearWhite": 1.95,
+            "recommendedText": "#0E0E10",
+            "aaNormal": true
+          },
+          "600": {
+            "hex": "#C08A16",
+            "contrastOnNearBlack": 6.33,
+            "contrastOnNearWhite": 2.72,
+            "recommendedText": "#0E0E10",
+            "aaNormal": true
+          },
+          "700": {
+            "hex": "#9B7012",
+            "contrastOnNearBlack": 4.33,
+            "contrastOnNearWhite": 3.97,
+            "recommendedText": "#0E0E10",
+            "aaNormal": false
+          },
+          "800": {
+            "hex": "#7B590E",
+            "contrastOnNearBlack": 3.01,
+            "contrastOnNearWhite": 5.72,
+            "recommendedText": "#F4F2EC",
+            "aaNormal": true
+          },
+          "900": {
+            "hex": "#5B420B",
+            "contrastOnNearBlack": 2.05,
+            "contrastOnNearWhite": 8.42,
+            "recommendedText": "#F4F2EC",
+            "aaNormal": true
+          },
+          "950": {
+            "hex": "#372706",
+            "contrastOnNearBlack": 1.34,
+            "contrastOnNearWhite": 12.89,
+            "recommendedText": "#F4F2EC",
+            "aaNormal": true
+          }
+        }
+      }
+    },
+    "surfaceTreatments": [
+      {
+        "id": "grain",
+        "name": "Film Grain",
+        "css": "position:fixed;inset:0;opacity:.045;pointer-events:none;background-image:url(\"data:image/svg+xml,…feTurbulence…\")",
+        "note": "SVG fractal noise — see snippet grain-overlay"
+      },
+      {
+        "id": "glass-hairline",
+        "name": "Glass + Gradient Hairline",
+        "css": "background:rgba(13,13,18,.62);backdrop-filter:blur(16px);border:1px solid rgba(244,242,236,.10)",
+        "note": "see snippet glass-hairline-panel"
+      },
+      {
+        "id": "mesh-ambient",
+        "name": "Ambient Mesh Radials",
+        "css": "radial-gradient(58vw 48vh at 84% 16%, rgba(255,61,0,.13), transparent 70%), radial-gradient(50vw 50vh at 8% 92%, rgba(124,155,255,.09), transparent 70%)",
+        "note": "two fixed radials, no JS"
+      },
+      {
+        "id": "obsidian-elevated",
+        "name": "Obsidian Elevation Ladder",
+        "css": "#070709 → #0D0D12 → #12121A",
+        "note": "bg → surface → elevated, hairline 10% → 24% strength"
+      }
+    ]
+  },
+  "motion": {
+    "easings": [
+      {
+        "id": "kinetic-snap",
+        "name": "Kinetic snap",
+        "by": "Prometheus",
+        "cubicBezier": [
+          0.16,
+          1,
+          0.3,
+          1
+        ],
+        "kind": "entrance",
+        "use": "Structural entrances, modals, masked headlines, panel arrivals",
+        "example": "transition: transform 1.15s cubic-bezier(0.16, 1, 0.3, 1);",
+        "css": "cubic-bezier(0.16, 1, 0.3, 1)"
+      },
+      {
+        "id": "celestial-drift",
+        "name": "Celestial drift",
+        "by": "Athena",
+        "cubicBezier": [
+          0.33,
+          1,
+          0.68,
+          1
+        ],
+        "kind": "editorial",
+        "use": "Text reveals, editorial opacity ramps, long luxurious fades",
+        "example": "transition: opacity 0.9s cubic-bezier(0.33, 1, 0.68, 1);",
+        "css": "cubic-bezier(0.33, 1, 0.68, 1)"
+      },
+      {
+        "id": "velocity-whip",
+        "name": "Velocity whip",
+        "by": "Hermes",
+        "cubicBezier": [
+          0.22,
+          1,
+          0.36,
+          1
+        ],
+        "kind": "entrance",
+        "use": "Magnetic cursors, drawers, anything that must outrun the user's click",
+        "example": "transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);",
+        "css": "cubic-bezier(0.22, 1, 0.36, 1)"
+      },
+      {
+        "id": "obsidian-settle",
+        "name": "Obsidian settle",
+        "by": "Nyx",
+        "cubicBezier": [
+          0.5,
+          1,
+          0.89,
+          1
+        ],
+        "kind": "ambient",
+        "use": "Dark surfaces arriving — overlays, panels, depth transitions",
+        "example": "transition: background-color 1.4s cubic-bezier(0.5, 1, 0.89, 1);",
+        "css": "cubic-bezier(0.5, 1, 0.89, 1)"
+      },
+      {
+        "id": "editorial-ease",
+        "name": "Editorial ease",
+        "by": "Iris",
+        "cubicBezier": [
+          0.25,
+          1,
+          0.5,
+          1
+        ],
+        "kind": "editorial",
+        "use": "Marquees settling, color washes, quiet cross-fades",
+        "example": "transition: color 0.6s cubic-bezier(0.25, 1, 0.5, 1);",
+        "css": "cubic-bezier(0.25, 1, 0.5, 1)"
+      },
+      {
+        "id": "chronos-cortege",
+        "name": "Chronos cortege",
+        "by": "Chronos",
+        "cubicBezier": [
+          0.76,
+          0,
+          0.24,
+          1
+        ],
+        "kind": "exit",
+        "use": "Symmetric in-out for media handoffs and sequenced dismisses",
+        "example": "transition: transform 0.8s cubic-bezier(0.76, 0, 0.24, 1);",
+        "css": "cubic-bezier(0.76, 0, 0.24, 1)"
+      },
+      {
+        "id": "daedalus-rule",
+        "name": "Daedalus rule",
+        "by": "Daedalus",
+        "cubicBezier": [
+          0.65,
+          0,
+          0.35,
+          1
+        ],
+        "kind": "exit",
+        "use": "Hairline reveals and measured exits drawn like a pen stroke",
+        "example": "transition: transform 0.9s cubic-bezier(0.65, 0, 0.35, 1);",
+        "css": "cubic-bezier(0.65, 0, 0.35, 1)"
+      },
+      {
+        "id": "hephaestus-overshoot",
+        "name": "Hephaestus overshoot",
+        "by": "Hephaestus",
+        "cubicBezier": [
+          0.34,
+          1.56,
+          0.64,
+          1
+        ],
+        "kind": "spring",
+        "use": "Controls that want to feel hammered into shape — toggles, badges, buttons",
+        "example": "transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);",
+        "css": "cubic-bezier(0.34, 1.56, 0.64, 1)"
+      },
+      {
+        "id": "meridian-glide",
+        "name": "Meridian glide",
+        "by": "Atlas (open)",
+        "cubicBezier": [
+          0.2,
+          0.8,
+          0.2,
+          1
+        ],
+        "kind": "ambient",
+        "use": "Navigation chrome gliding across the viewport",
+        "example": "transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);",
+        "css": "cubic-bezier(0.2, 0.8, 0.2, 1)"
+      },
+      {
+        "id": "glacier-drift",
+        "name": "Glacier drift",
+        "by": "Atlas (open)",
+        "cubicBezier": [
+          0.4,
+          0,
+          0.2,
+          1
+        ],
+        "kind": "ambient",
+        "use": "Slow ambient loops — aurora, mesh gradients, idle shimmer",
+        "example": "transition: opacity 2.4s cubic-bezier(0.4, 0, 0.2, 1);",
+        "css": "cubic-bezier(0.4, 0, 0.2, 1)"
+      },
+      {
+        "id": "nova-burst",
+        "name": "Nova burst",
+        "by": "Hephaestus",
+        "cubicBezier": [
+          0.34,
+          1.3,
+          0.64,
+          1
+        ],
+        "kind": "spring",
+        "use": "Micro-feedback pops — like/confirm/copied states",
+        "example": "transition: transform 0.35s cubic-bezier(0.34, 1.3, 0.64, 1);",
+        "css": "cubic-bezier(0.34, 1.3, 0.64, 1)"
+      },
+      {
+        "id": "umbra-sink",
+        "name": "Umbra sink",
+        "by": "Nyx",
+        "cubicBezier": [
+          0.55,
+          0,
+          1,
+          0.45
+        ],
+        "kind": "exit",
+        "use": "Exits that fall away — toasts dismissing, trays sinking",
+        "example": "transition: transform 0.4s cubic-bezier(0.55, 0, 1, 0.45);",
+        "css": "cubic-bezier(0.55, 0, 1, 0.45)"
+      }
+    ],
+    "springs": [
+      {
+        "id": "magnetic",
+        "name": "Magnetic pull",
+        "stiffness": 260,
+        "damping": 16,
+        "use": "Cursor-attracted buttons and controls (see snippet magnetic-button)"
+      },
+      {
+        "id": "drape",
+        "name": "Drape",
+        "stiffness": 180,
+        "damping": 26,
+        "use": "Drawers and curtains settling to rest"
+      },
+      {
+        "id": "drawer-eject",
+        "name": "Drawer eject",
+        "stiffness": 320,
+        "damping": 22,
+        "use": "Panels ejecting toward the user on open"
+      }
+    ],
+    "microInteractions": [
+      "magnetic-button",
+      "spotlight-card",
+      "masked-rise-headline",
+      "stateful-button",
+      "smooth-drawer",
+      "marquee-zero-cls",
+      "reveal-on-scroll",
+      "tilt-card-3d",
+      "conic-border-spin",
+      "grain-overlay",
+      "glass-hairline-panel",
+      "accordion-spring"
+    ]
+  },
+  "snippets": {
+    "magnetic-button": {
+      "id": "magnetic-button",
+      "name": "Magnetic Button",
+      "category": "control",
+      "description": "Button that leans toward the cursor with a spring-like settle. Pairs with .chip / .btn-flame styling.",
+      "language": "html",
+      "code": "<button class=\"ak-magnetic\" data-strength=\"0.32\">Claim the tier</button>\n<style>\n  .ak-magnetic {\n    display: inline-flex; align-items: center; gap: 0.75rem;\n    padding: 1.1rem 2.2rem; border-radius: 9999px; border: 0;\n    background: #FF3D00; color: #fff; font-weight: 600; cursor: pointer;\n    transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);\n    will-change: transform;\n  }\n  @media (prefers-reduced-motion: reduce) { .ak-magnetic { transform: none !important; transition: none; } }\n</style>\n<script>\n  (() => {\n    if (window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches) return;\n    document.querySelectorAll(\".ak-magnetic\").forEach((el) => {\n      const strength = parseFloat(el.dataset.strength || \"0.3\");\n      el.addEventListener(\"pointermove\", (e) => {\n        const r = el.getBoundingClientRect();\n        const x = (e.clientX - (r.left + r.width / 2)) * strength;\n        const y = (e.clientY - (r.top + r.height / 2)) * strength;\n        el.style.transform = \"translate(\" + x.toFixed(1) + \"px,\" + y.toFixed(1) + \"px)\";\n      });\n      el.addEventListener(\"pointerleave\", () => { el.style.transform = \"translate(0px, 0px)\"; });\n    });\n  })();\n</script>"
+    },
+    "spotlight-card": {
+      "id": "spotlight-card",
+      "name": "Spotlight Hover Card",
+      "category": "card",
+      "description": "Card that tracks the pointer with a warm radial spotlight — the Kinetik bento signature.",
+      "language": "html",
+      "code": "<article class=\"ak-spot\"><h3>Ember</h3><p>Depth-of-field pricing panel.</p></article>\n<style>\n  .ak-spot {\n    position: relative; overflow: hidden; border-radius: 1rem;\n    background: #0D0D12; border: 1px solid rgba(244, 242, 236, 0.10);\n    padding: 1.5rem; color: #F4F2EC;\n  }\n  .ak-spot::before {\n    content: \"\"; position: absolute; inset: 0; pointer-events: none;\n    background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 50%),\n      rgba(255, 61, 0, 0.14), transparent 62%);\n    opacity: 0; transition: opacity 0.35s ease;\n  }\n  .ak-spot:hover::before { opacity: 1; }\n</style>\n<script>\n  document.querySelectorAll(\".ak-spot\").forEach((card) => {\n    card.addEventListener(\"pointermove\", (e) => {\n      const r = card.getBoundingClientRect();\n      card.style.setProperty(\"--mx\", (e.clientX - r.left) + \"px\");\n      card.style.setProperty(\"--my\", (e.clientY - r.top) + \"px\");\n    });\n  });\n</script>"
+    },
+    "masked-rise-headline": {
+      "id": "masked-rise-headline",
+      "name": "Masked Baseline Rise Headline",
+      "category": "typography",
+      "description": "Line-by-line masked headline reveal — zero CLS, GPU-only transform, matches Atelier Kinetik's hero.",
+      "language": "html",
+      "code": "<h1 class=\"ak-rise\">\n  <span class=\"ak-rise-mask\"><span class=\"ak-rise-line\">Kinetic</span></span>\n  <span class=\"ak-rise-mask\"><span class=\"ak-rise-line\">by design.</span></span>\n</h1>\n<style>\n  .ak-rise-mask { display: block; overflow: hidden; padding: 0.08em 0.05em 0.12em; margin: -0.08em -0.05em -0.12em; }\n  .ak-rise-line {\n    display: block; transform-origin: 0 100%;\n    transform: translateY(118%) rotate(3.5deg);\n    animation: ak-rise-in 1.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;\n  }\n  .ak-rise-mask:nth-child(2) .ak-rise-line { animation-delay: 0.12s; }\n  @keyframes ak-rise-in { to { transform: translateY(0) rotate(0deg); } }\n  @media (prefers-reduced-motion: reduce) { .ak-rise-line { animation: none; transform: none; } }\n</style>"
+    },
+    "stateful-button": {
+      "id": "stateful-button",
+      "name": "Stateful Button (idle → busy → done)",
+      "category": "control",
+      "description": "Button with truthful busy/success states — aria-live announcement included, no fake spinners.",
+      "language": "html",
+      "code": "<button class=\"ak-state\" data-state=\"idle\"><span class=\"ak-state-label\">Copy tokens</span></button>\n<span class=\"ak-state-live\" aria-live=\"polite\" style=\"position:absolute;left:-9999px\"></span>\n<style>\n  .ak-state { padding: 0.9rem 1.6rem; border-radius: 0.75rem; border: 1px solid rgba(244,242,236,0.24);\n    background: transparent; color: #F4F2EC; cursor: pointer; transition: background-color .3s, color .3s; }\n  .ak-state[data-state=\"busy\"] { opacity: 0.75; pointer-events: none; }\n  .ak-state[data-state=\"done\"] { background: #10B981; border-color: #10B981; color: #04120C; }\n</style>\n<script>\n  const btn = document.querySelector(\".ak-state\");\n  const live = document.querySelector(\".ak-state-live\");\n  const label = btn.querySelector(\".ak-state-label\");\n  btn.addEventListener(\"click\", async () => {\n    btn.dataset.state = \"busy\"; label.textContent = \"Copying…\";\n    try {\n      await navigator.clipboard.writeText(\"color.accent: #FF3D00\");\n      btn.dataset.state = \"done\"; label.textContent = \"Copied\"; live.textContent = \"Tokens copied to clipboard\";\n    } catch (err) {\n      btn.dataset.state = \"idle\"; label.textContent = \"Retry copy\"; live.textContent = \"Copy failed\";\n    }\n    setTimeout(() => { btn.dataset.state = \"idle\"; label.textContent = \"Copy tokens\"; }, 1800);\n  });\n</script>"
+    },
+    "smooth-drawer": {
+      "id": "smooth-drawer",
+      "name": "Spring Drawer",
+      "category": "navigation",
+      "description": "Right-hand drawer on transform only (no layout thrash) — Escape closes, body scroll locks, focus lands inside.",
+      "language": "html",
+      "code": "<button class=\"ak-drawer-open\">Open index</button>\n<div class=\"ak-drawer\" role=\"dialog\" aria-modal=\"true\" aria-label=\"Site index\" aria-hidden=\"true\">\n  <button class=\"ak-drawer-close\" aria-label=\"Close\">×</button>\n  <nav><a href=\"#one\">01 — The Forge</a><a href=\"#two\">02 — Registry</a></nav>\n</div>\n<style>\n  .ak-drawer {\n    position: fixed; top: 0; right: 0; z-index: 80; height: 100dvh; width: min(420px, 92vw);\n    background: rgba(13, 13, 18, 0.92); backdrop-filter: blur(18px);\n    border-left: 1px solid rgba(244, 242, 236, 0.24); padding: 4rem 2rem 2rem;\n    transform: translateX(102%); transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);\n    visibility: hidden;\n  }\n  .ak-drawer.open { transform: translateX(0); visibility: visible; }\n  @media (prefers-reduced-motion: reduce) { .ak-drawer { transition: none; } }\n  body.ak-locked { overflow: hidden; }\n</style>\n<script>\n  const drawer = document.querySelector(\".ak-drawer\");\n  const open = () => { drawer.classList.add(\"open\"); drawer.setAttribute(\"aria-hidden\", \"false\");\n    document.body.classList.add(\"ak-locked\"); drawer.querySelector(\"a\").focus(); };\n  const close = () => { drawer.classList.remove(\"open\"); drawer.setAttribute(\"aria-hidden\", \"true\");\n    document.body.classList.remove(\"ak-locked\"); };\n  document.querySelector(\".ak-drawer-open\").addEventListener(\"click\", open);\n  document.querySelector(\".ak-drawer-close\").addEventListener(\"click\", close);\n  document.addEventListener(\"keydown\", (e) => { if (e.key === \"Escape\") close(); });\n</script>"
+    },
+    "marquee-zero-cls": {
+      "id": "marquee-zero-cls",
+      "name": "Marquee (Zero CLS)",
+      "category": "editorial",
+      "description": "Seamless editorial marquee — content duplicated aria-hidden, transform-only animation, no layout shift.",
+      "language": "html",
+      "code": "<div class=\"ak-marquee\" aria-hidden=\"true\"><div class=\"ak-marquee-track\">\n  <span>60 typefaces</span><span>·</span><span>Zero layout shift</span><span>·</span><span>The agents never rest</span><span>·</span>\n  <span>60 typefaces</span><span>·</span><span>Zero layout shift</span><span>·</span><span>The agents never rest</span><span>·</span>\n</div></div>\n<style>\n  .ak-marquee { overflow: hidden; white-space: nowrap; border-top: 1px solid rgba(244,242,236,0.24); border-bottom: 1px solid rgba(244,242,236,0.24); padding: 0.9rem 0; }\n  .ak-marquee-track { display: inline-flex; gap: 2.5rem; width: max-content;\n    animation: ak-marquee 22s linear infinite; }\n  @keyframes ak-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }\n  @media (prefers-reduced-motion: reduce) { .ak-marquee-track { animation: none; } }\n</style>"
+    },
+    "reveal-on-scroll": {
+      "id": "reveal-on-scroll",
+      "name": "Reveal on Scroll (IO, Zero CLS)",
+      "category": "scroll",
+      "description": "IntersectionObserver reveals with transform/opacity only — no reflow, no CLS, reduced-motion safe.",
+      "language": "html",
+      "code": "<section class=\"ak-reveal\">Editorial content…</section>\n<style>\n  .ak-reveal { opacity: 0; transform: translateY(28px);\n    transition: opacity 0.7s ease, transform 0.85s cubic-bezier(0.16, 1, 0.3, 1); }\n  .ak-reveal.is-in { opacity: 1; transform: none; }\n  @media (prefers-reduced-motion: reduce) { .ak-reveal { transition: none; opacity: 1; transform: none; } }\n</style>\n<script>\n  const io = new IntersectionObserver((entries) => {\n    entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add(\"is-in\"); io.unobserve(entry.target); } });\n  }, { rootMargin: \"0px 0px -12% 0px\", threshold: 0.08 });\n  document.querySelectorAll(\".ak-reveal\").forEach((el) => io.observe(el));\n</script>"
+    },
+    "tilt-card-3d": {
+      "id": "tilt-card-3d",
+      "name": "Tilt Card 3D",
+      "category": "card",
+      "description": "Pointer-tracked perspective tilt — GPU transform only, settles back with a soft spring on leave.",
+      "language": "html",
+      "code": "<div class=\"ak-tilt\"><div class=\"ak-tilt-inner\">Hover the instrument.</div></div>\n<style>\n  .ak-tilt { perspective: 900px; }\n  .ak-tilt-inner {\n    border-radius: 1rem; padding: 2rem; background: #12121A; border: 1px solid rgba(244,242,236,0.10);\n    color: #F4F2EC; transform-style: preserve-3d;\n    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);\n  }\n  @media (prefers-reduced-motion: reduce) { .ak-tilt-inner { transition: none; transform: none !important; } }\n</style>\n<script>\n  if (!window.matchMedia(\"(prefers-reduced-motion: reduce)\").matches) {\n    document.querySelectorAll(\".ak-tilt\").forEach((wrap) => {\n      const inner = wrap.querySelector(\".ak-tilt-inner\");\n      wrap.addEventListener(\"pointermove\", (e) => {\n        const r = wrap.getBoundingClientRect();\n        const rx = ((e.clientY - (r.top + r.height / 2)) / (r.height / 2)) * -7;\n        const ry = ((e.clientX - (r.left + r.width / 2)) / (r.width / 2)) * 9;\n        inner.style.transform = \"rotateX(\" + rx.toFixed(2) + \"deg) rotateY(\" + ry.toFixed(2) + \"deg)\";\n      });\n      wrap.addEventListener(\"pointerleave\", () => { inner.style.transform = \"rotateX(0deg) rotateY(0deg)\"; });\n    });\n  }\n</script>"
+    },
+    "conic-border-spin": {
+      "id": "conic-border-spin",
+      "name": "Conic Border Spin",
+      "category": "decorative",
+      "description": "Rotating conic-gradient border via @property — glowing edge for hero CTAs, with static fallback.",
+      "language": "css",
+      "code": "@property --ak-angle { syntax: \"<angle>\"; initial-value: 0deg; inherits: false; }\n.ak-conic {\n  position: relative; border-radius: 1rem; padding: 1.5rem 2rem;\n  background: #0D0D12; color: #F4F2EC; isolation: isolate;\n}\n.ak-conic::before {\n  content: \"\"; position: absolute; inset: -1.5px; z-index: -1; border-radius: inherit;\n  background: conic-gradient(from var(--ak-angle), #FF3D00, #E5A93C, #00F0FF, #FF3D00);\n  animation: ak-spin 3.2s linear infinite;\n}\n@keyframes ak-spin { to { --ak-angle: 360deg; } }\n@media (prefers-reduced-motion: reduce) { .ak-conic::before { animation: none; } }\n/* Fallback for browsers without @property: static 1px var(--line-strong) border + glow */\n@supports not (background: conic-gradient(from 0deg, red, blue)) {\n  .ak-conic::before { background: none; border: 1px solid rgba(244,242,236,0.24); }\n}"
+    },
+    "grain-overlay": {
+      "id": "grain-overlay",
+      "name": "Grain / Film Overlay",
+      "category": "surface",
+      "description": "Fixed SVG fractal-noise grain at 4.5% opacity — kills sterile gradients, zero layout cost.",
+      "language": "html",
+      "code": "<div class=\"ak-grain\" aria-hidden=\"true\"></div>\n<style>\n  .ak-grain {\n    position: fixed; inset: 0; z-index: 60; pointer-events: none; opacity: 0.045;\n    background-image: url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\");\n  }\n</style>"
+    },
+    "glass-hairline-panel": {
+      "id": "glass-hairline-panel",
+      "name": "Glass Hairline Panel",
+      "category": "surface",
+      "description": "The Kinetik glass: blurred obsidian panel crossed by a gradient hairline — nav pills, floating chrome.",
+      "language": "css",
+      "code": ".ak-glass {\n  position: relative;\n  background: rgba(13, 13, 18, 0.62);\n  backdrop-filter: blur(16px) saturate(0.9);\n  -webkit-backdrop-filter: blur(16px) saturate(0.9);\n  border: 1px solid rgba(244, 242, 236, 0.10);\n  border-radius: 9999px;\n  box-shadow: inset 0 1px 0 rgba(244, 242, 236, 0.08), 0 18px 50px -18px rgba(0, 0, 0, 0.6);\n}\n.ak-glass::before {\n  content: \"\"; position: absolute; top: 0; left: 12%; right: 12%; height: 1px;\n  background: linear-gradient(90deg, transparent, rgba(244, 242, 236, 0.4), transparent);\n}"
+    },
+    "accordion-spring": {
+      "id": "accordion-spring",
+      "name": "Accordion Spring (grid-rows)",
+      "category": "layout",
+      "description": "Height animation via grid-template-rows 0fr→1fr — no measurement JS, spring easing, animates cleanly.",
+      "language": "html",
+      "code": "<div class=\"ak-acc\"><button class=\"ak-acc-toggle\" aria-expanded=\"false\">Motion laws <span aria-hidden=\"true\">+</span></button>\n  <div class=\"ak-acc-panel\"><div class=\"ak-acc-inner\">Kinetic snap governs entrances. Velocity whip governs exits.</div></div>\n</div>\n<style>\n  .ak-acc-toggle { width: 100%; display: flex; justify-content: space-between; gap: 1rem;\n    padding: 1rem 0; background: none; border: 0; color: #F4F2EC; cursor: pointer; text-align: left; }\n  .ak-acc-panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.5s cubic-bezier(0.16, 1, 0.3, 1); }\n  .ak-acc.open .ak-acc-panel { grid-template-rows: 1fr; }\n  .ak-acc-inner { overflow: hidden; min-height: 0; color: #8E8D8A; }\n  @media (prefers-reduced-motion: reduce) { .ak-acc-panel { transition: none; } }\n</style>\n<script>\n  document.querySelectorAll(\".ak-acc-toggle\").forEach((btn) => {\n    btn.addEventListener(\"click\", () => {\n      const item = btn.closest(\".ak-acc\");\n      item.classList.toggle(\"open\");\n      btn.setAttribute(\"aria-expanded\", String(item.classList.contains(\"open\")));\n    });\n  });\n</script>"
+    }
+  },
+  "fx": [
+    {
+      "id": "cosmic-starfield",
+      "name": "Cosmic Starfield",
+      "file": "registry/fx/01-cosmic-starfield.html",
+      "tags": [
+        "hero",
+        "ambient",
+        "parallax"
+      ],
+      "bestFor": "Every hero — three parallax star layers + shooting stars",
+      "engine": "vanilla-canvas-2d",
+      "fps": 60,
+      "adaptiveQuality": true,
+      "reducedMotionSafe": true,
+      "dependencies": "none"
+    },
+    {
+      "id": "mouse-masked-dot-matrix",
+      "name": "Mouse-Masked Dot Matrix",
+      "file": "registry/fx/02-mouse-masked-dot-matrix.html",
+      "tags": [
+        "hero",
+        "interactive",
+        "grid"
+      ],
+      "bestFor": "Product heros that want tactility without imagery",
+      "engine": "vanilla-canvas-2d",
+      "fps": 60,
+      "adaptiveQuality": true,
+      "reducedMotionSafe": true,
+      "dependencies": "none"
+    },
+    {
+      "id": "descending-light-beams",
+      "name": "Descending Light Beams",
+      "file": "registry/fx/03-descending-light-beams.html",
+      "tags": [
+        "hero",
+        "ambient",
+        "god-rays"
+      ],
+      "bestFor": "Cinematic launches and black-tie reveals",
+      "engine": "vanilla-canvas-2d",
+      "fps": 60,
+      "adaptiveQuality": true,
+      "reducedMotionSafe": true,
+      "dependencies": "none"
+    },
+    {
+      "id": "dotted-globe-3d",
+      "name": "3D Dotted Globe",
+      "file": "registry/fx/04-dotted-globe-3d.html",
+      "tags": [
+        "hero",
+        "3d",
+        "network"
+      ],
+      "bestFor": "Global products, networks, distributed systems",
+      "engine": "vanilla-canvas-2d",
+      "fps": 60,
+      "adaptiveQuality": true,
+      "reducedMotionSafe": true,
+      "dependencies": "none"
+    },
+    {
+      "id": "armillary-sphere",
+      "name": "Armillary Sphere",
+      "file": "registry/fx/05-armillary-sphere.html",
+      "tags": [
+        "hero",
+        "3d",
+        "instrument"
+      ],
+      "bestFor": "The Kinetik house signature — precision instruments",
+      "engine": "vanilla-canvas-2d",
+      "fps": 60,
+      "adaptiveQuality": true,
+      "reducedMotionSafe": true,
+      "dependencies": "none"
+    },
+    {
+      "id": "nebula-embers",
+      "name": "Nebula Embers",
+      "file": "registry/fx/06-nebula-embers.html",
+      "tags": [
+        "hero",
+        "particles",
+        "flame"
+      ],
+      "bestFor": "Warm-accent brands — ember drift over obsidian",
+      "engine": "vanilla-canvas-2d",
+      "fps": 60,
+      "adaptiveQuality": true,
+      "reducedMotionSafe": true,
+      "dependencies": "none"
+    },
+    {
+      "id": "aurora-ribbons",
+      "name": "Aurora Ribbons",
+      "file": "registry/fx/07-aurora-ribbons.html",
+      "tags": [
+        "hero",
+        "ambient",
+        "sine"
+      ],
+      "bestFor": "Aegean/cyan brands — polar-light gradients in motion",
+      "engine": "vanilla-canvas-2d",
+      "fps": 60,
+      "adaptiveQuality": true,
+      "reducedMotionSafe": true,
+      "dependencies": "none"
+    },
+    {
+      "id": "horizon-grid",
+      "name": "Horizon Grid",
+      "file": "registry/fx/08-horizon-grid.html",
+      "tags": [
+        "hero",
+        "retro",
+        "perspective"
+      ],
+      "bestFor": "Synthwave and retro-technical launches",
+      "engine": "vanilla-canvas-2d",
+      "fps": 60,
+      "adaptiveQuality": true,
+      "reducedMotionSafe": true,
+      "dependencies": "none"
+    },
+    {
+      "id": "constellation-cursor",
+      "name": "Constellation Cursor",
+      "file": "registry/fx/09-constellation-cursor.html",
+      "tags": [
+        "hero",
+        "interactive",
+        "particles"
+      ],
+      "bestFor": "Playful developer-tool landings — cursor draws the sky",
+      "engine": "vanilla-canvas-2d",
+      "fps": 60,
+      "adaptiveQuality": true,
+      "reducedMotionSafe": true,
+      "dependencies": "none"
+    },
+    {
+      "id": "flow-field",
+      "name": "Sine Flow Field",
+      "file": "registry/fx/10-flow-field.html",
+      "tags": [
+        "hero",
+        "generative",
+        "particles"
+      ],
+      "bestFor": "Generative-art credibility — thousands of streaked particles",
+      "engine": "vanilla-canvas-2d",
+      "fps": 60,
+      "adaptiveQuality": true,
+      "reducedMotionSafe": true,
+      "dependencies": "none"
+    },
+    {
+      "id": "lattice-bloom",
+      "name": "Lattice Bloom",
+      "file": "registry/fx/11-lattice-bloom.html",
+      "tags": [
+        "hero",
+        "grid",
+        "pulse"
+      ],
+      "bestFor": "Calm technical heros — a breathing dot lattice",
+      "engine": "vanilla-canvas-2d",
+      "fps": 60,
+      "adaptiveQuality": true,
+      "reducedMotionSafe": true,
+      "dependencies": "none"
+    },
+    {
+      "id": "orbital-rings",
+      "name": "Orbital Rings",
+      "file": "registry/fx/12-orbital-rings.html",
+      "tags": [
+        "hero",
+        "3d",
+        "orbit"
+      ],
+      "bestFor": "Infrastructure, satellites, reliability narratives",
+      "engine": "vanilla-canvas-2d",
+      "fps": 60,
+      "adaptiveQuality": true,
+      "reducedMotionSafe": true,
+      "dependencies": "none"
+    },
+    {
+      "id": "ink-ripple",
+      "name": "Ink Ripple",
+      "file": "registry/fx/13-ink-ripple.html",
+      "tags": [
+        "hero",
+        "interactive",
+        "fluid"
+      ],
+      "bestFor": "Paper/Parchment light themes — ink dropped in water",
+      "engine": "vanilla-canvas-2d",
+      "fps": 60,
+      "adaptiveQuality": true,
+      "reducedMotionSafe": true,
+      "dependencies": "none"
+    },
+    {
+      "id": "glyph-cascade",
+      "name": "Glyph Cascade",
+      "file": "registry/fx/14-glyph-cascade.html",
+      "tags": [
+        "hero",
+        "terminal",
+        "rain"
+      ],
+      "bestFor": "Security, cryptography, terminal-authentic brands",
+      "engine": "vanilla-canvas-2d",
+      "fps": 60,
+      "adaptiveQuality": true,
+      "reducedMotionSafe": true,
+      "dependencies": "none"
+    },
+    {
+      "id": "mesh-gradient-drift",
+      "name": "Mesh Gradient Drift",
+      "file": "registry/fx/15-mesh-gradient-drift.html",
+      "tags": [
+        "hero",
+        "gradient",
+        "ambient"
+      ],
+      "bestFor": "Modern marketing heros — slow luminous mesh, zero JS particles",
+      "engine": "vanilla-canvas-2d",
+      "fps": 60,
+      "adaptiveQuality": true,
+      "reducedMotionSafe": true,
+      "dependencies": "none"
+    },
+    {
+      "id": "sonar-sweep",
+      "name": "Sonar Sweep",
+      "file": "registry/fx/16-sonar-sweep.html",
+      "tags": [
+        "hero",
+        "radar",
+        "instrument"
+      ],
+      "bestFor": "Observability, monitoring, detection narratives",
+      "engine": "vanilla-canvas-2d",
+      "fps": 60,
+      "adaptiveQuality": true,
+      "reducedMotionSafe": true,
+      "dependencies": "none"
+    }
+  ],
+  "auditing": {
+    "wcag": "2.1 AA threshold 4.5 (normal text) / 3.0 (large text/graphics) / 7.0 (AAA). All ratios in this file are computed, not asserted.",
+    "method": "relative luminance per WCAG 2.1 (sRGB → linear, 0.2126/0.7152/0.0722)"
+  }
+}

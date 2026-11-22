@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<!-- Atelier Kinetik · FX 07 · Aurora Ribbons — layered sine ribbons, additive. Zero dependencies. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kinetik FX — Aurora Ribbons</title>
+<style>html,body{margin:0;height:100%;background:#040B12;overflow:hidden}canvas{display:block;width:100vw;height:100vh}</style>
+</head>
+<body>
+<canvas id="c" aria-hidden="true"></canvas>
+<script>
+(() => {
+  const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W = 0, H = 0;
+  let fpsAcc = 0, fpsN = 0, degraded = false;
+  function govern(dtMs) {
+    if (degraded) return;
+    fpsAcc += dtMs; fpsN++;
+    if (fpsN >= 120) { if (fpsAcc / fpsN > 21) degraded = true; fpsAcc = 0; fpsN = 0; }
+  }
+  const RIBBONS = [
+    { amp: 0.055, wl: 0.0042, y: 0.34, speed: 0.00016, hue: [0, 240, 255], alpha: 0.5, thickness: 0.30 },
+    { amp: 0.075, wl: 0.0028, y: 0.46, speed: -0.00012, hue: [16, 185, 129], alpha: 0.42, thickness: 0.34 },
+    { amp: 0.048, wl: 0.0051, y: 0.56, speed: 0.00021, hue: [124, 155, 255], alpha: 0.40, thickness: 0.26 },
+    { amp: 0.090, wl: 0.0021, y: 0.68, speed: -0.00009, hue: [255, 61, 0], alpha: 0.16, thickness: 0.30 },
+  ];
+  function resize() {
+    const dpr = Math.min(2, devicePixelRatio || 1);
+    W = innerWidth; H = innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function draw(t) {
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#030810'); g.addColorStop(0.55, '#040B12'); g.addColorStop(1, '#070709');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    // stars
+    ctx.fillStyle = 'rgba(230,247,255,0.5)';
+    for (let i = 0; i < 60; i++) {
+      const sx = (Math.sin(i * 127.1) * 0.5 + 0.5) * W;
+      const sy = (Math.sin(i * 311.7) * 0.5 + 0.5) * H * 0.38;
+      ctx.globalAlpha = 0.25 + 0.5 * (0.5 + 0.5 * Math.sin(t * 0.001 + i));
+      ctx.fillRect(sx, sy, 1.4, 1.4);
+    }
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'lighter';
+    RIBBONS.forEach(r => {
+      const baseY = r.y * H, amp = r.amp * H, th = r.thickness * H;
+      const grad = ctx.createLinearGradient(0, baseY - th, 0, baseY + th);
+      const [R_, G_, B_] = r.hue;
+      grad.addColorStop(0, 'rgba(' + R_ + ',' + G_ + ',' + B_ + ',0)');
+      grad.addColorStop(0.42, 'rgba(' + R_ + ',' + G_ + ',' + B_ + ',' + r.alpha + ')');
+      grad.addColorStop(0.58, 'rgba(' + R_ + ',' + G_ + ',' + B_ + ',' + (r.alpha * 0.85) + ')');
+      grad.addColorStop(1, 'rgba(' + R_ + ',' + G_ + ',' + B_ + ',0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      const step = degraded ? 28 : 14;
+      ctx.moveTo(0, H);
+      for (let x = 0; x <= W; x += step) {
+        const y = baseY + Math.sin(x * r.wl + t * r.speed * 1000) * amp
+                + Math.sin(x * r.wl * 2.7 + t * r.speed * 1730 + 1.7) * amp * 0.35;
+        ctx.lineTo(x, y - th);
+      }
+      for (let x = W; x >= 0; x -= step) {
+        const y = baseY + Math.sin(x * r.wl + t * r.speed * 1000) * amp
+                + Math.sin(x * r.wl * 2.7 + t * r.speed * 1730 + 1.7) * amp * 0.35;
+        ctx.lineTo(x, y + th);
+      }
+      ctx.closePath(); ctx.fill();
+    });
+    ctx.globalCompositeOperation = 'source-over';
+  }
+  let prev = 0;
+  function frame(t) {
+    govern(t - prev); prev = t;
+    draw(t);
+    if (!RM) requestAnimationFrame(frame);
+  }
+  resize(); addEventListener('resize', resize);
+  if (RM) draw(0); else requestAnimationFrame((t) => { prev = t; frame(t); });
+})();
+</script>
+</body>
+</html>

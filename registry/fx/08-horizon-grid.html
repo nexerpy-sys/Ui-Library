@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<!-- Atelier Kinetik · FX 08 · Horizon Grid — perspective floor + ember sun. Zero dependencies. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kinetik FX — Horizon Grid</title>
+<style>html,body{margin:0;height:100%;background:#050308;overflow:hidden}canvas{display:block;width:100vw;height:100vh}</style>
+</head>
+<body>
+<canvas id="c" aria-hidden="true"></canvas>
+<script>
+(() => {
+  const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W = 0, H = 0, horizon = 0;
+  let fpsAcc = 0, fpsN = 0, degraded = false;
+  function govern(dtMs) {
+    if (degraded) return;
+    fpsAcc += dtMs; fpsN++;
+    if (fpsN >= 120) { if (fpsAcc / fpsN > 21) degraded = true; fpsAcc = 0; fpsN = 0; }
+  }
+  function resize() {
+    const dpr = Math.min(2, devicePixelRatio || 1);
+    W = innerWidth; H = innerHeight; horizon = H * 0.38;
+    cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function draw(t) {
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#0A0512'); g.addColorStop(0.38, '#140A1E'); g.addColorStop(0.40, '#1B0F26'); g.addColorStop(1, '#050308');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    // sun
+    const sunR = Math.min(W, H) * 0.16, sunX = W / 2, sunY = horizon - sunR * 0.12;
+    const sg = ctx.createLinearGradient(0, sunY - sunR, 0, sunY + sunR);
+    sg.addColorStop(0, '#FFD166'); sg.addColorStop(0.45, '#FF6A21'); sg.addColorStop(1, '#FF3D00');
+    ctx.fillStyle = sg;
+    ctx.beginPath(); ctx.arc(sunX, sunY, sunR, Math.PI, 0); ctx.fill();
+    // sun scanline gaps
+    ctx.fillStyle = '#0A0512';
+    const gapT = RM ? 0 : (t * 0.00022) % 1;
+    for (let i = 0; i < 5; i++) {
+      const gy = sunY - sunR * 0.15 + i * sunR * 0.24 + gapT * 8;
+      ctx.fillRect(sunX - sunR, gy, sunR * 2, 2 + i * 1.6);
+    }
+    // horizon glow line
+    const hg = ctx.createLinearGradient(W * 0.1, 0, W * 0.9, 0);
+    hg.addColorStop(0, 'rgba(0,240,255,0)'); hg.addColorStop(0.5, 'rgba(0,240,255,0.85)'); hg.addColorStop(1, 'rgba(0,240,255,0)');
+    ctx.fillStyle = hg; ctx.fillRect(W * 0.06, horizon - 1, W * 0.88, 2);
+    // floor fill
+    const fg = ctx.createLinearGradient(0, horizon, 0, H);
+    fg.addColorStop(0, 'rgba(9,13,24,0.0)'); fg.addColorStop(1, 'rgba(9,13,24,0.75)');
+    ctx.fillStyle = fg; ctx.fillRect(0, horizon, W, H - horizon);
+    // converging verticals
+    ctx.strokeStyle = 'rgba(0,240,255,0.5)'; ctx.lineWidth = 1;
+    const vpX = W / 2, LANES = 24;
+    for (let i = -LANES; i <= LANES; i++) {
+      const bx = vpX + (i / LANES) * W * 1.65;
+      ctx.globalAlpha = 0.5 - Math.abs(i) / LANES * 0.28;
+      ctx.beginPath(); ctx.moveTo(vpX, horizon); ctx.lineTo(bx, H + 30); ctx.stroke();
+    }
+    // horizontals sweeping toward viewer (z-projected)
+    const speed = RM ? 0 : t * 0.00016;
+    for (let i = 0; i < 16; i++) {
+      const z = ((i / 16 + speed) % 1);
+      const p = Math.pow(z, 2.6);
+      const y = horizon + p * (H - horizon + 40);
+      ctx.globalAlpha = 0.12 + p * 0.62;
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+  let prev = 0;
+  function frame(t) {
+    govern(t - prev); prev = t;
+    draw(t);
+    if (!RM) requestAnimationFrame(frame);
+  }
+  resize(); addEventListener('resize', resize);
+  if (RM) draw(0); else requestAnimationFrame((t) => { prev = t; frame(t); });
+})();
+</script>
+</body>
+</html>

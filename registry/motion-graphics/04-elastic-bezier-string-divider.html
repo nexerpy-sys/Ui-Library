@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- Atelier Kinetik · Motion Graphics 04 · Elastic Bezier String Divider — damped harmonic oscillation on two simulated control points; drag or cross to pluck. Zero dependencies. -->
+<!-- Atelier Kinetik · Motion Graphics 04 · Elastic String Divider — 46-node Verlet lattice, pinned ends, emergent fundamental + harmonics; drag or cross to pluck. Zero dependencies. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -46,7 +46,7 @@
 <script>/* Kinetik theming: parent explorer injects via postMessage or ?theme= — Obsidian/Paper/Aegean */
 (function(){var T={obsidian:{'--bg':'#070709','--surface':'#0D0D12','--elevated':'#12121A','--ink':'#F4F2EC','--muted':'#8E8D8A','--flame':'#FF3D00','--cyan':'#00F0FF','--gold':'#E5A93C','--line':'rgba(244,242,236,.10)','--line-strong':'rgba(244,242,236,.24)'},paper:{'--bg':'#FBFAF7','--surface':'#F4F2EC','--elevated':'#ECEAE3','--ink':'#171512','--muted':'#5F5D58','--flame':'#C93300','--cyan':'#0B7285','--gold':'#8A6A1F','--line':'rgba(23,21,18,.14)','--line-strong':'rgba(23,21,18,.30)'},aegean:{'--bg':'#081521','--surface':'#0F2231','--elevated':'#173043','--ink':'#E9F1F5','--muted':'#7E93A3','--flame':'#FF6B35','--cyan':'#3ED6FF','--gold':'#E5A93C','--line':'rgba(233,241,245,.12)','--line-strong':'rgba(233,241,245,.28)'}};function apply(n){var t=T[n];if(!t)return;var r=document.documentElement,k;for(k in t)r.style.setProperty(k,t[k]);}var q=new URLSearchParams(location.search).get('theme');if(q)apply(q);window.addEventListener('message',function(e){var d=e.data;if(d&&d.type==='ak-theme'){apply(d.theme);window.dispatchEvent(new CustomEvent('ak-theme-applied',{detail:d.theme}));}});})();</script>
 
-<p class="hud"><b>04</b>&nbsp;&nbsp;Damped harmonic oscillator · ζ ≈ 0.16 · drag the wire</p>
+<p class="hud"><b>04</b>&nbsp;&nbsp;46-node Verlet lattice · emergent harmonics · drag the wire</p>
 <h1>Pull the line<span>Everything in the registry snaps back.</span></h1>
 <svg id="wire" role="separator" aria-orientation="horizontal" aria-label="Elastic divider — drag vertically to pluck">
   <path id="path" fill="none" stroke="var(--line-strong)" stroke-width="1.5" />
@@ -67,94 +67,146 @@
   const grab = document.getElementById('grab');
   const pinL = document.getElementById('pinL'), pinR = document.getElementById('pinR');
 
-  /* Damped harmonic oscillator: x'' = -ω₀²x - 2ζω₀x' (underdamped, ζ≈0.16) */
-  const W0 = 11.5, ZETA = 0.16;
-  const state = { y1: 0, v1: 0, y2: 0, v2: 0, x1: 0, vx1: 0, x2: 0, vx2: 0 };
+  /* A real string — not a drawn curve. 46-node Verlet lattice pinned at both
+     ends, transverse + longitudinal DOF, 4 constraint-relaxation passes.
+     Fundamental + 2nd/3rd harmonics emerge from the lattice itself;
+     nothing is scripted. Per-step damping ≈ 0.986 (ring time ≈ 4.4 s). */
+  const N = 46;
   let W = 0, H = 200, baseY = 100, pad = 44;
-  let dragging = false, grabY = 0, lastPointerY = 0, lastMoveT = 0, lastCrossSign = 0;
+  const pts = [];
+  const segLen = () => (W - 2 * pad) / (N - 1);
 
+  function buildLattice() {
+    pts.length = 0;
+    for (let i = 0; i < N; i++) {
+      const x = pad + i * ((W - 2 * pad) / (N - 1));
+      pts.push({ x, y: baseY, px: x, py: baseY, pin: i === 0 || i === N - 1 });
+    }
+  }
   function resize() {
     W = Math.max(320, innerWidth);
     svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
     pinL.setAttribute('cx', String(pad)); pinL.setAttribute('cy', String(baseY));
     pinR.setAttribute('cx', String(W - pad)); pinR.setAttribute('cy', String(baseY));
+    buildLattice();
     render();
   }
-  function wireYAt(t) {
-    /* cubic bezier with P0,P3 on baseline, dynamic control offsets */
-    const mt = 1 - t;
-    const c1x = W * 0.33 + state.x1, c1y = baseY + state.y1;
-    const c2x = W * 0.66 + state.x2, c2y = baseY + state.y2;
-    const y = mt*mt*mt*baseY + 3*mt*mt*t*c1y + 3*mt*t*t*c2y + t*t*t*baseY;
-    const x = mt*mt*mt*pad + 3*mt*mt*t*c1x + 3*mt*t*t*c2x + t*t*t*(W - pad);
-    return { x, y };
+  function pathD() {
+    /* quadratic-midpoint smoothing through the lattice — renders as one clean spline */
+    let d = `M ${pts[0].x.toFixed(2)} ${pts[0].y.toFixed(2)}`;
+    for (let i = 1; i < N - 1; i++) {
+      const mx = (pts[i].x + pts[i + 1].x) / 2, my = (pts[i].y + pts[i + 1].y) / 2;
+      d += ` Q ${pts[i].x.toFixed(2)} ${pts[i].y.toFixed(2)} ${mx.toFixed(2)} ${my.toFixed(2)}`;
+    }
+    d += ` L ${pts[N - 1].x.toFixed(2)} ${pts[N - 1].y.toFixed(2)}`;
+    return d;
   }
   function render() {
-    const c1x = W * 0.33 + state.x1, c2x = W * 0.66 + state.x2;
-    const d = `M ${pad} ${baseY} C ${c1x.toFixed(2)} ${(baseY + state.y1).toFixed(2)} ${c2x.toFixed(2)} ${(baseY + state.y2).toFixed(2)} ${W - pad} ${baseY}`;
+    const d = pathD();
     path.setAttribute('d', d);
     glow.setAttribute('d', d);
-    const mid = wireYAt(0.5);
-    grab.setAttribute('cx', String(mid.x)); grab.setAttribute('cy', String(mid.y));
+    const mid = pts[(N - 1) >> 1];
+    grab.setAttribute('cx', mid.x.toFixed(2)); grab.setAttribute('cy', mid.y.toFixed(2));
   }
-  function physics(dt) {
-    const acc = (y, v) => -(W0 * W0) * y - 2 * ZETA * W0 * v;
-    if (!dragging) {
-      state.v1 += acc(state.y1, state.v1) * dt; state.y1 += state.v1 * dt;
-      state.v2 += acc(state.y2, state.v2) * dt; state.y2 += state.v2 * dt;
-      state.vx1 += acc(state.x1, state.vx1) * 0.8 * dt; state.x1 += state.vx1 * dt;
-      state.vx2 += acc(state.x2, state.vx2) * 0.8 * dt; state.x2 += state.vx2 * dt;
-    } else {
-      /* control points chase the pointer with a stiff spring — release triggers oscillation */
-      const target = grabY - baseY;
-      state.v1 += ((target * 0.9 - state.y1) * 180 - state.v1 * 18) * dt; state.y1 += state.v1 * dt;
-      state.v2 += ((target * 0.9 - state.y2) * 180 - state.v2 * 18) * dt; state.y2 += state.v2 * dt;
+  function simulate(dt) {
+    const damp = Math.pow(0.986, dt * 60);
+    const seg = segLen();
+    for (let i = 0; i < pts.length; i++) {
+      const p = pts[i];
+      if (p.pin || i === grabIdx) continue;
+      const vx = (p.x - p.px) * damp, vy = (p.y - p.py) * damp;
+      p.px = p.x; p.py = p.y;
+      p.x += vx; p.y += vy;
+    }
+    if (grabIdx >= 0) {
+      /* grabbed node chases the pointer stiffly, zero stored velocity */
+      const g = pts[grabIdx];
+      const ease = Math.min(1, dt * 60 * 0.85);
+      g.x += (grabTarget.x - g.x) * ease;
+      g.y += (grabTarget.y - g.y) * ease;
+      g.px = g.x; g.py = g.y;
+    }
+    for (let k = 0; k < 4; k++) {
+      for (let i = 0; i < N - 1; i++) {
+        const a = pts[i], b = pts[i + 1];
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const dist = Math.hypot(dx, dy) || 1e-6;
+        const diff = (dist - seg) / dist;
+        const aPinned = a.pin || i === grabIdx, bPinned = b.pin || i + 1 === grabIdx;
+        if (aPinned && bPinned) continue;
+        if (aPinned) { b.x -= dx * diff; b.y -= dy * diff; }
+        else if (bPinned) { a.x += dx * diff; a.y += dy * diff; }
+        else { a.x += dx * diff * 0.5; a.y += dy * diff * 0.5; b.x -= dx * diff * 0.5; b.y -= dy * diff * 0.5; }
+      }
     }
   }
-  window.addEventListener('resize', resize);
+
+  /* ---- pointer: drag the wire like a real string; fast crossing plucks it ---- */
+  let grabIdx = -1, grabTarget = { x: 0, y: 0 }, grabHist = [];
+  let lastPointerY = 0, lastMoveT = 0, lastCrossSign = 0;
+  const localX = (e) => { const r = svg.getBoundingClientRect(); return e.clientX - r.left; };
+  const localY = (e) => { const r = svg.getBoundingClientRect(); return e.clientY - r.top; };
 
   svg.addEventListener('pointerdown', (e) => {
-    const r = svg.getBoundingClientRect();
-    const y = e.clientY - r.top;
-    if (Math.abs(y - baseY) < 90 || e.target === grab) {
-      dragging = true; grabY = y; svg.setPointerCapture(e.pointerId);
-      grab.style.cursor = 'grabbing';
-    }
+    const y = localY(e);
+    if (Math.abs(y - baseY) > 90 && e.target !== grab) return;
+    const x = localX(e);
+    let best = 0, bd = Infinity;
+    pts.forEach((p, i) => { const d = Math.abs(p.x - x); if (d < bd) { bd = d; best = i; } });
+    grabIdx = best;
+    grabTarget = { x: pts[best].x, y };
+    grabHist = [{ x: pts[best].x, y, t: performance.now() }];
+    try { svg.setPointerCapture(e.pointerId); } catch (err) {}
+    grab.style.cursor = 'grabbing';
   });
   svg.addEventListener('pointermove', (e) => {
-    const r = svg.getBoundingClientRect();
-    const y = e.clientY - r.top;
-    const now = performance.now();
-    if (dragging) { grabY = y; }
-    else {
-      /* crossing the wire at speed = pluck */
+    const y = localY(e), x = localX(e), now = performance.now();
+    if (grabIdx >= 0) {
+      grabTarget = { x: Math.max(pad + 6, Math.min(W - pad - 6, x)), y };
+      grabHist.push({ x, y, t: now });
+      if (grabHist.length > 8) grabHist.shift();
+    } else {
+      /* crossing the baseline at speed = gaussian impulse, σ = 64 px */
       const sign = Math.sign(y - baseY);
       const dt = Math.max(8, now - lastMoveT) / 1000;
       const vy = (y - lastPointerY) / dt;
       if (sign !== 0 && lastCrossSign !== 0 && sign !== lastCrossSign && Math.abs(vy) > 260) {
-        state.v1 += vy * 0.45; state.v2 += vy * 0.45;
-        state.vx1 -= vy * 0.02; state.vx2 += vy * 0.02;
+        const SIGMA = 64;
+        for (const p of pts) {
+          const w = Math.exp(-((p.x - x) * (p.x - x)) / (2 * SIGMA * SIGMA));
+          p.py = p.y - (vy * 0.85 * w) / 60;   /* inject transverse velocity */
+        }
       }
       lastCrossSign = sign || lastCrossSign;
-      lastPointerY = y; lastMoveT = now;
     }
     lastPointerY = y; lastMoveT = now;
   });
   function endDrag(e) {
-    dragging = false; grab.style.cursor = 'grab';
+    if (grabIdx >= 0 && grabHist.length >= 2) {
+      /* hand velocity imparted to the released node — the ring you hear */
+      const a = grabHist[0], b = grabHist[grabHist.length - 1];
+      const dt = Math.max(16, b.t - a.t) / 1000;
+      const vy = (b.y - a.y) / dt;
+      const g = pts[grabIdx];
+      g.py = g.y - (vy / 60) * 1.5;
+    }
+    grabIdx = -1; grab.style.cursor = 'grab';
     try { svg.releasePointerCapture(e.pointerId); } catch (err) {}
   }
   svg.addEventListener('pointerup', endDrag);
   svg.addEventListener('pointercancel', endDrag);
 
-  let last = 0;
-  function tick(t) {
-    const dt = Math.min(0.05, last ? (t - last) / 1000 : 0.016); last = t;
-    physics(dt); render();
-    if (!RM) requestAnimationFrame(tick);
-  }
+  window.addEventListener('resize', resize);
   resize();
-  if (!RM) requestAnimationFrame(tick);
+  if (!RM) {
+    let last = 0;
+    const tick = (t) => {
+      const dt = Math.min(0.05, last ? (t - last) / 1000 : 0.016); last = t;
+      simulate(dt); render();
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
 })();
 </script>
 

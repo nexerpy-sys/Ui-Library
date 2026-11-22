@@ -2964,17 +2964,17 @@
     },
     {
       "id": "elastic-bezier-string-divider",
-      "name": "Elastic Bezier String Divider",
+      "name": "Elastic String Divider",
       "file": "registry/motion-graphics/04-elastic-bezier-string-divider.html",
       "tags": [
-        "svg",
-        "harmonic-oscillator",
-        "bezier",
+        "verlet",
+        "wave-equation",
+        "lattice",
         "divider"
       ],
-      "math": "Damped harmonic oscillator (ω₀ 11.5, ζ 0.16) on two simulated control points · cubic-Bezier wire · speed-crossing impulse",
-      "bestFor": "Section dividers — pluckable hairline that rings like a real wire",
-      "engine": "svg",
+      "math": "46-node Verlet lattice, pinned ends, transverse+longitudinal DOF · 4 constraint-relaxation passes · quadratic-midpoint spline render · gaussian impulse pluck (σ 64px) · ring via per-step damping 0.986",
+      "bestFor": "Section dividers — a physical string; grab it, pluck it, watch harmonics emerge",
+      "engine": "verlet",
       "fps": 60,
       "reducedMotionSafe": true,
       "dependencies": "none"

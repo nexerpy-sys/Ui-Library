@@ -111,6 +111,7 @@
         const pa = pts[a], pb = pts[b];
         let dx = pb.x - pa.x, dy = pb.y - pa.y;
         const dist = Math.hypot(dx, dy) || 1e-6;
+        cons[i][3] = (dist - rest) / rest;    /* retained strain — drives the heat pass */
         const diff = (dist - rest) / dist;
         const aPinned = pa.pin || a === grabIdx, bPinned = pb.pin || b === grabIdx;
         if (aPinned && bPinned) continue;
@@ -140,6 +141,16 @@
     ctx.fill();
     ctx.globalAlpha = 1;
     ctx.strokeStyle = 'rgba(0,0,0,0.35)'; ctx.lineWidth = 1.2; ctx.stroke();
+    /* live strain heat — amber at 2% yield, flame at 18%+; the cloth confesses */
+    ctx.lineWidth = 1;
+    for (let i = 0; i < cons.length; i++) {
+      const mag = Math.abs(cons[i][3] || 0);
+      if (mag < 0.02) continue;
+      const a = pts[cons[i][0]], b = pts[cons[i][1]];
+      const heat = Math.min(1, (mag - 0.02) / 0.16);
+      ctx.strokeStyle = 'rgba(255,' + Math.round(200 - heat * 131) + ',' + Math.round(80 - heat * 80) + ',' + (0.28 + heat * 0.62).toFixed(3) + ')';
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+    }
     /* woven seam lines */
     ctx.globalAlpha = 0.45;
     [1, 2].forEach(r => {

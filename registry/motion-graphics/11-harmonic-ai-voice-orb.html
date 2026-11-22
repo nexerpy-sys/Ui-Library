@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<!-- Atelier Kinetik · Motion Graphics 11 · Harmonic AI Voice Orb — multi-octave simplex-noise spline orb across idle/listening/thinking/speaking states. Zero dependencies. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kinetik Motion — Harmonic AI Voice Orb</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#070709; --surface:#0D0D12; --elevated:#12121A; --ink:#F4F2EC; --muted:#8E8D8A;
+    --flame:#FF3D00; --cyan:#00F0FF; --gold:#E5A93C;
+    --line:rgba(244,242,236,.10); --line-strong:rgba(244,242,236,.24); --snap:cubic-bezier(.16,1,.3,1); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { height:100%; overflow:hidden; background:var(--bg); -webkit-font-smoothing:antialiased; }
+  body { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1.4rem;
+    background:radial-gradient(56vw 46vh at 50% -12%, rgba(255,61,0,.08), transparent 60%), var(--bg); }
+  canvas { display:block; }
+  .hud { position:absolute; top:1.1rem; left:1.25rem; font-family:"JetBrains Mono", monospace;
+    font-size:9px; letter-spacing:.26em; text-transform:uppercase; color:var(--muted); }
+  .hud b { color:var(--flame); font-weight:500; }
+  .states { display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+  .state-btn { font-family:"JetBrains Mono", monospace; font-size:9px; letter-spacing:.2em; text-transform:uppercase;
+    color:var(--muted); background:transparent; border:1px solid var(--line-strong); border-radius:999px;
+    padding:9px 16px; cursor:pointer; transition:color .3s, border-color .3s, background-color .3s; }
+  .state-btn:hover { color:var(--ink); }
+  .state-btn:focus-visible { outline:2px solid var(--flame); outline-offset:2px; }
+  .state-btn.is-on { color:#160800; background:var(--flame); border-color:var(--flame); }
+  .readout { font-family:"JetBrains Mono", monospace; font-size:8.5px; letter-spacing:.24em; text-transform:uppercase; color:var(--muted); }
+  .readout output { color:var(--ink); }
+</style>
+</head>
+<body>
+<script>/* Kinetik theming: parent explorer injects via postMessage or ?theme= — Obsidian/Paper/Aegean */
+(function(){var T={obsidian:{'--bg':'#070709','--surface':'#0D0D12','--elevated':'#12121A','--ink':'#F4F2EC','--muted':'#8E8D8A','--flame':'#FF3D00','--cyan':'#00F0FF','--gold':'#E5A93C','--line':'rgba(244,242,236,.10)','--line-strong':'rgba(244,242,236,.24)'},paper:{'--bg':'#FBFAF7','--surface':'#F4F2EC','--elevated':'#ECEAE3','--ink':'#171512','--muted':'#5F5D58','--flame':'#C93300','--cyan':'#0B7285','--gold':'#8A6A1F','--line':'rgba(23,21,18,.14)','--line-strong':'rgba(23,21,18,.30)'},aegean:{'--bg':'#081521','--surface':'#0F2231','--elevated':'#173043','--ink':'#E9F1F5','--muted':'#7E93A3','--flame':'#FF6B35','--cyan':'#3ED6FF','--gold':'#E5A93C','--line':'rgba(233,241,245,.12)','--line-strong':'rgba(233,241,245,.28)'}};function apply(n){var t=T[n];if(!t)return;var r=document.documentElement,k;for(k in t)r.style.setProperty(k,t[k]);}var q=new URLSearchParams(location.search).get('theme');if(q)apply(q);window.addEventListener('message',function(e){var d=e.data;if(d&&d.type==='ak-theme'){apply(d.theme);window.dispatchEvent(new CustomEvent('ak-theme-applied',{detail:d.theme}));}});})();</script>
+
+<p class="hud"><b>11</b>&nbsp;&nbsp;Simplex-noise spline · 3 octaves · harmonic state envelope</p>
+<canvas id="c" width="420" height="380" role="img" aria-label="Voice orb — morphs between idle, listening, thinking and speaking states"></canvas>
+<div class="states" role="group" aria-label="Orb state">
+  <button class="state-btn is-on" data-state="idle">Idle</button>
+  <button class="state-btn" data-state="listening">Listening</button>
+  <button class="state-btn" data-state="thinking">Thinking</button>
+  <button class="state-btn" data-state="speaking">Speaking</button>
+</div>
+<p class="readout">state <output id="readout">idle</output> · <output id="amp">amp 0.12</output></p>
+
+<script>
+(() => {
+  'use strict';
+  const RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const cv = document.getElementById('c');
+  const ctx = cv.getContext('2d');
+  if (!ctx) { cv.style.display = 'none'; return; }
+  const readout = document.getElementById('readout'), ampOut = document.getElementById('amp');
+  const PAL = { ink:'#F4F2EC', flame:'#FF3D00', cyan:'#00F0FF', gold:'#E5A93C', muted:'#8E8D8A', bg:'#070709' };
+  function tk(){ try { const cs = getComputedStyle(document.documentElement);
+    ['ink','flame','cyan','gold','muted','bg'].forEach(k => { const v = cs.getPropertyValue('--' + k); if (v) PAL[k] = v.trim(); }); } catch (e) {} }
+  tk();
+  window.addEventListener('ak-theme-applied', () => {
+    tk();
+    /* re-resolve state palettes so theme swaps reach the orb */
+    STATES.idle.colA = PAL.muted; STATES.idle.colB = PAL.flame;
+    STATES.listening.colA = PAL.cyan;
+    STATES.thinking.colA = PAL.gold; STATES.thinking.colB = PAL.flame;
+    STATES.speaking.colA = PAL.flame; STATES.speaking.colB = PAL.gold;
+  });
+
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const W = 420, H = 380;
+  cv.width = W * dpr; cv.height = H * dpr;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  /* ---- compact 2D simplex noise (Gustavson-style, public domain algorithm) ---- */
+  const F2 = 0.5 * (Math.sqrt(3) - 1), G2 = (3 - Math.sqrt(3)) / 6;
+  const grad = [[1,1],[-1,1],[1,-1],[-1,-1],[1,0],[-1,0],[0,1],[0,-1]];
+  const perm = new Uint8Array(512);
+  (() => { const p = new Uint8Array(256); for (let i = 0; i < 256; i++) p[i] = i;
+    let seed = 1337; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    for (let i = 255; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); const t = p[i]; p[i] = p[j]; p[j] = t; }
+    for (let i = 0; i < 512; i++) perm[i] = p[i & 255]; })();
+  function simplex2(xin, yin) {
+    let n0 = 0, n1 = 0, n2 = 0;
+    const s = (xin + yin) * F2;
+    const i = Math.floor(xin + s), j = Math.floor(yin + s);
+    const t = (i + j) * G2;
+    const x0 = xin - (i - t), y0 = yin - (j - t);
+    const i1 = x0 > y0 ? 1 : 0, j1 = x0 > y0 ? 0 : 1;
+    const x1 = x0 - i1 + G2, y1 = y0 - j1 + G2;
+    const x2 = x0 - 1 + 2 * G2, y2 = y0 - 1 + 2 * G2;
+    const ii = i & 255, jj = j & 255;
+    let t0 = 0.5 - x0 * x0 - y0 * y0;
+    if (t0 >= 0) { const g = grad[perm[ii + perm[jj]] & 7]; t0 *= t0; n0 = t0 * t0 * (g[0] * x0 + g[1] * y0); }
+    let t1 = 0.5 - x1 * x1 - y1 * y1;
+    if (t1 >= 0) { const g = grad[perm[ii + i1 + perm[jj + j1]] & 7]; t1 *= t1; n1 = t1 * t1 * (g[0] * x1 + g[1] * y1); }
+    let t2 = 0.5 - x2 * x2 - y2 * y2;
+    if (t2 >= 0) { const g = grad[perm[ii + 1 + perm[jj + 1]] & 7]; t2 *= t2; n2 = t2 * t2 * (g[0] * x2 + g[1] * y2); }
+    return 70 * (n0 + n1 + n2);   /* ∈ [-1, 1] */
+  }
+
+  /* ---- state machine with crossfading harmonic parameters ---- */
+  const STATES = {
+    idle:      { amp: 0.10, freq: 1.6, speed: 0.55, harm: 0.35, colA: PAL.muted, colB: PAL.flame, glow: 0.20, label: 'idle' },
+    listening: { amp: 0.22, freq: 2.1, speed: 0.95, harm: 0.55, colA: PAL.cyan,  colB: '#7DF9FF', glow: 0.34, label: 'listening' },
+    thinking:  { amp: 0.30, freq: 3.1, speed: 1.7,  harm: 0.9,  colA: PAL.gold,  colB: PAL.flame, glow: 0.38, label: 'thinking' },
+    speaking:  { amp: 0.44, freq: 2.6, speed: 1.25, harm: 1.0,  colA: PAL.flame, colB: PAL.gold,  glow: 0.46, label: 'speaking' }
+  };
+  let current = 'idle';
+  const cur = { amp: STATES.idle.amp, freq: STATES.idle.freq, speed: STATES.idle.speed, harm: STATES.idle.harm, glow: STATES.idle.glow };
+
+  const buttons = Array.from(document.querySelectorAll('.state-btn'));
+  function setState(name) {
+    if (!STATES[name]) return;
+    current = name;
+    readout.textContent = STATES[name].label;
+    buttons.forEach(b => b.classList.toggle('is-on', b.dataset.state === name));
+  }
+  buttons.forEach(b => b.addEventListener('click', () => setState(b.dataset.state)));
+  window.addEventListener('keydown', (e) => {
+    const map = { 1: 'idle', 2: 'listening', 3: 'thinking', 4: 'speaking' };
+    if (map[e.key]) setState(map[e.key]);
+  });
+
+  const VERTS = 150;
+  let rings = [];   /* echo rings while listening */
+  function frame(t) {
+    const ts = t * 0.001;
+    const tgt = STATES[current];
+    /* harmonic crossfade — exponential approach */
+    const a = RM ? 1 : 0.075;
+    cur.amp += (tgt.amp - cur.amp) * a;
+    cur.freq += (tgt.freq - cur.freq) * a;
+    cur.speed += (tgt.speed - cur.speed) * a;
+    cur.harm += (tgt.harm - cur.harm) * a;
+    cur.glow += (tgt.glow - cur.glow) * a;
+    if (ampOut) ampOut.textContent = 'amp ' + cur.amp.toFixed(2);
+
+    /* speaking envelope — layered incommensurable sines simulate speech cadence */
+    const speechEnv = current === 'speaking'
+      ? 0.62 + 0.38 * Math.abs(Math.sin(ts * 9.2) * 0.6 + Math.sin(ts * 5.7 + 1.2) * 0.4)
+      : 1;
+
+    /* echo rings */
+    if (current === 'listening' && Math.floor(ts * 1.4) !== Math.floor((ts - 1 / 60) * 1.4)) rings.push(ts);
+    rings = rings.filter(r0 => ts - r0 < 2.1);
+
+    ctx.clearRect(0, 0, W, H);
+    const cx = W / 2, cy = H * 0.44, base = 84;
+
+    /* ambient glow */
+    const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 190);
+    glow.addColorStop(0, hexA(tgt.colA, cur.glow));
+    glow.addColorStop(0.55, hexA(tgt.colA, cur.glow * 0.28));
+    glow.addColorStop(1, hexA(tgt.colA, 0));
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H);
+
+    /* echo rings */
+    rings.forEach(r0 => {
+      const age = ts - r0, rr = base + age * 62, alpha = Math.max(0, 0.4 * (1 - age / 2.1));
+      ctx.beginPath(); ctx.arc(cx, cy, rr, 0, Math.PI * 2);
+      ctx.strokeStyle = hexA(tgt.colA, alpha); ctx.lineWidth = 1.6; ctx.stroke();
+    });
+
+    /* orb silhouette — 3 simplex octaves on a polar spline */
+    const pts = [];
+    for (let i = 0; i < VERTS; i++) {
+      const th = (i / VERTS) * Math.PI * 2;
+      const nx = Math.cos(th), ny = Math.sin(th);
+      const n1 = simplex2(nx * cur.freq + ts * cur.speed, ny * cur.freq - ts * cur.speed * 0.8);
+      const n2 = simplex2(nx * cur.freq * 2.3 - ts * cur.speed * 1.4, ny * cur.freq * 2.3 + ts * cur.speed) * 0.5;
+      const n3 = simplex2(nx * 5.1 + 40, ny * 5.1 + ts * 0.5) * 0.22;
+      const breath = 1 + 0.045 * Math.sin(ts * 1.9 + th * 3);
+      const r = (base + (n1 + n2 * cur.harm + n3) * base * cur.amp * speechEnv) * breath;
+      pts.push([cx + Math.cos(th) * r, cy + Math.sin(th) * r]);
+    }
+    const grad = ctx.createRadialGradient(cx - base * 0.35, cy - base * 0.4, base * 0.1, cx, cy, base * 1.45);
+    grad.addColorStop(0, PAL.ink);
+    grad.addColorStop(0.28, tgt.colA);
+    grad.addColorStop(0.78, tgt.colB);
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.beginPath();
+    ctx.moveTo(pts[0][0], pts[0][1]);
+    for (let i = 1; i < VERTS; i++) {
+      const [x0, y0] = pts[i], [x1, y1] = pts[(i + 1) % VERTS];
+      ctx.quadraticCurveTo(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2);
+    }
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.globalAlpha = 0.96; ctx.fill(); ctx.globalAlpha = 1;
+
+    /* thinking — rotating segmented sweep */
+    if (current === 'thinking') {
+      ctx.save();
+      ctx.translate(cx, cy); ctx.rotate(ts * 2.1);
+      for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.arc(0, 0, base + 26, i * (Math.PI * 2 / 3), i * (Math.PI * 2 / 3) + Math.PI * 0.36);
+        ctx.strokeStyle = hexA(PAL.gold, 0.85 - i * 0.25); ctx.lineWidth = 3.2; ctx.stroke();
+      }
+      ctx.restore();
+    }
+    /* specular crescent */
+    ctx.beginPath();
+    ctx.ellipse(cx - base * 0.34, cy - base * 0.42, base * 0.36, base * 0.17, -0.6, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255,255,255,0.16)';
+    ctx.fill();
+    /* ground reflection line */
+    ctx.fillStyle = hexA(tgt.colA, 0.28);
+    ctx.fillRect(cx - 72, H * 0.86, 144, 1.5);
+
+    if (!RM) requestAnimationFrame(frame);
+  }
+  function hexA(hex, alpha) {
+    const m = String(hex).trim().match(/^#?([0-9a-f]{6})$/i);
+    if (!m) return hex;
+    const n = parseInt(m[1], 16);
+    return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + Math.max(0, Math.min(1, alpha)).toFixed(3) + ')';
+  }
+  if (RM) { frame(0); } else { requestAnimationFrame(frame); }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<!-- Atelier Kinetik · Template 02 · Bento Grid — 6-cell feature bento with spotlight hover. Zero JS frameworks; one inline handler. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kinetik Template — Bento Grid</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#070709; --surface:#0D0D12; --elevated:#12121A; --ink:#F4F2EC; --muted:#8E8D8A;
+    --line:rgba(244,242,236,.10); --line-strong:rgba(244,242,236,.24); --flame:#FF3D00; --cyan:#00F0FF; --gold:#E5A93C; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--ink); font-family:"Hanken Grotesk", system-ui, sans-serif; -webkit-font-smoothing:antialiased; }
+  .f-display{font-family:"Syne",sans-serif;letter-spacing:-.03em}
+  .f-serif{font-family:"Instrument Serif", Georgia, serif}
+  .f-mono{font-family:"JetBrains Mono", ui-monospace, monospace}
+  section { max-width:1200px; margin:0 auto; padding:clamp(3rem,8vh,6rem) clamp(1.25rem,4vw,3rem); }
+  .kicker{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--flame);margin-bottom:1.25rem}
+  h2{font-size:clamp(1.8rem,4.5vw,3.2rem);line-height:.98;font-weight:800;text-transform:uppercase;margin-bottom:2.5rem}
+  .bento { display:grid; gap:1rem; grid-template-columns:repeat(12,1fr); }
+  .cell { position:relative; overflow:hidden; border-radius:1.1rem; padding:1.6rem;
+    background:var(--surface); border:1px solid var(--line); transition:border-color .35s; min-height:11rem; }
+  .cell:hover { border-color:var(--line-strong); }
+  .cell::before { content:""; position:absolute; inset:0; pointer-events:none; opacity:0; transition:opacity .4s;
+    background:radial-gradient(280px circle at var(--mx,50%) var(--my,50%), rgba(255,61,0,.13), transparent 62%); }
+  .cell:hover::before { opacity:1; }
+  .span-7{grid-column:span 7} .span-5{grid-column:span 5} .span-4{grid-column:span 4} .span-6{grid-column:span 6} .span-12{grid-column:1/-1}
+  @media (max-width:820px){ .span-7,.span-5,.span-4,.span-6{grid-column:1/-1} }
+  .tag { font-size:9.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); }
+  .cell h3 { font-size:1.35rem; margin:.75rem 0 .5rem; font-weight:700; }
+  .cell p { color:var(--muted); line-height:1.55; font-size:.95rem; }
+  .big { font-size:clamp(2.4rem,6vw,4rem); font-weight:800; line-height:1; }
+  .big small { font-size:.35em; color:var(--muted); letter-spacing:.2em; text-transform:uppercase; vertical-align:.9em; }
+  .cyan{color:var(--cyan)} .gold{color:var(--gold)} .flame{color:var(--flame)}
+</style>
+</head>
+<body>
+<section aria-label="Capabilities">
+  <p class="kicker f-mono">02 · Capabilities</p>
+  <h2 class="f-display">Everything the<br><span class="f-serif" style="font-weight:400;font-style:italic;text-transform:none;color:var(--flame)">registry ships.</span></h2>
+  <div class="bento" id="bento">
+    <article class="cell span-7"><span class="tag f-mono">Typography Foundry</span><h3 class="f-display">60 fonts.<br>24 pairings.</h3><p>Editorial, luxury and technical Google Fonts with studio-tested display + serif + body + mono lockups — tracking and leading specified per pairing.</p></article>
+    <article class="cell span-5"><span class="tag f-mono">Fluid Type</span><p class="big f-display">clamp()<br><small>375 → 1440px</small></p><p style="margin-top:.6rem">Breakpoint-free scales — Perfect Fourth, Major Third, Minor Third.</p></article>
+    <article class="cell span-4"><span class="tag f-mono">Color</span><p class="big cyan f-display">AAA</p><p>All six light/dark semantic systems, measured WCAG 2.1 — never vibes.</p></article>
+    <article class="cell span-4"><span class="tag f-mono">Motion Law</span><p class="big gold f-display">12</p><p>Named cubic-bezier laws from Kinetic snap to Umbra sink.</p></article>
+    <article class="cell span-4"><span class="tag f-mono">Canvas FX</span><p class="big flame f-display">16</p><p>Zero-dependency 60fps hero engines — adaptive quality, DPR-capped.</p></article>
+    <article class="cell span-12"><span class="tag f-mono">Micro-interactions</span><h3>Magnetic controls, spring drawers, zero-CLS marquees, spotlight cards — copy-paste, reduced-motion safe.</h3></article>
+  </div>
+</section>
+<script>
+  document.querySelectorAll('#bento .cell').forEach((cell) => {
+    cell.addEventListener('pointermove', (e) => {
+      const r = cell.getBoundingClientRect();
+      cell.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+      cell.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    });
+  });
+</script>
+</body>
+</html>

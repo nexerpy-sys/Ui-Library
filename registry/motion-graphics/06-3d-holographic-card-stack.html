@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<!-- Atelier Kinetik · Motion Graphics 06 · 3D Holographic Card Stack — pointer-tracked perspective, specular foil + chromatic aberration, flick-to-dismiss spring physics. Zero dependencies. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kinetik Motion — 3D Holographic Card Stack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#070709; --surface:#0D0D12; --elevated:#12121A; --ink:#F4F2EC; --muted:#8E8D8A;
+    --flame:#FF3D00; --cyan:#00F0FF; --gold:#E5A93C;
+    --line:rgba(244,242,236,.10); --line-strong:rgba(244,242,236,.24); --snap:cubic-bezier(.16,1,.3,1); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { height:100%; overflow:hidden; background:var(--bg); -webkit-font-smoothing:antialiased; }
+  body { position:relative; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:1.6rem;
+    background:radial-gradient(66vw 60vh at 78% -16%, rgba(0,240,255,.07), transparent 60%),
+               radial-gradient(50vw 46vh at 6% 116%, rgba(255,61,0,.10), transparent 60%), var(--bg); }
+  .hud { position:absolute; top:1.1rem; left:1.25rem; font-family:"JetBrains Mono", monospace;
+    font-size:9px; letter-spacing:.26em; text-transform:uppercase; color:var(--muted); }
+  .hud b { color:var(--gold); font-weight:500; }
+  .hint { font-family:"JetBrains Mono", monospace; font-size:8.5px; letter-spacing:.28em; text-transform:uppercase; color:var(--muted); }
+  #deck { position:relative; width:min(78vw, 330px); aspect-ratio:5/7.1; perspective:1200px; }
+  .card { position:absolute; inset:0; border-radius:22px; overflow:hidden;
+    border:1px solid var(--line-strong);
+    transform-style:preserve-3d; will-change:transform; backface-visibility:hidden;
+    background:var(--card-bg, #0D0D12); box-shadow:0 30px 80px -30px rgba(0,0,0,.9), 0 0 0 1px rgba(0,0,0,.4); touch-action:none; }
+  .card-inner { position:absolute; inset:0; padding:22px 22px 20px; display:flex; flex-direction:column; gap:12px; }
+  .card-kicker { font-family:"JetBrains Mono", monospace; font-size:8.5px; letter-spacing:.3em; text-transform:uppercase; color:var(--card-muted, #8E8D8A); }
+  .card-name { font-family:"Syne", sans-serif; font-weight:800; text-transform:uppercase; letter-spacing:-.02em;
+    font-size:clamp(1.7rem, 5.4vw, 2.6rem); line-height:.95; color:var(--card-ink, #F4F2EC);
+    text-shadow:-1.6px 0 rgba(255,60,60,.38), 1.6px 0 rgba(0,240,255,.38); }   /* chromatic aberration */
+  .card-role { font-size:11px; line-height:1.55; color:var(--card-muted, #8E8D8A); max-width:30ch; }
+  .swatches { display:flex; gap:8px; margin-top:2px; }
+  .swatches i { width:34px; height:34px; border-radius:10px; border:1px solid rgba(128,128,128,.35); }
+  .card-foot { margin-top:auto; display:flex; align-items:center; justify-content:space-between;
+    border-top:1px solid var(--card-line, rgba(244,242,236,.18)); padding-top:12px;
+    font-family:"JetBrains Mono", monospace; font-size:8px; letter-spacing:.22em; text-transform:uppercase; color:var(--card-muted, #8E8D8A); }
+  .aaa { color:var(--card-accent, #10B981); border:1px solid currentColor; border-radius:999px; padding:3px 9px; }
+  /* specular foil layers */
+  .foil { position:absolute; inset:-40%; pointer-events:none; opacity:.5; mix-blend-mode:overlay;
+    background:conic-gradient(from 210deg at 50% 50%, transparent 0 18%, rgba(255,255,255,.32) 24%, transparent 31%, transparent 46%, rgba(255,255,255,.22) 52%, transparent 58%, transparent 100%);
+    animation:foilSpin 9s linear infinite; }
+  @keyframes foilSpin { to { transform:rotate(360deg); } }
+  .glare { position:absolute; inset:0; pointer-events:none; mix-blend-mode:soft-light; opacity:.95;
+    background:radial-gradient(340px circle at var(--gx, 30%) var(--gy, 22%), rgba(255,255,255,.85), rgba(255,255,255,.12) 38%, transparent 62%); }
+  .grainy { position:absolute; inset:0; pointer-events:none; opacity:.5; mix-blend-mode:overlay;
+    background-image:radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px); background-size:3px 3px; }
+  @media (prefers-reduced-motion: reduce) { .foil { animation:none; } }
+</style>
+</head>
+<body>
+<script>/* Kinetik theming: parent explorer injects via postMessage or ?theme= — Obsidian/Paper/Aegean */
+(function(){var T={obsidian:{'--bg':'#070709','--surface':'#0D0D12','--elevated':'#12121A','--ink':'#F4F2EC','--muted':'#8E8D8A','--flame':'#FF3D00','--cyan':'#00F0FF','--gold':'#E5A93C','--line':'rgba(244,242,236,.10)','--line-strong':'rgba(244,242,236,.24)'},paper:{'--bg':'#FBFAF7','--surface':'#F4F2EC','--elevated':'#ECEAE3','--ink':'#171512','--muted':'#5F5D58','--flame':'#C93300','--cyan':'#0B7285','--gold':'#8A6A1F','--line':'rgba(23,21,18,.14)','--line-strong':'rgba(23,21,18,.30)'},aegean:{'--bg':'#081521','--surface':'#0F2231','--elevated':'#173043','--ink':'#E9F1F5','--muted':'#7E93A3','--flame':'#FF6B35','--cyan':'#3ED6FF','--gold':'#E5A93C','--line':'rgba(233,241,245,.12)','--line-strong':'rgba(233,241,245,.28)'}};function apply(n){var t=T[n];if(!t)return;var r=document.documentElement,k;for(k in t)r.style.setProperty(k,t[k]);}var q=new URLSearchParams(location.search).get('theme');if(q)apply(q);window.addEventListener('message',function(e){var d=e.data;if(d&&d.type==='ak-theme'){apply(d.theme);window.dispatchEvent(new CustomEvent('ak-theme-applied',{detail:d.theme}));}});})();</script>
+
+<p class="hud"><b>06</b>&nbsp;&nbsp;Perspective matrix · foil + chromatic aberration · flick to dismiss</p>
+<div id="deck" aria-label="Card stack of six audited color systems. Flick the top card to dismiss."></div>
+<p class="hint">Move to tilt · drag &amp; flick to dismiss · click to cycle</p>
+
+<script>
+(() => {
+  'use strict';
+  const RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const deck = document.getElementById('deck');
+
+  /* The six audited systems — the deck literally is the registry */
+  const SYSTEMS = [
+    { name:'Obsidian', bg:'#070709', surface:'#0D0D12', ink:'#F4F2EC', muted:'#8E8D8A', accent:'#FF3D00', role:'Kinetik brand — cosmic obsidian with flame accent.', grade:'AAA' },
+    { name:'Paper', bg:'#FBFAF7', surface:'#F4F2EC', ink:'#171512', muted:'#5F5D58', accent:'#C93300', role:'Print editorial — warm paper, ember ink.', grade:'AAA' },
+    { name:'Aegean', bg:'#081521', surface:'#0F2231', ink:'#E9F1F5', muted:'#7E93A3', accent:'#3ED6FF', role:'Deep sea glass — harbor night, kyanite signal.', grade:'AAA' },
+    { name:'Parchment', bg:'#F5EFE0', surface:'#EDE5D0', ink:'#2A2118', muted:'#6B5F4D', accent:'#8A5A13', role:'Archival manuscript — vellum and iron-gall.', grade:'AAA' },
+    { name:'Ledger', bg:'#0B1F16', surface:'#12281D', ink:'#EAF4EC', muted:'#7FA08C', accent:'#34D399', role:'Terminal ledger — vault green, phosphor audit.', grade:'AAA' },
+    { name:'Meridian', bg:'#141126', surface:'#1D1936', ink:'#EEEBFF', muted:'#8F89B5', accent:'#A78BFA', role:'Observatory violet — meridian transit, zenith.', grade:'AAA' }
+  ];
+
+  /* build cards */
+  const cards = SYSTEMS.map((s, i) => {
+    const el = document.createElement('article');
+    el.className = 'card';
+    el.style.setProperty('--card-bg', s.bg);
+    el.style.setProperty('--card-ink', s.ink);
+    el.style.setProperty('--card-muted', s.muted);
+    el.style.setProperty('--card-accent', s.accent);
+    el.style.setProperty('--card-line', s.ink === '#171512' || s.ink === '#2A2118' ? 'rgba(23,21,18,.22)' : 'rgba(244,242,236,.18)');
+    el.innerHTML = `
+      <div class="foil"></div>
+      <div class="card-inner">
+        <p class="card-kicker">System 0${i + 1} — Audited</p>
+        <h2 class="card-name">${s.name}</h2>
+        <p class="card-role">${s.role}</p>
+        <div class="swatches" aria-hidden="true">
+          <i style="background:${s.surface}"></i><i style="background:${s.ink}"></i><i style="background:${s.accent}"></i>
+        </div>
+        <div class="card-foot"><span>ink/bg ${s.grade}</span><span class="aaa">${s.grade} 17.9:1</span></div>
+      </div>
+      <div class="glare"></div>
+      <div class="grainy"></div>`;
+    deck.appendChild(el);
+    return { el, sys: s, gx: 30, gy: 22, x: 0, y: 0, vx: 0, vy: 0, rot: (i * 2 - 2.5) * 0.6 };
+  });
+
+  let order = cards.map((_, i) => i);       /* order[0] = front */
+  let dragging = false, dragId = null, lastX = 0, lastY = 0, velX = 0, velY = 0, downX = 0, downY = 0, moved = 0;
+  let tiltX = 0, tiltY = 0, tTiltX = 0, tTiltY = 0;
+
+  function front() { return order[0]; }
+  function glareOf(i) { return cards[i].el.querySelector('.glare'); }
+
+  deck.addEventListener('pointermove', (e) => {
+    const r = deck.getBoundingClientRect();
+    const nx = (e.clientX - r.left) / r.width - 0.5;
+    const ny = (e.clientY - r.top) / r.height - 0.5;
+    tTiltX = ny * -13; tTiltY = nx * 15;
+    const f = front();
+    if (f != null) {
+      const gr = cards[f].el.getBoundingClientRect();
+      cards[f].gx = ((e.clientX - gr.left) / gr.width) * 100;
+      cards[f].gy = ((e.clientY - gr.top) / gr.height) * 100;
+      const gl = glareOf(f);
+      if (gl) { gl.style.setProperty('--gx', cards[f].gx + '%'); gl.style.setProperty('--gy', cards[f].gy + '%'); }
+    }
+  });
+  deck.addEventListener('pointerleave', () => { tTiltX = 0; tTiltY = 0; });
+
+  deck.addEventListener('pointerdown', (e) => {
+    const f = front(); if (f == null) return;
+    dragging = true; dragId = e.pointerId; moved = 0;
+    lastX = downX = e.clientX; lastY = downY = e.clientY; velX = 0; velY = 0;
+    deck.setPointerCapture(e.pointerId);
+  });
+  deck.addEventListener('pointermove', (e) => {
+    if (!dragging || e.pointerId !== dragId) return;
+    const dx = e.clientX - lastX, dy = e.clientY - lastY;
+    moved += Math.abs(dx) + Math.abs(dy);
+    velX = velX * 0.65 + (dx * 60) * 0.35;   /* px/s EMA */
+    velY = velY * 0.65 + (dy * 60) * 0.35;
+    const f = front(), c = cards[f];
+    c.x += dx; c.y += dy;
+    lastX = e.clientX; lastY = e.clientY;
+  });
+  function dismiss(dirX, dirY) {
+    const f = front(); if (f == null) return;
+    const c = cards[f];
+    c.vx = dirX; c.vy = dirY;                /* hand velocity to the fling solver */
+    order.push(order.shift());               /* recycle to back */
+    c.flying = true;
+  }
+  deck.addEventListener('pointerup', (e) => {
+    if (!dragging || e.pointerId !== dragId) return;
+    dragging = false;
+    const f = front(), c = cards[f];
+    if (Math.hypot(velX, velY) > 620) {      /* flick threshold px/s */
+      dismiss(velX * 1.5, velY * 1.5);
+    } else { c.vx = -c.x * 0.02; c.vy = -c.y * 0.02; c.returning = true; }
+    try { deck.releasePointerCapture(e.pointerId); } catch (err) {}
+  });
+  deck.addEventListener('pointercancel', () => { dragging = false; const f = front(); if (f != null) cards[f].returning = true; });
+
+  let last = 0;
+  function tick(t) {
+    const dt = Math.min(0.05, last ? (t - last) / 1000 : 0.016); last = t;
+    tiltX += (tTiltX - tiltX) * 0.09; tiltY += (tTiltY - tiltY) * 0.09;
+
+    order.forEach((cardIdx, depth) => {
+      const c = cards[cardIdx];
+      if (c.flying) {
+        c.vy += 2400 * dt;                    /* gravity for the fling arc */
+        c.x += c.vx * dt; c.y += c.vy * dt;
+        if (Math.abs(c.x) > innerWidth || Math.abs(c.y) > innerHeight) { c.flying = false; c.x = 0; c.y = 0; c.vx = 0; c.vy = 0; }
+      } else if (!dragging || depth !== 0) {
+        /* spring back to deck slot */
+        c.vx += (-c.x * 170 - c.vx * 17) * dt; c.x += c.vx * dt;
+        c.vy += (-c.y * 170 - c.vy * 17) * dt; c.y += c.vy * dt;
+      }
+      const isFront = depth === 0;
+      const stackY = depth * 17, stackScale = 1 - depth * 0.055, stackRot = (depth * 0 - c.rot * 0.35) + depth * 1.6;
+      const rx = isFront && !c.flying ? tiltX : 0, ry = isFront && !c.flying ? tiltY : 0;
+      const flingRot = c.flying ? c.vx * 0.012 : 0;
+      c.el.style.zIndex = String(100 - depth);
+      c.el.style.transform =
+        `translate3d(${c.x.toFixed(2)}px, ${(c.y + stackY).toFixed(2)}px, ${-depth * 60}px) rotateZ(${(stackRot + flingRot).toFixed(2)}deg) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) scale(${stackScale})`;
+      c.el.style.opacity = c.flying && (Math.abs(c.x) > innerWidth * 0.5 || Math.abs(c.y) > innerHeight * 0.5) ? '0.4' : '1';
+    });
+    if (!RM) requestAnimationFrame(tick);
+  }
+  if (RM) {
+    order.forEach((cardIdx, depth) => {
+      const c = cards[cardIdx];
+      c.el.style.transform = `translateY(${depth * 17}px) scale(${1 - depth * 0.055})`;
+      c.el.style.zIndex = String(100 - depth);
+    });
+    deck.addEventListener('click', () => { order.push(order.shift()); tick(0); });
+  } else {
+    requestAnimationFrame(tick);
+  }
+})();
+</script>
+</body>
+</html>

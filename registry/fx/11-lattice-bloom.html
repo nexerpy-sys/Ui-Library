@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<!-- Atelier Kinetik · FX 11 · Lattice Bloom — calm pulsing dot lattice. Zero dependencies. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kinetik FX — Lattice Bloom</title>
+<style>html,body{margin:0;height:100%;background:#08090C;overflow:hidden}canvas{display:block;width:100vw;height:100vh}</style>
+</head>
+<body>
+<canvas id="c" aria-hidden="true"></canvas>
+<script>
+(() => {
+  const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W = 0, H = 0, spacing = 30, blooms = [];
+  let fpsAcc = 0, fpsN = 0, degraded = false, bloomTimer = 0;
+  function govern(dtMs) {
+    if (degraded) return;
+    fpsAcc += dtMs; fpsN++;
+    if (fpsN >= 120) { if (fpsAcc / fpsN > 21) { degraded = true; spacing = Math.round(spacing * 1.4); } fpsAcc = 0; fpsN = 0; }
+  }
+  function resize() {
+    const dpr = Math.min(2, devicePixelRatio || 1);
+    W = innerWidth; H = innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function addBloom() { blooms.push({ x: Math.random() * W, y: Math.random() * H, t: 0, max: 2.6 + Math.random() * 1.4 }); }
+  function draw(t, dt) {
+    ctx.fillStyle = '#08090C'; ctx.fillRect(0, 0, W, H);
+    bloomTimer -= dt;
+    if (bloomTimer <= 0 && blooms.length < 3) { addBloom(); bloomTimer = 1.1 + Math.random() * 1.6; }
+    blooms = blooms.filter(b => b.t < b.max);
+    blooms.forEach(b => { b.t += dt; });
+    const ampMax = 2.1;
+    for (let y = spacing / 2; y < H; y += spacing) {
+      for (let x = spacing / 2; x < W; x += spacing) {
+        let lift = 0;
+        blooms.forEach(b => {
+          const d = Math.hypot(x - b.x, y - b.y);
+          const wave = Math.exp(-Math.pow((d - b.t * 340) / 130, 2)) * Math.exp(-b.t * 1.15);
+          lift += wave;
+        });
+        const idle = 0.5 + 0.5 * Math.sin(t * 0.0009 + x * 0.008 + y * 0.006);
+        const glow = Math.min(1, lift);
+        const a = 0.10 + idle * 0.05 + glow * 0.78;
+        const r = 1.15 + idle * 0.25 + glow * 2.35;
+        ctx.fillStyle = glow > 0.22 ? 'rgba(229,169,60,' + a + ')' : 'rgba(244,242,236,' + a + ')';
+        ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+  }
+  let prev = 0;
+  function frame(t) {
+    const dt = Math.min(0.05, (t - prev) / 1000 || 0.016);
+    govern(t - prev); prev = t;
+    draw(t, dt);
+    if (!RM) requestAnimationFrame(frame);
+  }
+  resize(); addEventListener('resize', resize);
+  if (RM) { addBloom(); draw(800, 0.3); } else requestAnimationFrame((t) => { prev = t; bloomTimer = 0; frame(t); });
+})();
+</script>
+</body>
+</html>

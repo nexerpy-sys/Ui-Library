@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<!-- Atelier Kinetik · FX 10 · Sine Flow Field — streaked particles on a curl-ish field. Zero dependencies. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kinetik FX — Sine Flow Field</title>
+<style>html,body{margin:0;height:100%;background:#070709;overflow:hidden}canvas{display:block;width:100vw;height:100vh}</style>
+</head>
+<body>
+<canvas id="c" aria-hidden="true"></canvas>
+<script>
+(() => {
+  const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W = 0, H = 0, quality = 1, particles = [];
+  let fpsAcc = 0, fpsN = 0, degraded = false;
+  const rand = (a, b) => a + Math.random() * (b - a);
+  const HUES = ['244,242,236', '255,97,38', '0,240,255', '229,169,60'];
+
+  function govern(dtMs) {
+    if (degraded) return;
+    fpsAcc += dtMs; fpsN++;
+    if (fpsN >= 120) { if (fpsAcc / fpsN > 21) { degraded = true; quality *= 0.55; build(); } fpsAcc = 0; fpsN = 0; }
+  }
+  function spawn() {
+    return { x: Math.random() * W, y: Math.random() * H, px: 0, py: 0,
+      hue: HUES[Math.floor(Math.pow(Math.random(), 1.6) * HUES.length)], life: rand(60, 200), maxLife: 0 };
+  }
+  function build() {
+    particles = [];
+    const n = Math.max(90, Math.round(420 * quality));
+    for (let i = 0; i < n; i++) { const p = spawn(); p.maxLife = p.life; p.px = p.x; p.py = p.y; particles.push(p); }
+  }
+  function resize() {
+    const dpr = Math.min(2, devicePixelRatio || 1);
+    W = innerWidth; H = innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = '#070709'; ctx.fillRect(0, 0, W, H);
+    build();
+  }
+  const field = (x, y, t) =>
+    Math.sin(x * 0.0021 + t * 0.00016) * 2.1 +
+    Math.sin(y * 0.0027 - t * 0.00012) * 1.7 +
+    Math.sin((x + y) * 0.0013 + t * 0.00009) * 1.3;
+
+  function draw(t, dt) {
+    ctx.fillStyle = 'rgba(7,7,9,0.055)'; ctx.fillRect(0, 0, W, H);
+    ctx.lineWidth = 1.05;
+    particles.forEach(p => {
+      p.px = p.x; p.py = p.y;
+      const a = field(p.x, p.y, t) * Math.PI;
+      const speed = 46 * dt + 10 * dt;
+      p.x += Math.cos(a) * speed; p.y += Math.sin(a) * speed;
+      p.life -= 1;
+      const fade = Math.min(1, p.life / 40);
+      ctx.strokeStyle = 'rgba(' + p.hue + ',' + (0.5 * fade).toFixed(3) + ')';
+      ctx.beginPath(); ctx.moveTo(p.px, p.py); ctx.lineTo(p.x, p.y); ctx.stroke();
+      if (p.life <= 0 || p.x < -10 || p.x > W + 10 || p.y < -10 || p.y > H + 10) {
+        Object.assign(p, spawn()); p.maxLife = p.life; p.px = p.x; p.py = p.y;
+      }
+    });
+  }
+  let prev = 0;
+  function frame(t) {
+    const dt = Math.min(0.05, (t - prev) / 1000 || 0.016);
+    govern(t - prev); prev = t;
+    draw(t, dt);
+    if (!RM) requestAnimationFrame(frame);
+  }
+  resize(); addEventListener('resize', resize);
+  if (RM) { draw(0, 0.016); } else requestAnimationFrame((t) => { prev = t; frame(t); });
+})();
+</script>
+</body>
+</html>

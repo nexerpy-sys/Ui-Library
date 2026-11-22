@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<!-- Atelier Kinetik · FX 14 · Glyph Cascade — terminal glyph rain, flame head / ivory trail. Zero dependencies. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kinetik FX — Glyph Cascade</title>
+<style>html,body{margin:0;height:100%;background:#050705;overflow:hidden}canvas{display:block;width:100vw;height:100vh}</style>
+</head>
+<body>
+<canvas id="c" aria-hidden="true"></canvas>
+<script>
+(() => {
+  const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W = 0, H = 0, quality = 1, cell = 17, columns = [];
+  let fpsAcc = 0, fpsN = 0, degraded = false;
+  const GLYPHS = '01アカキクケコサシスセソタチツテトナニヌネノサイバーATELIERKINETIK<>/{}[]=+';
+  const rand = (a, b) => a + Math.random() * (b - a);
+
+  function govern(dtMs) {
+    if (degraded) return;
+    fpsAcc += dtMs; fpsN++;
+    if (fpsN >= 120) { if (fpsAcc / fpsN > 21) { degraded = true; quality *= 0.55; build(); } fpsAcc = 0; fpsN = 0; }
+  }
+  function build() {
+    cell = Math.max(15, Math.round(17 / quality));
+    const count = Math.ceil(W / cell);
+    columns = [];
+    for (let i = 0; i < count; i++) {
+      columns.push({ x: i * cell, y: rand(-H, 0), speed: rand(60, 165), len: 6 + Math.floor(rand(0, 14)), glyphs: Array.from({ length: 22 }, () => GLYPHS[Math.floor(Math.random() * GLYPHS.length)]) });
+    }
+  }
+  function resize() {
+    const dpr = Math.min(2, devicePixelRatio || 1);
+    W = innerWidth; H = innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = '#050705'; ctx.fillRect(0, 0, W, H);
+    build();
+  }
+  function draw(dt) {
+    ctx.fillStyle = 'rgba(5,7,5,0.075)'; ctx.fillRect(0, 0, W, H);
+    ctx.font = '600 ' + cell + 'px "JetBrains Mono", ui-monospace, monospace';
+    columns.forEach(col => {
+      col.y += col.speed * dt * (degraded ? 0.8 : 1);
+      const headRow = Math.floor(col.y / cell);
+      for (let k = 0; k < col.len; k++) {
+        const row = headRow - k;
+        if (row < -1) continue;
+        const y = row * cell;
+        if (y > H) continue;
+        if (Math.random() < 0.055) col.glyphs[(row + 100) % col.glyphs.length] = GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+        const ch = col.glyphs[((row % col.glyphs.length) + col.glyphs.length) % col.glyphs.length];
+        if (k === 0) { ctx.fillStyle = '#FFF3E2'; }
+        else if (k < 3) { ctx.fillStyle = 'rgba(255,97,38,' + (1 - k * 0.28) + ')'; }
+        else { const a = Math.max(0.04, 0.62 - k * 0.052); ctx.fillStyle = 'rgba(188,255,205,' + a + ')'; }
+        ctx.fillText(ch, col.x, y);
+      }
+      if (col.y - col.len * cell > H && Math.random() < 0.018) { col.y = rand(-H * 0.6, -cell); col.speed = rand(60, 165); }
+    });
+  }
+  let prev = 0;
+  function frame(t) {
+    const dt = Math.min(0.05, (t - prev) / 1000 || 0.016);
+    govern(t - prev); prev = t;
+    draw(dt);
+    if (!RM) requestAnimationFrame(frame);
+  }
+  resize(); addEventListener('resize', resize);
+  if (RM) draw(0.016); else requestAnimationFrame((t) => { prev = t; frame(t); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<!-- Atelier Kinetik · Template 04 · Feature Split — editorial split: serif claim + checklist vs mono spec card. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kinetik Template — Feature Split</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#070709; --surface:#0D0D12; --elevated:#12121A; --ink:#F4F2EC; --muted:#8E8D8A;
+    --line:rgba(244,242,236,.10); --line-strong:rgba(244,242,236,.24); --flame:#FF3D00; --cyan:#00F0FF; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--ink); font-family:"Hanken Grotesk", system-ui, sans-serif; -webkit-font-smoothing:antialiased; }
+  .f-display{font-family:"Syne",sans-serif;letter-spacing:-.03em}
+  .f-serif{font-family:"Instrument Serif", Georgia, serif}
+  .f-mono{font-family:"JetBrains Mono", ui-monospace, monospace}
+  section { max-width:1200px; margin:0 auto; padding:clamp(3rem,9vh,6.5rem) clamp(1.25rem,4vw,3rem);
+    display:grid; grid-template-columns:1.05fr .95fr; gap:clamp(2rem,5vw,4.5rem); align-items:center; }
+  @media (max-width:900px){ section{grid-template-columns:1fr} }
+  .kicker{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--flame);margin-bottom:1.5rem}
+  h2{font-size:clamp(2rem,5vw,3.6rem);line-height:1.0;font-weight:400}
+  h2 em { color:var(--flame); }
+  .copy { margin-top:1.5rem; color:var(--muted); line-height:1.65; max-width:32rem; }
+  ul { list-style:none; margin-top:1.75rem; display:grid; gap:.8rem; }
+  li { display:flex; gap:.7rem; align-items:baseline; color:#D8D6CF; }
+  li svg { flex:none; transform:translateY(2px); }
+  .spec { background:var(--surface); border:1px solid var(--line-strong); border-radius:1.1rem; padding:1.5rem;
+    box-shadow:0 30px 80px -30px rgba(0,0,0,.7); }
+  .spec-head { display:flex; justify-content:space-between; align-items:center; padding-bottom:.9rem; border-bottom:1px solid var(--line); }
+  .dot { width:9px;height:9px;border-radius:50%;background:var(--line-strong);display:inline-block;margin-right:6px}
+  .dot.r{background:#FF5F57}.dot.y{background:#FEBC2E}.dot.g{background:#28C840}
+  .spec-rows { display:grid; gap:0; padding-top:.5rem; }
+  .row { display:grid; grid-template-columns:auto 1fr; gap:1.25rem; padding:.8rem .2rem; border-bottom:1px dashed var(--line); align-items:baseline; }
+  .row:last-child{border-bottom:0}
+  .row b { font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); font-weight:500; }
+  .row code { color:var(--cyan); font-size:.82rem; }
+</style>
+</head>
+<body>
+<section aria-label="Why the registry">
+  <div>
+    <p class="kicker f-mono">04 · Doctrine</p>
+    <h2 class="f-serif"><em>AI writes the UI.</em><br>We write the taste.</h2>
+    <p class="copy">Default Tailwind blue, flat cards, stiff eases — slop is a vocabulary problem, not a model problem. The registry hands agents the exact tokens studios use, pre-audited and copy-ready.</p>
+    <ul>
+      <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8.5 6 12.5 14 3.5" stroke="#FF3D00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Fluid clamp() type — no breakpoints, no brittle scales</li>
+      <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8.5 6 12.5 14 3.5" stroke="#FF3D00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Measured WCAG 2.1 — ratios computed, never claimed</li>
+      <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8.5 6 12.5 14 3.5" stroke="#FF3D00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Motion laws with names, curves and spring configs</li>
+      <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8.5 6 12.5 14 3.5" stroke="#FF3D00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>llms.txt + registry.json — one fetch, zero scraping</li>
+    </ul>
+  </div>
+  <aside class="spec" aria-label="Registry spec sheet">
+    <div class="spec-head"><span><i class="dot r"></i><i class="dot y"></i><i class="dot g"></i></span><span class="f-mono" style="font-size:10px;color:var(--muted);letter-spacing:.2em">REGISTRY.JSON</span></div>
+    <div class="spec-rows f-mono">
+      <div class="row"><b>Release</b><code>1.5.0 · 2026-11-22</code></div>
+      <div class="row"><b>Fonts</b><code>60 · 4 categories · OFL</code></div>
+      <div class="row"><b>Pairings</b><code>24 lockups · tracking+leading</code></div>
+      <div class="row"><b>Systems</b><code>6 light/dark · ink AAA</code></div>
+      <div class="row"><b>Type scale</b><code>clamp() · 375→1440px</code></div>
+      <div class="row"><b>Motion</b><code>12 bezier laws · 3 springs</code></div>
+      <div class="row"><b>Snippets</b><code>24 micro-interactions</code></div>
+      <div class="row"><b>FX</b><code>16 canvas · adaptive · 0-dep</code></div>
+      <div class="row"><b>CLS</b><code>0 · transforms+opacity only</code></div>
+    </div>
+  </aside>
+</section>
+</body>
+</html>

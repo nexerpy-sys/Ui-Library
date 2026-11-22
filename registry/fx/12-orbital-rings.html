@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<!-- Atelier Kinetik · FX 12 · Orbital Rings — dashed orbits with satellite beads. Zero dependencies. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kinetik FX — Orbital Rings</title>
+<style>html,body{margin:0;height:100%;background:#060910;overflow:hidden}canvas{display:block;width:100vw;height:100vh}</style>
+</head>
+<body>
+<canvas id="c" aria-hidden="true"></canvas>
+<script>
+(() => {
+  const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W = 0, H = 0, CX = 0, CY = 0, unit = 0;
+  let fpsAcc = 0, fpsN = 0, degraded = false;
+  const TAU = Math.PI * 2;
+  function govern(dtMs) {
+    if (degraded) return;
+    fpsAcc += dtMs; fpsN++;
+    if (fpsN >= 120) { if (fpsAcc / fpsN > 21) degraded = true; fpsAcc = 0; fpsN = 0; }
+  }
+  const RINGS = [
+    { r: 0.16, w: 1.2, a: 0.5, dash: [2, 7], speed: 0.00021, sat: true, satR: 2.1, hue: '230,247,255' },
+    { r: 0.24, w: 1.0, a: 0.34, dash: [1, 9], speed: -0.00016, sat: false, hue: '230,247,255' },
+    { r: 0.33, w: 1.6, a: 0.55, dash: [10, 6], speed: 0.00012, sat: true, satR: 2.7, hue: '0,240,255' },
+    { r: 0.43, w: 1.1, a: 0.30, dash: [1, 11], speed: 0.00009, sat: false, hue: '230,247,255' },
+    { r: 0.54, w: 1.8, a: 0.5, dash: [16, 8], speed: -0.00007, sat: true, satR: 3.1, hue: '255,97,38' },
+    { r: 0.66, w: 1.0, a: 0.22, dash: [1, 14], speed: 0.000055, sat: false, hue: '230,247,255' },
+  ];
+  function resize() {
+    const dpr = Math.min(2, devicePixelRatio || 1);
+    W = innerWidth; H = innerHeight; CX = W / 2; CY = H * 0.5; unit = Math.min(W, H);
+    cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function draw(t) {
+    ctx.fillStyle = '#060910'; ctx.fillRect(0, 0, W, H);
+    // core star
+    const core = ctx.createRadialGradient(CX, CY, 0, CX, CY, unit * 0.10);
+    core.addColorStop(0, '#FFF6E8'); core.addColorStop(0.25, '#FFB45E'); core.addColorStop(0.7, 'rgba(255,61,0,0.28)'); core.addColorStop(1, 'rgba(255,61,0,0)');
+    ctx.fillStyle = core; ctx.beginPath(); ctx.arc(CX, CY, unit * 0.10, 0, TAU); ctx.fill();
+    const rot = RM ? 0 : t;
+    RINGS.forEach(ring => {
+      const R = ring.r * unit;
+      ctx.lineWidth = ring.w;
+      ctx.setLineDash(ring.dash);
+      ctx.lineDashOffset = -rot * ring.speed * R * 2.2;
+      ctx.strokeStyle = 'rgba(' + ring.hue + ',' + ring.a + ')';
+      ctx.beginPath(); ctx.arc(CX, CY, R, 0, TAU); ctx.stroke();
+      ctx.setLineDash([]);
+      if (ring.sat) {
+        const ang = rot * ring.speed * 2.0 + ring.r * 9.4;
+        const sx = CX + Math.cos(ang) * R, sy = CY + Math.sin(ang) * R;
+        const g = ctx.createRadialGradient(sx, sy, 0, sx, sy, ring.satR * 4.5);
+        g.addColorStop(0, 'rgba(' + ring.hue + ',0.85)'); g.addColorStop(1, 'rgba(' + ring.hue + ',0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(sx, sy, ring.satR * 4.5, 0, TAU); ctx.fill();
+        ctx.fillStyle = '#FFF7EA'; ctx.beginPath(); ctx.arc(sx, sy, ring.satR * 0.55, 0, TAU); ctx.fill();
+      }
+    });
+    // tick marks around outer ring
+    const R = 0.74 * unit;
+    ctx.strokeStyle = 'rgba(230,247,255,0.35)'; ctx.lineWidth = 1;
+    for (let i = 0; i < 60; i++) {
+      const ang = (i / 60) * TAU;
+      const long = i % 5 === 0;
+      const r0 = R - (long ? 10 : 5), r1 = R;
+      ctx.beginPath();
+      ctx.moveTo(CX + Math.cos(ang) * r0, CY + Math.sin(ang) * r0);
+      ctx.lineTo(CX + Math.cos(ang) * r1, CY + Math.sin(ang) * r1);
+      ctx.stroke();
+    }
+  }
+  let prev = 0;
+  function frame(t) {
+    govern(t - prev); prev = t;
+    draw(t);
+    if (!RM) requestAnimationFrame(frame);
+  }
+  resize(); addEventListener('resize', resize);
+  if (RM) draw(0); else requestAnimationFrame((t) => { prev = t; frame(t); });
+})();
+</script>
+</body>
+</html>

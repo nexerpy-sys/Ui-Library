@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<!-- Atelier Kinetik · Template 05 · Stats Bar — four metrics with ease-out count-up on view. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kinetik Template — Stats Bar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#070709; --surface:#0D0D12; --ink:#F4F2EC; --muted:#8E8D8A;
+    --line:rgba(244,242,236,.10); --line-strong:rgba(244,242,236,.24); --flame:#FF3D00; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--bg); color:var(--ink); font-family:"Hanken Grotesk", system-ui, sans-serif; -webkit-font-smoothing:antialiased; }
+  .f-display{font-family:"Syne",sans-serif;letter-spacing:-.03em}
+  .f-mono{font-family:"JetBrains Mono", ui-monospace, monospace}
+  .bar { border-top:1px solid var(--line-strong); border-bottom:1px solid var(--line-strong); background:var(--surface); }
+  .inner { max-width:1200px; margin:0 auto; padding:1.6rem clamp(1.25rem,4vw,3rem);
+    display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; }
+  @media (max-width:760px){ .inner{grid-template-columns:repeat(2,1fr); row-gap:1.4rem} }
+  .stat { text-align:left; }
+  .num { font-size:clamp(1.9rem,4vw,2.9rem); font-weight:800; line-height:1; }
+  .num i { font-style:normal; color:var(--flame); }
+  .lbl { margin-top:.45rem; font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); }
+  .stat + .stat { border-left:1px solid var(--line); padding-left:1.2rem; }
+  @media (max-width:760px){ .stat + .stat{border-left:0;padding-left:0} }
+</style>
+</head>
+<body>
+<div class="bar" role="region" aria-label="Registry metrics">
+  <div class="inner">
+    <div class="stat"><div class="num f-display"><span class="ak-count" data-to="60">0</span><i>+</i></div><p class="lbl f-mono">Curated fonts</p></div>
+    <div class="stat"><div class="num f-display"><span class="ak-count" data-to="24">0</span></div><p class="lbl f-mono">Studio pairings</p></div>
+    <div class="stat"><div class="num f-display"><span class="ak-count" data-to="12">0</span></div><p class="lbl f-mono">Named motion laws</p></div>
+    <div class="stat"><div class="num f-display"><span class="ak-count" data-to="16">0</span></div><p class="lbl f-mono">60fps canvas FX</p></div>
+  </div>
+</div>
+<script>
+  (() => {
+    const easeOut = (t) => 1 - Math.pow(2, -10 * t);
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target; io.unobserve(el);
+        const to = parseFloat(el.dataset.to || '0');
+        if (reduced) { el.textContent = String(to); return; }
+        const dur = 1500, t0 = performance.now();
+        const tick = (now) => {
+          const p = Math.min(1, (now - t0) / dur);
+          el.textContent = String(Math.round(to * (p >= 1 ? 1 : easeOut(p))));
+          if (p < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      });
+    }, { threshold: 0.6 });
+    document.querySelectorAll('.ak-count').forEach((el) => io.observe(el));
+  })();
+</script>
+</body>
+</html>

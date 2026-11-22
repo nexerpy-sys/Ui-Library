@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<!-- Atelier Kinetik · Motion Graphics 10 · Gravitational Bento Lens — hairline grid + bento cells warp radially around pointer mass; spring-restoring vertices. Zero dependencies. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kinetik Motion — Gravitational Bento Lens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#070709; --surface:#0D0D12; --elevated:#12121A; --ink:#F4F2EC; --muted:#8E8D8A;
+    --flame:#FF3D00; --cyan:#00F0FF; --gold:#E5A93C;
+    --line:rgba(244,242,236,.10); --line-strong:rgba(244,242,236,.24); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { height:100%; overflow:hidden; background:var(--bg); -webkit-font-smoothing:antialiased; }
+  body { position:relative; cursor:crosshair;
+    background:radial-gradient(64vw 52vh at 50% -20%, rgba(0,240,255,.06), transparent 60%), var(--bg); }
+  canvas { display:block; width:100vw; height:100vh; }
+  .hud { position:absolute; top:1.1rem; left:1.25rem; font-family:"JetBrains Mono", monospace;
+    font-size:9px; letter-spacing:.26em; text-transform:uppercase; color:var(--muted); pointer-events:none; }
+  .hud b { color:var(--cyan); font-weight:500; }
+</style>
+</head>
+<body>
+<script>/* Kinetik theming: parent explorer injects via postMessage or ?theme= — Obsidian/Paper/Aegean */
+(function(){var T={obsidian:{'--bg':'#070709','--surface':'#0D0D12','--elevated':'#12121A','--ink':'#F4F2EC','--muted':'#8E8D8A','--flame':'#FF3D00','--cyan':'#00F0FF','--gold':'#E5A93C','--line':'rgba(244,242,236,.10)','--line-strong':'rgba(244,242,236,.24)'},paper:{'--bg':'#FBFAF7','--surface':'#F4F2EC','--elevated':'#ECEAE3','--ink':'#171512','--muted':'#5F5D58','--flame':'#C93300','--cyan':'#0B7285','--gold':'#8A6A1F','--line':'rgba(23,21,18,.14)','--line-strong':'rgba(23,21,18,.30)'},aegean:{'--bg':'#081521','--surface':'#0F2231','--elevated':'#173043','--ink':'#E9F1F5','--muted':'#7E93A3','--flame':'#FF6B35','--cyan':'#3ED6FF','--gold':'#E5A93C','--line':'rgba(233,241,245,.12)','--line-strong':'rgba(233,241,245,.28)'}};function apply(n){var t=T[n];if(!t)return;var r=document.documentElement,k;for(k in t)r.style.setProperty(k,t[k]);}var q=new URLSearchParams(location.search).get('theme');if(q)apply(q);window.addEventListener('message',function(e){var d=e.data;if(d&&d.type==='ak-theme'){apply(d.theme);window.dispatchEvent(new CustomEvent('ak-theme-applied',{detail:d.theme}));}});})();</script>
+
+<p class="hud"><b>10</b>&nbsp;&nbsp;Radial spacetime lens · s = 6800 · r⁻² falloff · spring-restoring mass</p>
+<canvas id="c" role="img" aria-label="Grid and bento cells warp around the pointer like a gravity well"></canvas>
+
+<script>
+(() => {
+  'use strict';
+  const RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const cv = document.getElementById('c');
+  const ctx = cv.getContext('2d');
+  if (!ctx) { cv.style.display = 'none'; return; }
+  const PAL = { bg:'#070709', surface:'#0D0D12', elevated:'#12121A', ink:'#F4F2EC', muted:'#8E8D8A', flame:'#FF3D00', cyan:'#00F0FF', lineStrong:'rgba(244,242,236,.24)', line:'rgba(244,242,236,.10)' };
+  function tk(){ try { const cs = getComputedStyle(document.documentElement);
+    ['bg','surface','elevated','ink','muted','flame','cyan'].forEach(k => { const v = cs.getPropertyValue('--' + k); if (v) PAL[k] = v.trim(); });
+    const ls = cs.getPropertyValue('--line-strong'); if (ls) PAL.lineStrong = ls.trim();
+    const ln = cs.getPropertyValue('--line'); if (ln) PAL.line = ln.trim(); } catch (e) {} }
+  tk(); window.addEventListener('ak-theme-applied', tk);
+
+  let W = 0, H = 0, dpr = 1;
+  /* pointer mass — spring-restoring, drifts on a lissajous when untouched */
+  const mass = { x: 0, y: 0, vx: 0, vy: 0, strength: 0, target: 1 };
+  let px = null, py = null, lastMove = 0;
+
+  /* bento layout in a 12×8 logical grid */
+  const CELLS = [
+    { c: 0, r: 0, w: 5, h: 5, label: 'HERO / MASKED-RISE', accent: true },
+    { c: 5, r: 0, w: 3, h: 2, label: 'STATS' },
+    { c: 8, r: 0, w: 4, h: 2, label: 'PRICING' },
+    { c: 5, r: 2, w: 7, h: 3, label: 'BENTO GRID' },
+    { c: 0, r: 5, w: 4, h: 3, label: 'CTA BAND' },
+    { c: 4, r: 5, w: 8, h: 3, label: 'FAQ / ACCORDION' }
+  ];
+
+  /* spacetime lens: displacement toward the mass, s/r² with softening */
+  function lens(x, y) {
+    const dx = mass.x - x, dy = mass.y - y;
+    const r2 = dx * dx + dy * dy + 2600;      /* softening length² */
+    const r = Math.sqrt(r2);
+    const pull = (6800 * mass.strength) / r2;  /* Einstein-ring-ish falloff */
+    const maxShift = 96;
+    const shift = Math.min(maxShift, pull * 46);
+    return { x: x + (dx / r) * shift, y: y + (dy / r) * shift, k: shift / maxShift };
+  }
+  function cellRect(cell) {
+    const gw = W / 12.6, gh = H / 9.0;
+    const ox = W * 0.028, oy = H * 0.075;
+    return { x: ox + cell.c * gw, y: oy + cell.r * gh, w: cell.w * gw - 10, h: cell.h * gh - 10 };
+  }
+  function drawGrid(t) {
+    ctx.strokeStyle = PAL.line;
+    ctx.lineWidth = 1;
+    const step = 64;
+    for (let gx = -step; gx <= W + step; gx += step) {
+      ctx.beginPath();
+      for (let y = -8; y <= H + 8; y += 9) {
+        const p = lens(gx, y);
+        y === -8 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
+      }
+      ctx.stroke();
+    }
+    for (let gy = -step; gy <= H + step; gy += step) {
+      ctx.beginPath();
+      for (let x = -8; x <= W + 8; x += 9) {
+        const p = lens(x, gy);
+        x === -8 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
+      }
+      ctx.stroke();
+    }
+  }
+  function drawCells(t) {
+    const tLabel = 'JetBrains Mono, monospace';
+    CELLS.forEach((cell, i) => {
+      const r = cellRect(cell);
+      /* corners displaced by the lens; scale by mean magnification */
+      const c1 = lens(r.x, r.y), c2 = lens(r.x + r.w, r.y), c3 = lens(r.x + r.w, r.y + r.h), c4 = lens(r.x, r.y + r.h);
+      const mag = (c1.k + c2.k + c3.k + c4.k) / 4;
+      const cx = (c1.x + c2.x + c3.x + c4.x) / 4, cy = (c1.y + c2.y + c3.y + c4.y) / 4;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(1 + mag * 0.16, 1 + mag * 0.16);                 /* local spacetime magnification */
+      ctx.translate(-r.w / 2, -r.h / 2);
+      ctx.beginPath();
+      const rad = 14;
+      ctx.roundRect ? ctx.roundRect(0, 0, r.w, r.h, rad) : ctx.rect(0, 0, r.w, r.h);
+      ctx.fillStyle = cell.accent ? PAL.elevated : PAL.surface;
+      ctx.fill();
+      ctx.strokeStyle = cell.accent ? PAL.flame : PAL.lineStrong;
+      ctx.lineWidth = cell.accent ? 1.6 : 1.1;
+      ctx.stroke();
+      ctx.fillStyle = cell.accent ? PAL.flame : PAL.muted;
+      ctx.font = '500 9px ' + tLabel;
+      ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+      ctx.fillText(cell.label, 16, 14);
+      ctx.restore();
+    });
+  }
+  function drawMass(t) {
+    if (mass.strength < 0.03) return;
+    const g = ctx.createRadialGradient(mass.x, mass.y, 0, mass.x, mass.y, 150);
+    g.addColorStop(0, 'rgba(0,240,255,0.16)'); g.addColorStop(0.35, 'rgba(0,240,255,0.05)'); g.addColorStop(1, 'rgba(0,240,255,0)');
+    ctx.fillStyle = g; ctx.fillRect(mass.x - 150, mass.y - 150, 300, 300);
+    ctx.beginPath(); ctx.arc(mass.x, mass.y, 5.2, 0, Math.PI * 2);
+    ctx.fillStyle = PAL.cyan; ctx.fill();
+  }
+  function resize() {
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    W = window.innerWidth; H = window.innerHeight;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (px == null) { mass.x = W * 0.5; mass.y = H * 0.45; }
+  }
+  window.addEventListener('resize', resize);
+  window.addEventListener('pointermove', (e) => { px = e.clientX; py = e.clientY; lastMove = performance.now(); }, { passive: true });
+  window.addEventListener('pointerleave', () => { px = null; });
+
+  let last = 0;
+  function frame(t) {
+    const dt = Math.min(0.05, last ? (t - last) / 1000 : 0.016); last = t;
+    /* target: pointer when fresh, else a slow autonomous lissajous drift */
+    let tx, ty, tStrength;
+    if (px != null && performance.now() - lastMove < 2600) { tx = px; ty = py; tStrength = 1; }
+    else { tx = W * 0.5 + Math.sin(t * 0.00042) * W * 0.26; ty = H * 0.44 + Math.sin(t * 0.00063 + 1.3) * H * 0.22; tStrength = 0.72; }
+    /* spring-restore the mass toward its target (critically damped-ish) */
+    mass.vx += ((tx - mass.x) * 120 - mass.vx * 13) * dt; mass.x += mass.vx * dt;
+    mass.vy += ((ty - mass.y) * 120 - mass.vy * 13) * dt; mass.y += mass.vy * dt;
+    mass.strength += (tStrength - mass.strength) * 0.055;
+
+    ctx.fillStyle = PAL.bg;
+    ctx.fillRect(0, 0, W, H);
+    drawGrid(t);
+    drawCells(t);
+    drawMass(t);
+    if (!RM) requestAnimationFrame(frame);
+  }
+  resize();
+  if (RM) {
+    mass.x = W * 0.5; mass.y = H * 0.45; mass.strength = 0.55;
+    ctx.fillStyle = PAL.bg; ctx.fillRect(0, 0, W, H);
+    drawGrid(0); drawCells(0); drawMass(0);
+  } else {
+    requestAnimationFrame(frame);
+  }
+})();
+</script>
+</body>
+</html>

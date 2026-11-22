@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<!-- Atelier Kinetik · Motion Graphics 12 · FLIP Shared-Element Portal — First/Last/Invert/Play layout animation, compact card → fullscreen editorial modal via transform + clip-path only. Zero dependencies. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kinetik Motion — FLIP Shared-Element Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#070709; --surface:#0D0D12; --elevated:#12121A; --ink:#F4F2EC; --muted:#8E8D8A;
+    --flame:#FF3D00; --cyan:#00F0FF; --gold:#E5A93C; --emerald:#10B981;
+    --line:rgba(244,242,236,.10); --line-strong:rgba(244,242,236,.24); --snap:cubic-bezier(.16,1,.3,1); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { height:100%; overflow:hidden; background:var(--bg); -webkit-font-smoothing:antialiased; }
+  body { position:relative; display:flex; flex-direction:column; justify-content:center; gap:1.4rem; padding:0 clamp(1rem,4vw,3rem);
+    background:radial-gradient(64vw 52vh at 78% -16%, rgba(167,139,250,.08), transparent 60%), var(--bg); }
+  .hud { position:absolute; top:1.1rem; left:clamp(1rem,4vw,3rem); font-family:"JetBrains Mono", monospace;
+    font-size:9px; letter-spacing:.26em; text-transform:uppercase; color:var(--muted); }
+  .hud b { color:var(--gold); font-weight:500; }
+  h1 { font-family:"Syne", sans-serif; font-weight:800; text-transform:uppercase; letter-spacing:-.02em;
+    font-size:clamp(1.4rem, 4vw, 2.6rem); color:var(--ink); line-height:.96; }
+  h1 em { font-family:"Instrument Serif", serif; font-style:italic; font-weight:400; text-transform:none; color:var(--flame); }
+  .grid { display:grid; grid-template-columns:repeat(6, minmax(0,1fr)); gap:10px; }
+  @media (max-width:900px) { .grid { grid-template-columns:repeat(3, minmax(0,1fr)); } }
+  @media (max-width:560px) { .grid { grid-template-columns:repeat(2, minmax(0,1fr)); } }
+  .sys-card { text-align:left; cursor:pointer; border:1px solid var(--line); border-radius:16px; background:var(--surface);
+    padding:12px 12px 11px; display:flex; flex-direction:column; gap:9px; min-height:118px;
+    transition:border-color .3s, background-color .3s, transform .35s var(--snap); }
+  .sys-card:hover { border-color:var(--line-strong); background:var(--elevated); transform:translateY(-3px); }
+  .sys-card:focus-visible { outline:2px solid var(--flame); outline-offset:2px; }
+  .sys-kicker { font-family:"JetBrains Mono", monospace; font-size:7.5px; letter-spacing:.24em; text-transform:uppercase; color:var(--muted); }
+  .sys-name { font-family:"Syne", sans-serif; font-weight:700; font-size:.95rem; color:var(--ink); letter-spacing:-.01em; }
+  .sys-dots { display:flex; gap:5px; }
+  .sys-dots i { width:14px; height:14px; border-radius:5px; border:1px solid var(--line-strong); }
+  .sys-grade { margin-top:auto; font-family:"JetBrains Mono", monospace; font-size:7px; letter-spacing:.2em; color:var(--emerald); }
+
+  /* ---- fullscreen editorial portal ---- */
+  #portal { position:fixed; inset:0; z-index:40; display:none; align-items:center; justify-content:center; padding:4vmin;
+    background:rgba(4,4,6,.66); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }
+  #portal.open { display:flex; }
+  #panel { position:relative; width:min(920px, 94vw); height:min(600px, 88vh); border-radius:26px; overflow:hidden;
+    background:var(--portal-bg, #0D0D12); border:1px solid var(--line-strong);
+    box-shadow:0 60px 140px -50px rgba(0,0,0,.9); will-change:transform, clip-path; }
+  .panel-inner { position:absolute; inset:0; padding:clamp(1.4rem,4vmin,2.6rem); display:flex; flex-direction:column; gap:14px; overflow:auto; }
+  .panel-kicker { font-family:"JetBrains Mono", monospace; font-size:8.5px; letter-spacing:.3em; text-transform:uppercase; color:var(--portal-accent, #FF3D00); }
+  .panel-name { font-family:"Syne", sans-serif; font-weight:800; text-transform:uppercase; letter-spacing:-.025em; line-height:.94;
+    font-size:clamp(2.6rem, 7.4vw, 4.6rem); color:var(--portal-ink, #F4F2EC); }
+  .panel-role { max-width:46ch; font-size:13px; line-height:1.65; color:var(--portal-muted, #8E8D8A); }
+  .panel-swatches { display:flex; gap:14px; margin-top:4px; }
+  .panel-swatch { display:flex; flex-direction:column; gap:6px; }
+  .panel-swatch i { width:74px; height:74px; border-radius:16px; border:1px solid var(--line-strong); }
+  .panel-swatch span { font-family:"JetBrains Mono", monospace; font-size:7.5px; letter-spacing:.12em; color:var(--portal-muted, #8E8D8A); text-transform:uppercase; }
+  .panel-foot { margin-top:auto; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+    border-top:1px solid var(--line); padding-top:14px;
+    font-family:"JetBrains Mono", monospace; font-size:8px; letter-spacing:.2em; text-transform:uppercase; color:var(--portal-muted, #8E8D8A); }
+  #close-portal { position:absolute; top:14px; right:14px; width:40px; height:40px; border-radius:50%;
+    border:1px solid var(--line-strong); background:rgba(0,0,0,.35); color:var(--portal-ink, #F4F2EC);
+    font-size:17px; line-height:1; cursor:pointer; transition:transform .3s var(--snap), border-color .3s; }
+  #close-portal:hover { transform:rotate(90deg); border-color:var(--flame); }
+  #close-portal:focus-visible { outline:2px solid var(--flame); outline-offset:2px; }
+</style>
+</head>
+<body>
+<script>/* Kinetik theming: parent explorer injects via postMessage or ?theme= — Obsidian/Paper/Aegean */
+(function(){var T={obsidian:{'--bg':'#070709','--surface':'#0D0D12','--elevated':'#12121A','--ink':'#F4F2EC','--muted':'#8E8D8A','--flame':'#FF3D00','--cyan':'#00F0FF','--gold':'#E5A93C','--line':'rgba(244,242,236,.10)','--line-strong':'rgba(244,242,236,.24)'},paper:{'--bg':'#FBFAF7','--surface':'#F4F2EC','--elevated':'#ECEAE3','--ink':'#171512','--muted':'#5F5D58','--flame':'#C93300','--cyan':'#0B7285','--gold':'#8A6A1F','--line':'rgba(23,21,18,.14)','--line-strong':'rgba(23,21,18,.30)'},aegean:{'--bg':'#081521','--surface':'#0F2231','--elevated':'#173043','--ink':'#E9F1F5','--muted':'#7E93A3','--flame':'#FF6B35','--cyan':'#3ED6FF','--gold':'#E5A93C','--line':'rgba(233,241,245,.12)','--line-strong':'rgba(233,241,245,.28)'}};function apply(n){var t=T[n];if(!t)return;var r=document.documentElement,k;for(k in t)r.style.setProperty(k,t[k]);}var q=new URLSearchParams(location.search).get('theme');if(q)apply(q);window.addEventListener('message',function(e){var d=e.data;if(d&&d.type==='ak-theme'){apply(d.theme);window.dispatchEvent(new CustomEvent('ak-theme-applied',{detail:d.theme}));}});})();</script>
+
+<p class="hud"><b>12</b>&nbsp;&nbsp;FLIP — First Last Invert Play · transform + clip-path only</p>
+<h1>Six systems.<br><em>One tap away.</em></h1>
+<div class="grid" id="grid" role="list" aria-label="Audited colour systems"></div>
+
+<div id="portal" role="dialog" aria-modal="true" aria-label="System detail">
+  <div id="panel">
+    <button id="close-portal" type="button" aria-label="Close panel">✕</button>
+    <div class="panel-inner">
+      <p class="panel-kicker" id="p-kicker">System</p>
+      <h2 class="panel-name" id="p-name">Obsidian</h2>
+      <p class="panel-role" id="p-role"></p>
+      <div class="panel-swatches" id="p-swatches"></div>
+      <div class="panel-foot"><span id="p-audit">ink/bg AAA</span><span>Kinetik audited · WCAG 2.1</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const SYSTEMS = [
+    { name:'Obsidian', bg:'#070709', surface:'#0D0D12', ink:'#F4F2EC', muted:'#8E8D8A', accent:'#FF3D00', role:'Kinetik brand — cosmic obsidian with flame accent. The default canvas everything is designed against.', audit:'ink/bg 17.98:1 AAA', on:'#160800' },
+    { name:'Paper', bg:'#FBFAF7', surface:'#F4F2EC', ink:'#171512', muted:'#5F5D58', accent:'#C93300', role:'Print editorial — warm paper stock with ember ink. Reads like a broadsheet, ships like a product.', audit:'ink/bg 16.4:1 AAA', on:'#FFF6EC' },
+    { name:'Aegean', bg:'#081521', surface:'#0F2231', ink:'#E9F1F5', muted:'#7E93A3', accent:'#3ED6FF', role:'Deep sea glass — harbor night with a kyanite signal. Cool, hydrous, quietly electric.', audit:'ink/bg 14.1:1 AAA', on:'#03222E' },
+    { name:'Parchment', bg:'#F5EFE0', surface:'#EDE5D0', ink:'#2A2118', muted:'#6B5F4D', accent:'#8A5A13', role:'Archival manuscript — vellum and iron-gall ink. For long documents and longer attention.', audit:'ink/bg 12.9:1 AAA', on:'#FBF3DF' },
+    { name:'Ledger', bg:'#0B1F16', surface:'#12281D', ink:'#EAF4EC', muted:'#7FA08C', accent:'#34D399', role:'Terminal ledger — vault green with phosphor audit. Numbers first, adjectives later.', audit:'ink/bg 14.8:1 AAA', on:'#04150D' },
+    { name:'Meridian', bg:'#141126', surface:'#1D1936', ink:'#EEEBFF', muted:'#8F89B5', accent:'#A78BFA', role:'Observatory violet — meridian transit at zenith. Night-shift instrumentation.', audit:'ink/bg 13.6:1 AAA', on:'#1A0930' }
+  ];
+
+  const grid = document.getElementById('grid');
+  const portal = document.getElementById('portal');
+  const panel = document.getElementById('panel');
+  const closeBtn = document.getElementById('close-portal');
+  let activeCard = null, lastFocus = null;
+
+  SYSTEMS.forEach((s, i) => {
+    const b = document.createElement('button');
+    b.className = 'sys-card';
+    b.type = 'button';
+    b.setAttribute('role', 'listitem');
+    b.setAttribute('aria-haspopup', 'dialog');
+    b.innerHTML = `
+      <span class="sys-kicker">System 0${i + 1}</span>
+      <span class="sys-name">${s.name}</span>
+      <span class="sys-dots" aria-hidden="true"><i style="background:${s.bg}"></i><i style="background:${s.surface}"></i><i style="background:${s.accent}"></i></span>
+      <span class="sys-grade">${s.audit.split(' ')[1]} ${s.audit.split(' ')[2]}</span>`;
+    b.addEventListener('click', () => openPortal(s, b));
+    grid.appendChild(b);
+  });
+
+  function fillPanel(s, i) {
+    document.getElementById('p-kicker').textContent = 'System 0' + (i + 1) + ' — ' + s.name;
+    document.getElementById('p-name').textContent = s.name;
+    document.getElementById('p-role').textContent = s.role;
+    document.getElementById('p-swatches').innerHTML = [
+      ['BG', s.bg], ['Surface', s.surface], ['Ink', s.ink], ['Accent', s.accent]
+    ].map(([label, hex]) => `<span class="panel-swatch"><i style="background:${hex}"></i><span>${label}<br>${hex}</span></span>`).join('');
+    document.getElementById('p-audit').textContent = s.audit;
+    panel.style.setProperty('--portal-bg', s.bg);
+    panel.style.setProperty('--portal-ink', s.ink);
+    panel.style.setProperty('--portal-muted', s.muted);
+    panel.style.setProperty('--portal-accent', s.accent);
+  }
+
+  /* ---- the FLIP: First (record) → Last (show) → Invert (transform) → Play ---- */
+  function openPortal(s, card) {
+    const i = SYSTEMS.indexOf(s);
+    lastFocus = document.activeElement;
+    activeCard = card;
+    fillPanel(s, i);
+
+    const first = card.getBoundingClientRect();          /* FIRST */
+    portal.classList.add('open');                        /* LAST  */
+    document.documentElement.style.overflow = 'hidden';
+    panel.style.visibility = 'hidden';
+    const last = panel.getBoundingClientRect();
+    panel.style.visibility = '';
+
+    const dx = (first.left + first.width / 2) - (last.left + last.width / 2);
+    const dy = (first.top + first.height / 2) - (last.top + last.height / 2);
+    const sx = first.width / last.width, sy = first.height / last.height;
+    const firstRadius = getComputedStyle(card).borderRadius;
+
+    if (RM) {
+      panel.style.clipPath = 'none';
+    } else {
+      /* INVERT — pretend the panel still occupies the card */
+      panel.style.transform = `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`;
+      panel.style.transformOrigin = '50% 50%';
+      panel.style.clipPath = `inset(0 0 0 0 round ${firstRadius})`;
+      /* PLAY — animate to identity; transform + clip-path only, zero layout thrash */
+      requestAnimationFrame(() => {
+        panel.animate([
+          { transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`, clipPath: `inset(0 0 0 0 round ${firstRadius})`, borderRadius: firstRadius },
+          { transform: 'translate(0px, 0px) scale(1, 1)', clipPath: 'inset(0 0 0 0 round 26px)', borderRadius: '26px' }
+        ], { duration: 560, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'forwards' });
+        panel.style.transform = 'none';
+        panel.style.clipPath = 'inset(0 0 0 0 round 26px)';
+        /* inner content cascades in after the shell lands */
+        panel.querySelectorAll('.panel-inner > *').forEach((el, k) => {
+          el.animate(
+            [{ opacity: 0, transform: 'translateY(18px)' }, { opacity: 1, transform: 'none' }],
+            { duration: 520, delay: 140 + k * 70, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'backwards' });
+        });
+      });
+    }
+    closeBtn.focus({ preventScroll: true });
+  }
+  function closePortal() {
+    if (!portal.classList.contains('open')) return;
+    const done = () => {
+      portal.classList.remove('open');
+      document.documentElement.style.overflow = '';
+      if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true });
+    };
+    if (RM || !activeCard) { done(); return; }
+    const last = panel.getBoundingClientRect();          /* FIRST (of the close) */
+    const target = activeCard.getBoundingClientRect();   /* LAST */
+    const dx = (target.left + target.width / 2) - (last.left + last.width / 2);
+    const dy = (target.top + target.height / 2) - (last.top + last.height / 2);
+    const sx = target.width / last.width, sy = target.height / last.height;
+    const firstRadius = getComputedStyle(activeCard).borderRadius;
+    const anim = panel.animate([
+      { transform: 'translate(0px, 0px) scale(1, 1)', clipPath: 'inset(0 0 0 0 round 26px)', opacity: 1 },
+      { transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`, clipPath: `inset(0 0 0 0 round ${firstRadius})`, opacity: 0.55 }
+    ], { duration: 430, easing: 'cubic-bezier(0.32, 0, 0.67, 0)', fill: 'forwards' });
+    anim.onfinish = done;
+  }
+  closeBtn.addEventListener('click', closePortal);
+  portal.addEventListener('pointerdown', (e) => { if (e.target === portal) closePortal(); });
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closePortal();
+    if (portal.classList.contains('open') && e.key === 'Tab') {
+      /* minimal focus containment — close button is the only control */
+      e.preventDefault(); closeBtn.focus();
+    }
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<!-- Atelier Kinetik · FX 04 · 3D Dotted Globe — fibonacci point sphere, orthographic. Zero dependencies. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kinetik FX — 3D Dotted Globe</title>
+<style>html,body{margin:0;height:100%;background:#070709;overflow:hidden}canvas{display:block;width:100vw;height:100vh}</style>
+</head>
+<body>
+<canvas id="c" aria-hidden="true"></canvas>
+<script>
+(() => {
+  const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W = 0, H = 0, quality = 1, R = 0, tilt = 0.42, points = [];
+  let fpsAcc = 0, fpsN = 0, degraded = false;
+  const PHI = Math.PI * (3 - Math.sqrt(5));
+
+  function govern(dtMs) {
+    if (degraded) return;
+    fpsAcc += dtMs; fpsN++;
+    if (fpsN >= 120) { if (fpsAcc / fpsN > 21) { degraded = true; quality *= 0.6; build(); } fpsAcc = 0; fpsN = 0; }
+  }
+  function build() {
+    points = [];
+    const n = Math.max(140, Math.round(720 * quality));
+    for (let i = 0; i < n; i++) {
+      const y = 1 - (i / (n - 1)) * 2;
+      const rad = Math.sqrt(Math.max(0, 1 - y * y));
+      const th = PHI * i;
+      points.push({ x: Math.cos(th) * rad, y, z: Math.sin(th) * rad });
+    }
+  }
+  function resize() {
+    const dpr = Math.min(2, devicePixelRatio || 1);
+    W = innerWidth; H = innerHeight; R = Math.min(W, H) * 0.335;
+    cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    build();
+  }
+  const rotY = (p, a) => { const c = Math.cos(a), s = Math.sin(a); return { x: p.x * c - p.z * s, y: p.y, z: p.x * s + p.z * c }; };
+  const rotX = (p, a) => { const c = Math.cos(a), s = Math.sin(a); return { x: p.x, y: p.y * c - p.z * s, z: p.y * s + p.z * c }; };
+
+  function draw(t) {
+    ctx.fillStyle = '#070709'; ctx.fillRect(0, 0, W, H);
+    const cx = W / 2, cy = H * 0.52;
+    // halo
+    const halo = ctx.createRadialGradient(cx, cy, R * 0.55, cx, cy, R * 1.6);
+    halo.addColorStop(0, 'rgba(0,240,255,0.07)'); halo.addColorStop(1, 'rgba(0,240,255,0)');
+    ctx.fillStyle = halo; ctx.fillRect(0, 0, W, H);
+    // equator glow ring
+    ctx.strokeStyle = 'rgba(0,240,255,0.16)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.ellipse(cx, cy, R * 1.02, R * 1.02 * Math.abs(Math.sin(tilt)) + 2, 0, 0, Math.PI * 2); ctx.stroke();
+
+    const spin = RM ? 0.6 : t * 0.00033;
+    const projected = points.map(p => {
+      const q = rotX(rotY(p, spin), tilt);
+      return { sx: cx + q.x * R, sy: cy + q.y * R, z: q.z };
+    }).sort((a, b) => a.z - b.z);
+
+    projected.forEach(p => {
+      const depth = (p.z + 1) / 2; // 0 back → 1 front
+      const alpha = 0.08 + depth * 0.85;
+      const r = 0.55 + depth * 1.75;
+      ctx.fillStyle = depth > 0.62 ? 'rgba(230,247,255,' + alpha + ')' : 'rgba(111,163,184,' + alpha + ')';
+      ctx.beginPath(); ctx.arc(p.sx, p.sy, r, 0, Math.PI * 2); ctx.fill();
+    });
+  }
+  let prev = 0;
+  function frame(t) {
+    govern(t - prev); prev = t;
+    draw(t);
+    if (!RM) requestAnimationFrame(frame);
+  }
+  resize(); addEventListener('resize', resize);
+  if (RM) draw(0); else requestAnimationFrame((t) => { prev = t; frame(t); });
+})();
+</script>
+</body>
+</html>

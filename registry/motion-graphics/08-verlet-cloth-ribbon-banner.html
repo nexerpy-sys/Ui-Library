@@ -191,5 +191,28 @@
   if (!RM) requestAnimationFrame(frame);
 })();
 </script>
+
+<script>
+/* ak-telemetry — posts real frame pacing to the parent (Explorer) via postMessage.
+   Parent listens for {type:'ak-telemetry'} and validates e.source === iframe.contentWindow.
+   Zero dependencies; silently no-ops when opened standalone. */
+(function () {
+  var last = performance.now(), ema = 16.7, drops = 0, frames = 0, acc = 0;
+  function frame(now) {
+    var d = now - last; last = now;
+    if (d > 0 && d < 1000) {
+      ema = ema * 0.94 + d * 0.06;
+      if (d > 40) drops++;
+      frames++; acc += d;
+    }
+    if (acc >= 600) {
+      try { parent.postMessage({ type: 'ak-telemetry', fps: Math.max(1, Math.round(1000 / ema)), ms: Math.round(ema * 10) / 10, dropped: drops, frames: frames }, '*'); } catch (e) { /* standalone */ }
+      acc = 0; frames = 0; drops = 0;
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
 </body>
 </html>

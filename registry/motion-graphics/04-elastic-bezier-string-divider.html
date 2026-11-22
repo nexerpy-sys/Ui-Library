@@ -23,8 +23,23 @@
     font-size:clamp(1.6rem, 5.2vw, 3.6rem); letter-spacing:-.02em; line-height:.98; color:var(--ink); pointer-events:none; }
   h1 span { display:block; font-family:"Instrument Serif", serif; font-style:italic; font-weight:400; text-transform:none; color:var(--muted); font-size:.52em; margin-top:.5em; }
   #wire { display:block; width:100vw; height:200px; touch-action:none; }
+  /* traveling energy pulse along the wire — dash-phase garnish */
+  #pathGlow { animation: akPulse 2.4s linear infinite; }
+  @keyframes akPulse { to { stroke-dashoffset: -290; } }
+  @media (prefers-reduced-motion: reduce) { #pathGlow { animation: none; } }
   .pin-hint { position:absolute; bottom:1.1rem; left:50%; transform:translateX(-50%);
     font-family:"JetBrains Mono", monospace; font-size:8.5px; letter-spacing:.3em; text-transform:uppercase; color:var(--muted); white-space:nowrap; }
+</style>
+<style id="ak-grade">
+  /* ✦ Atelier Kinetik · cinematic grade — vignette + animated film grain */
+  body::after{ content:""; position:fixed; inset:0; z-index:9998; pointer-events:none;
+    background:radial-gradient(115% 88% at 50% 42%, transparent 57%, rgba(4,4,7,.42) 100%);
+    mix-blend-mode:multiply; }
+  body::before{ content:""; position:fixed; inset:-120px; z-index:9999; pointer-events:none; opacity:.055;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.62'/%3E%3C/svg%3E");
+    animation:akGrain 1.15s steps(3) infinite; }
+  @keyframes akGrain{ 0%,100%{ transform:translate(0,0) } 33%{ transform:translate(-38px,22px) } 66%{ transform:translate(26px,-30px) } }
+  @media (prefers-reduced-motion: reduce){ body::before{ animation:none } }
 </style>
 </head>
 <body>

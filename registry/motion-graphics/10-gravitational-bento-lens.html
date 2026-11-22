@@ -21,6 +21,17 @@
     font-size:9px; letter-spacing:.26em; text-transform:uppercase; color:var(--muted); pointer-events:none; }
   .hud b { color:var(--cyan); font-weight:500; }
 </style>
+<style id="ak-grade">
+  /* ✦ Atelier Kinetik · cinematic grade — vignette + animated film grain */
+  body::after{ content:""; position:fixed; inset:0; z-index:9998; pointer-events:none;
+    background:radial-gradient(115% 88% at 50% 42%, transparent 57%, rgba(4,4,7,.42) 100%);
+    mix-blend-mode:multiply; }
+  body::before{ content:""; position:fixed; inset:-120px; z-index:9999; pointer-events:none; opacity:.055;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.62'/%3E%3C/svg%3E");
+    animation:akGrain 1.15s steps(3) infinite; }
+  @keyframes akGrain{ 0%,100%{ transform:translate(0,0) } 33%{ transform:translate(-38px,22px) } 66%{ transform:translate(26px,-30px) } }
+  @media (prefers-reduced-motion: reduce){ body::before{ animation:none } }
+</style>
 </head>
 <body>
 <script>/* Kinetik theming: parent explorer injects via postMessage or ?theme= — Obsidian/Paper/Aegean */
@@ -128,6 +139,21 @@
     ctx.fillStyle = g; ctx.fillRect(mass.x - 150, mass.y - 150, 300, 300);
     ctx.beginPath(); ctx.arc(mass.x, mass.y, 5.2, 0, Math.PI * 2);
     ctx.fillStyle = PAL.cyan; ctx.fill();
+    /* Einstein-ring signature — gold/cyan chromatic separation on the rim */
+    const pulse = 1 + 0.06 * Math.sin(t * 0.0021);
+    const rimR = 42 * pulse;
+    ctx.beginPath(); ctx.arc(mass.x, mass.y, rimR, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(229,169,60,0.32)'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.beginPath(); ctx.arc(mass.x, mass.y, rimR + 3.8, 0, Math.PI * 2);
+    ctx.strokeStyle = 'rgba(0,240,255,0.24)'; ctx.lineWidth = 1.1; ctx.stroke();
+    /* 4-point diffraction flare — the mass reads as a luminous lens */
+    const fl = 30 * (0.5 + mass.strength * 0.7) * (1 + 0.14 * Math.sin(t * 0.0031));
+    const fh = ctx.createLinearGradient(mass.x - fl, mass.y, mass.x + fl, mass.y);
+    fh.addColorStop(0, 'rgba(0,240,255,0)'); fh.addColorStop(0.5, 'rgba(0,240,255,' + (0.5 * mass.strength).toFixed(3) + ')'); fh.addColorStop(1, 'rgba(0,240,255,0)');
+    ctx.fillStyle = fh; ctx.fillRect(mass.x - fl, mass.y - 0.75, fl * 2, 1.5);
+    const fv = ctx.createLinearGradient(mass.x, mass.y - fl, mass.x, mass.y + fl);
+    fv.addColorStop(0, 'rgba(229,169,60,0)'); fv.addColorStop(0.5, 'rgba(229,169,60,' + (0.45 * mass.strength).toFixed(3) + ')'); fv.addColorStop(1, 'rgba(229,169,60,0)');
+    ctx.fillStyle = fv; ctx.fillRect(mass.x - 0.75, mass.y - fl, 1.5, fl * 2);
   }
   function resize() {
     dpr = Math.min(2, window.devicePixelRatio || 1);

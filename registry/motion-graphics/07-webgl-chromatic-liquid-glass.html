@@ -35,6 +35,17 @@
   #fallback .fallback-card span { position:absolute; left:18px; bottom:16px; font-family:"JetBrains Mono", monospace;
     font-size:8.5px; letter-spacing:.24em; text-transform:uppercase; color:var(--muted); }
 </style>
+<style id="ak-grade">
+  /* ✦ Atelier Kinetik · cinematic grade — vignette + animated film grain */
+  body::after{ content:""; position:fixed; inset:0; z-index:9998; pointer-events:none;
+    background:radial-gradient(115% 88% at 50% 42%, transparent 57%, rgba(4,4,7,.42) 100%);
+    mix-blend-mode:multiply; }
+  body::before{ content:""; position:fixed; inset:-120px; z-index:9999; pointer-events:none; opacity:.055;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.62'/%3E%3C/svg%3E");
+    animation:akGrain 1.15s steps(3) infinite; }
+  @keyframes akGrain{ 0%,100%{ transform:translate(0,0) } 33%{ transform:translate(-38px,22px) } 66%{ transform:translate(26px,-30px) } }
+  @media (prefers-reduced-motion: reduce){ body::before{ animation:none } }
+</style>
 </head>
 <body>
 <script>/* Kinetik theming: parent explorer injects via postMessage or ?theme= — Obsidian/Paper/Aegean */
@@ -178,6 +189,12 @@ void main() {
   col += vec3(sheen);
   col += vec3(rim * 0.55, rim * 0.72, rim * 0.95) * (0.55 + 0.45 * frost);
   col += vec3(0.028, 0.034, 0.044) * uv.y;
+
+  /* ignition-hash dither — annihilates 8-bit banding in the frosted gradient */
+  float ign = fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715))));
+  col += (ign - 0.5) * (1.6 / 255.0);
+  /* gentle filmic toe — ink-true blacks, never clips highlights */
+  col = pow(col * 1.07, vec3(0.965));
 
   frag = vec4(mix(scene, col, inside), 1.0);
 }`;

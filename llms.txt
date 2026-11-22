@@ -72,7 +72,7 @@ External deps ARE permitted in your own builds (three.js, GSAP) — the FX thems
 
 ## 12 computational motion graphics (/registry/motion-graphics/, registry.json → motionGraphics)
 01 Liquid Gooey Dock (SVG feGaussianBlur+feColorMatrix metaballs, spring magnification) · 02 Kinetic Variable Type Field (cursor-velocity repulsion, live wght axis) ·
-03 Magnetic Morph Cursor (velocity squash/stretch, bounding-box morph) · 04 Elastic Bezier String Divider (damped harmonic oscillator, ζ 0.16) ·
+03 Magnetic Morph Cursor (velocity squash/stretch, bounding-box morph) · 04 Elastic String Divider (46-node Verlet lattice — emergent harmonics, drag or cross to pluck) ·
 05 Particle Text Disintegration (offscreen getImageData sampler, shockwave dispersion, spring reassembly) · 06 3D Holographic Card Stack (perspective matrix, foil + chromatic aberration, flick-to-dismiss) ·
 07 WebGL Chromatic Liquid Glass (raw WebGL2 fragment shader — rounded-rect SDF refraction, RGB dispersion, frosted rim, pointer ripples; Canvas2D/CSS backdrop-filter fallback) · 08 Verlet Cloth Ribbon (2D verlet mesh, pin constraints, gusting wind, pointer dragging) ·
 09 Path-Subdivision Icon Morpher (arc-length resample + per-point spring interpolation; menu↔close↔arrow↔check↔spark) · 10 Gravitational Bento Lens (s/r² spacetime displacement of grid + cells, spring-restoring mass) ·

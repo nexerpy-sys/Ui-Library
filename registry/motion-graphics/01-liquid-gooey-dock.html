@@ -23,6 +23,17 @@
   .glyph { stroke:var(--ink); stroke-width:1.7; fill:none; stroke-linecap:round; stroke-linejoin:round; }
   .dock-base { fill:rgba(13,13,18,.72); stroke:var(--line-strong); stroke-width:1; }
 </style>
+<style id="ak-grade">
+  /* ✦ Atelier Kinetik · cinematic grade — vignette + animated film grain */
+  body::after{ content:""; position:fixed; inset:0; z-index:9998; pointer-events:none;
+    background:radial-gradient(115% 88% at 50% 42%, transparent 57%, rgba(4,4,7,.42) 100%);
+    mix-blend-mode:multiply; }
+  body::before{ content:""; position:fixed; inset:-120px; z-index:9999; pointer-events:none; opacity:.055;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.62'/%3E%3C/svg%3E");
+    animation:akGrain 1.15s steps(3) infinite; }
+  @keyframes akGrain{ 0%,100%{ transform:translate(0,0) } 33%{ transform:translate(-38px,22px) } 66%{ transform:translate(26px,-30px) } }
+  @media (prefers-reduced-motion: reduce){ body::before{ animation:none } }
+</style>
 </head>
 <body>
 <script>/* Kinetik theming: parent explorer injects via postMessage or ?theme= — Obsidian/Paper/Aegean */
@@ -45,7 +56,23 @@
     <rect id="baseSheen" x="60" y="248" width="600" height="27" rx="27" fill="url(#dockSheen)" opacity=".5" pointer-events="none" />
     <g id="metaBalls" filter="url(#goo)"></g>
     <g id="icons"></g>
-  </svg>
+      <g id="ak-bless" aria-hidden="true">
+      <linearGradient id="akSheenG" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="rgba(255,255,255,0)"/><stop offset=".5" stop-color="rgba(255,255,255,.9)"/><stop offset="1" stop-color="rgba(255,255,255,0)"/>
+      </linearGradient>
+      <rect x="-170" y="247" width="76" height="56" rx="25" fill="url(#akSheenG)" opacity=".75">
+        <animate attributeName="x" values="-170;780" dur="4.4s" begin="0.9s" repeatCount="indefinite"/>
+      </rect>
+      <g fill="var(--flame)">
+        <circle cx="118" cy="330" r="1.7"><animate attributeName="cy" values="330;198" dur="5.4s" begin="0s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;.85;.65;0" keyTimes="0;.22;.74;1" dur="5.4s" begin="0s" repeatCount="indefinite"/></circle>
+        <circle cx="215" cy="330" r="1.3"><animate attributeName="cy" values="330;212" dur="6.3s" begin="1.1s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;.8;.6;0" keyTimes="0;.22;.74;1" dur="6.3s" begin="1.1s" repeatCount="indefinite"/></circle>
+        <circle cx="305" cy="330" r="1.9"><animate attributeName="cy" values="330;190" dur="4.8s" begin="0.6s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;.9;.7;0" keyTimes="0;.2;.74;1" dur="4.8s" begin="0.6s" repeatCount="indefinite"/></circle>
+        <circle cx="418" cy="330" r="1.4"><animate attributeName="cy" values="330;208" dur="5.9s" begin="2s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;.75;.6;0" keyTimes="0;.22;.74;1" dur="5.9s" begin="2s" repeatCount="indefinite"/></circle>
+        <circle cx="512" cy="330" r="1.8"><animate attributeName="cy" values="330;194" dur="5.1s" begin="0.3s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;.9;.68;0" keyTimes="0;.2;.74;1" dur="5.1s" begin="0.3s" repeatCount="indefinite"/></circle>
+        <circle cx="602" cy="330" r="1.2"><animate attributeName="cy" values="330;216" dur="6.6s" begin="1.6s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;.7;.55;0" keyTimes="0;.22;.74;1" dur="6.6s" begin="1.6s" repeatCount="indefinite"/></circle>
+      </g>
+    </g>
+</svg>
 </div>
 
 <script>
@@ -74,7 +101,7 @@
   /* spring-damped proximity state per icon */
   const icons = GLYPHS.map((d, i) => ({
     home: x0 + i * GAP, x: x0 + i * GAP, s: 1, vs: 0,
-    drift: 0, vdrift: 0, d, el: null, glyphEl: null
+    drift: 0, vdrift: 0, rot: 0, vrot: 0, d, el: null, glyphEl: null
   }));
 
   icons.forEach((ic) => {
@@ -119,8 +146,18 @@
       ic.el.setAttribute('cx', String(ic.x));
       ic.el.setAttribute('cy', String(CY - lift * 0.6));
       ic.el.setAttribute('r', String(Math.max(6, r)));
+      /* torsional pendulum — rotational spring driven by drift velocity,
+         the icon physically lags its own magnetism */
+      const lean = Math.max(-0.22, Math.min(0.22, -ic.vdrift * 0.00042));
+      const aR = (lean - ic.rot) * 95 - ic.vrot * 13;
+      ic.vrot += aR * dt; ic.rot += ic.vrot * dt;
+      /* volume-preserving squash — magnification widens AND flattens,
+         perceived area holds, like a droplet */
+      const sxs = ic.s * (1 + (ic.s - 1) * 0.42);
+      const sys = ic.s * (1 - (ic.s - 1) * 0.24);
+      const deg = ic.rot * 57.29578;
       ic.glyphEl.setAttribute('transform',
-        `translate(${ic.x - 12}, ${CY - 12 - lift}) scale(${ic.s}) translate(${(-12 * (ic.s - 1)) / ic.s}, ${(-12 * (ic.s - 1)) / ic.s})`);
+        `translate(${ic.x.toFixed(2)} ${(CY - lift).toFixed(2)}) rotate(${deg.toFixed(2)}) scale(${sxs.toFixed(3)} ${sys.toFixed(3)}) translate(-12 -12)`);
     });
     if (!RM) requestAnimationFrame(tick);
   }
@@ -132,6 +169,29 @@
   } else {
     requestAnimationFrame(tick);
   }
+})();
+</script>
+
+<script>
+/* ak-telemetry — posts real frame pacing to the parent (Explorer) via postMessage.
+   Parent listens for {type:'ak-telemetry'} and validates e.source === iframe.contentWindow.
+   Zero dependencies; silently no-ops when opened standalone. */
+(function () {
+  var last = performance.now(), ema = 16.7, drops = 0, frames = 0, acc = 0;
+  function frame(now) {
+    var d = now - last; last = now;
+    if (d > 0 && d < 1000) {
+      ema = ema * 0.94 + d * 0.06;
+      if (d > 40) drops++;
+      frames++; acc += d;
+    }
+    if (acc >= 600) {
+      try { parent.postMessage({ type: 'ak-telemetry', fps: Math.max(1, Math.round(1000 / ema)), ms: Math.round(ema * 10) / 10, dropped: drops, frames: frames }, '*'); } catch (e) { /* standalone */ }
+      acc = 0; frames = 0; drops = 0;
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
 })();
 </script>
 </body>

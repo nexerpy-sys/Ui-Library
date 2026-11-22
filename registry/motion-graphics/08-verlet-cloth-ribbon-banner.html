@@ -24,6 +24,17 @@
   .hint { position:absolute; bottom:1.15rem; left:50%; transform:translateX(-50%);
     font-family:"JetBrains Mono", monospace; font-size:8.5px; letter-spacing:.3em; text-transform:uppercase; color:var(--muted); white-space:nowrap; pointer-events:none; }
 </style>
+<style id="ak-grade">
+  /* ✦ Atelier Kinetik · cinematic grade — vignette + animated film grain */
+  body::after{ content:""; position:fixed; inset:0; z-index:9998; pointer-events:none;
+    background:radial-gradient(115% 88% at 50% 42%, transparent 57%, rgba(4,4,7,.42) 100%);
+    mix-blend-mode:multiply; }
+  body::before{ content:""; position:fixed; inset:-120px; z-index:9999; pointer-events:none; opacity:.055;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.62'/%3E%3C/svg%3E");
+    animation:akGrain 1.15s steps(3) infinite; }
+  @keyframes akGrain{ 0%,100%{ transform:translate(0,0) } 33%{ transform:translate(-38px,22px) } 66%{ transform:translate(26px,-30px) } }
+  @media (prefers-reduced-motion: reduce){ body::before{ animation:none } }
+</style>
 </head>
 <body>
 <script>/* Kinetik theming: parent explorer injects via postMessage or ?theme= — Obsidian/Paper/Aegean */
@@ -100,6 +111,7 @@
         const pa = pts[a], pb = pts[b];
         let dx = pb.x - pa.x, dy = pb.y - pa.y;
         const dist = Math.hypot(dx, dy) || 1e-6;
+        cons[i][3] = (dist - rest) / rest;    /* retained strain — drives the heat pass */
         const diff = (dist - rest) / dist;
         const aPinned = pa.pin || a === grabIdx, bPinned = pb.pin || b === grabIdx;
         if (aPinned && bPinned) continue;
@@ -129,6 +141,16 @@
     ctx.fill();
     ctx.globalAlpha = 1;
     ctx.strokeStyle = 'rgba(0,0,0,0.35)'; ctx.lineWidth = 1.2; ctx.stroke();
+    /* live strain heat — amber at 2% yield, flame at 18%+; the cloth confesses */
+    ctx.lineWidth = 1;
+    for (let i = 0; i < cons.length; i++) {
+      const mag = Math.abs(cons[i][3] || 0);
+      if (mag < 0.02) continue;
+      const a = pts[cons[i][0]], b = pts[cons[i][1]];
+      const heat = Math.min(1, (mag - 0.02) / 0.16);
+      ctx.strokeStyle = 'rgba(255,' + Math.round(200 - heat * 131) + ',' + Math.round(80 - heat * 80) + ',' + (0.28 + heat * 0.62).toFixed(3) + ')';
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+    }
     /* woven seam lines */
     ctx.globalAlpha = 0.45;
     [1, 2].forEach(r => {
@@ -189,6 +211,29 @@
   resize();
   window.addEventListener('resize', resize);
   if (!RM) requestAnimationFrame(frame);
+})();
+</script>
+
+<script>
+/* ak-telemetry — posts real frame pacing to the parent (Explorer) via postMessage.
+   Parent listens for {type:'ak-telemetry'} and validates e.source === iframe.contentWindow.
+   Zero dependencies; silently no-ops when opened standalone. */
+(function () {
+  var last = performance.now(), ema = 16.7, drops = 0, frames = 0, acc = 0;
+  function frame(now) {
+    var d = now - last; last = now;
+    if (d > 0 && d < 1000) {
+      ema = ema * 0.94 + d * 0.06;
+      if (d > 40) drops++;
+      frames++; acc += d;
+    }
+    if (acc >= 600) {
+      try { parent.postMessage({ type: 'ak-telemetry', fps: Math.max(1, Math.round(1000 / ema)), ms: Math.round(ema * 10) / 10, dropped: drops, frames: frames }, '*'); } catch (e) { /* standalone */ }
+      acc = 0; frames = 0; drops = 0;
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
 })();
 </script>
 </body>

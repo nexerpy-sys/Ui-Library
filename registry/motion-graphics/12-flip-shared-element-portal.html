@@ -61,6 +61,17 @@
   #close-portal:hover { transform:rotate(90deg); border-color:var(--flame); }
   #close-portal:focus-visible { outline:2px solid var(--flame); outline-offset:2px; }
 </style>
+<style id="ak-grade">
+  /* ✦ Atelier Kinetik · cinematic grade — vignette + animated film grain */
+  body::after{ content:""; position:fixed; inset:0; z-index:9998; pointer-events:none;
+    background:radial-gradient(115% 88% at 50% 42%, transparent 57%, rgba(4,4,7,.42) 100%);
+    mix-blend-mode:multiply; }
+  body::before{ content:""; position:fixed; inset:-120px; z-index:9999; pointer-events:none; opacity:.055;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.62'/%3E%3C/svg%3E");
+    animation:akGrain 1.15s steps(3) infinite; }
+  @keyframes akGrain{ 0%,100%{ transform:translate(0,0) } 33%{ transform:translate(-38px,22px) } 66%{ transform:translate(26px,-30px) } }
+  @media (prefers-reduced-motion: reduce){ body::before{ animation:none } }
+</style>
 </head>
 <body>
 <script>/* Kinetik theming: parent explorer injects via postMessage or ?theme= — Obsidian/Paper/Aegean */
@@ -101,6 +112,29 @@
   const panel = document.getElementById('panel');
   const closeBtn = document.getElementById('close-portal');
   let activeCard = null, lastFocus = null;
+
+  /* semi-implicit Euler spring tween for the portal shell.
+     Open:  k 168 / c 15.5 → ≈7% overshoot — snap with weight.
+     Close: k 150 / c 21   → critically damped, lands without wobble.
+     A monotonically increasing token cancels stale tweens on rapid re-open. */
+  let shellToken = 0;
+  function springShell(k, c, onUpdate, onDone) {
+    const token = ++shellToken;
+    let x = 0, v = 0, last = 0;
+    const t0 = performance.now(), CAP = 1600;
+    function step(now) {
+      if (token !== shellToken) return;
+      const dt = Math.min(0.032, last ? (now - last) / 1000 : 0.016); last = now;
+      v += ((1 - x) * k - v * c) * dt;
+      x += v * dt;
+      onUpdate(x);
+      if ((Math.abs(x - 1) < 0.0009 && Math.abs(v) < 0.005) || now - t0 > CAP) {
+        onUpdate(1); if (onDone) onDone(); return;
+      }
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
 
   SYSTEMS.forEach((s, i) => {
     const b = document.createElement('button');
@@ -153,23 +187,23 @@
     if (RM) {
       panel.style.clipPath = 'none';
     } else {
-      /* INVERT — pretend the panel still occupies the card */
-      panel.style.transform = `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`;
+      /* INVERT — pretend the panel still occupies the card, then SPRING to identity */
+      const r0 = parseFloat(firstRadius) || 16;
       panel.style.transformOrigin = '50% 50%';
-      panel.style.clipPath = `inset(0 0 0 0 round ${firstRadius})`;
-      /* PLAY — animate to identity; transform + clip-path only, zero layout thrash */
-      requestAnimationFrame(() => {
-        panel.animate([
-          { transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`, clipPath: `inset(0 0 0 0 round ${firstRadius})`, borderRadius: firstRadius },
-          { transform: 'translate(0px, 0px) scale(1, 1)', clipPath: 'inset(0 0 0 0 round 26px)', borderRadius: '26px' }
-        ], { duration: 560, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'forwards' });
-        panel.style.transform = 'none';
+      springShell(168, 15.5, (x) => {
+        const ix = 1 - x;                                   /* 0 at card → 1 at rest; overshoots past 1 */
+        const scx = 1 + (sx - 1) * ix, scy = 1 + (sy - 1) * ix;
+        const r = Math.max(8, 26 + (r0 - 26) * ix);
+        panel.style.transform = `translate(${(dx * ix).toFixed(2)}px, ${(dy * ix).toFixed(2)}px) scale(${scx.toFixed(4)}, ${scy.toFixed(4)})`;
+        panel.style.clipPath = `inset(0 0 0 0 round ${r.toFixed(2)}px)`;
+      }, () => {
+        panel.style.transform = '';
         panel.style.clipPath = 'inset(0 0 0 0 round 26px)';
         /* inner content cascades in after the shell lands */
-        panel.querySelectorAll('.panel-inner > *').forEach((el, k) => {
+        panel.querySelectorAll('.panel-inner > *').forEach((el, kIdx) => {
           el.animate(
             [{ opacity: 0, transform: 'translateY(18px)' }, { opacity: 1, transform: 'none' }],
-            { duration: 520, delay: 140 + k * 70, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'backwards' });
+            { duration: 520, delay: 40 + kIdx * 60, easing: 'cubic-bezier(0.16, 1, 0.3, 1)', fill: 'backwards' });
         });
       });
     }
@@ -189,11 +223,18 @@
     const dy = (target.top + target.height / 2) - (last.top + last.height / 2);
     const sx = target.width / last.width, sy = target.height / last.height;
     const firstRadius = getComputedStyle(activeCard).borderRadius;
-    const anim = panel.animate([
-      { transform: 'translate(0px, 0px) scale(1, 1)', clipPath: 'inset(0 0 0 0 round 26px)', opacity: 1 },
-      { transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`, clipPath: `inset(0 0 0 0 round ${firstRadius})`, opacity: 0.55 }
-    ], { duration: 430, easing: 'cubic-bezier(0.32, 0, 0.67, 0)', fill: 'forwards' });
-    anim.onfinish = done;
+    const r0 = parseFloat(firstRadius) || 16;
+    panel.style.transformOrigin = '50% 50%';
+    springShell(150, 21, (x) => {
+      const scx = 1 + (sx - 1) * x, scy = 1 + (sy - 1) * x;
+      const r = Math.max(8, 26 + (r0 - 26) * x);
+      panel.style.transform = `translate(${(dx * x).toFixed(2)}px, ${(dy * x).toFixed(2)}px) scale(${scx.toFixed(4)}, ${scy.toFixed(4)})`;
+      panel.style.clipPath = `inset(0 0 0 0 round ${r.toFixed(2)}px)`;
+      panel.style.opacity = String(1 - 0.45 * x);
+    }, () => {
+      panel.style.transform = ''; panel.style.clipPath = ''; panel.style.opacity = '';
+      done();
+    });
   }
   closeBtn.addEventListener('click', closePortal);
   portal.addEventListener('pointerdown', (e) => { if (e.target === portal) closePortal(); });
@@ -204,6 +245,29 @@
       e.preventDefault(); closeBtn.focus();
     }
   });
+})();
+</script>
+
+<script>
+/* ak-telemetry — posts real frame pacing to the parent (Explorer) via postMessage.
+   Parent listens for {type:'ak-telemetry'} and validates e.source === iframe.contentWindow.
+   Zero dependencies; silently no-ops when opened standalone. */
+(function () {
+  var last = performance.now(), ema = 16.7, drops = 0, frames = 0, acc = 0;
+  function frame(now) {
+    var d = now - last; last = now;
+    if (d > 0 && d < 1000) {
+      ema = ema * 0.94 + d * 0.06;
+      if (d > 40) drops++;
+      frames++; acc += d;
+    }
+    if (acc >= 600) {
+      try { parent.postMessage({ type: 'ak-telemetry', fps: Math.max(1, Math.round(1000 / ema)), ms: Math.round(ema * 10) / 10, dropped: drops, frames: frames }, '*'); } catch (e) { /* standalone */ }
+      acc = 0; frames = 0; drops = 0;
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
 })();
 </script>
 </body>

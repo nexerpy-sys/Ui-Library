@@ -49,6 +49,17 @@
     background-image:radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px); background-size:3px 3px; }
   @media (prefers-reduced-motion: reduce) { .foil { animation:none; } }
 </style>
+<style id="ak-grade">
+  /* ✦ Atelier Kinetik · cinematic grade — vignette + animated film grain */
+  body::after{ content:""; position:fixed; inset:0; z-index:9998; pointer-events:none;
+    background:radial-gradient(115% 88% at 50% 42%, transparent 57%, rgba(4,4,7,.42) 100%);
+    mix-blend-mode:multiply; }
+  body::before{ content:""; position:fixed; inset:-120px; z-index:9999; pointer-events:none; opacity:.055;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.62'/%3E%3C/svg%3E");
+    animation:akGrain 1.15s steps(3) infinite; }
+  @keyframes akGrain{ 0%,100%{ transform:translate(0,0) } 33%{ transform:translate(-38px,22px) } 66%{ transform:translate(26px,-30px) } }
+  @media (prefers-reduced-motion: reduce){ body::before{ animation:none } }
+</style>
 </head>
 <body>
 <script>/* Kinetik theming: parent explorer injects via postMessage or ?theme= — Obsidian/Paper/Aegean */
@@ -97,7 +108,7 @@
       <div class="glare"></div>
       <div class="grainy"></div>`;
     deck.appendChild(el);
-    return { el, sys: s, gx: 30, gy: 22, x: 0, y: 0, vx: 0, vy: 0, rot: (i * 2 - 2.5) * 0.6 };
+    return { el, sys: s, gx: 30, gy: 22, x: 0, y: 0, vx: 0, vy: 0, rot: (i * 2 - 2.5) * 0.6, fan: (i * 2 - 2.5) * 0.6, spin: 0 };
   });
 
   let order = cards.map((_, i) => i);       /* order[0] = front */
@@ -143,6 +154,7 @@
     const f = front(); if (f == null) return;
     const c = cards[f];
     c.vx = dirX; c.vy = dirY;                /* hand velocity to the fling solver */
+    c.spin = Math.max(-5.5, Math.min(5.5, dirX * 0.0042));   /* angular momentum, rad/s */
     order.push(order.shift());               /* recycle to back */
     c.flying = true;
   }
@@ -167,7 +179,9 @@
       if (c.flying) {
         c.vy += 2400 * dt;                    /* gravity for the fling arc */
         c.x += c.vx * dt; c.y += c.vy * dt;
-        if (Math.abs(c.x) > innerWidth || Math.abs(c.y) > innerHeight) { c.flying = false; c.x = 0; c.y = 0; c.vx = 0; c.vy = 0; }
+        c.rot += c.spin * 57.29578 * dt;      /* integrate angle — card tumbles as it flies */
+        c.spin *= Math.exp(-0.45 * dt);       /* aerodynamic torque drag */
+        if (Math.abs(c.x) > innerWidth || Math.abs(c.y) > innerHeight) { c.flying = false; c.x = 0; c.y = 0; c.vx = 0; c.vy = 0; c.rot = c.fan; c.spin = 0; }
       } else if (!dragging || depth !== 0) {
         /* spring back to deck slot */
         c.vx += (-c.x * 170 - c.vx * 17) * dt; c.x += c.vx * dt;
@@ -176,10 +190,9 @@
       const isFront = depth === 0;
       const stackY = depth * 17, stackScale = 1 - depth * 0.055, stackRot = (depth * 0 - c.rot * 0.35) + depth * 1.6;
       const rx = isFront && !c.flying ? tiltX : 0, ry = isFront && !c.flying ? tiltY : 0;
-      const flingRot = c.flying ? c.vx * 0.012 : 0;
       c.el.style.zIndex = String(100 - depth);
       c.el.style.transform =
-        `translate3d(${c.x.toFixed(2)}px, ${(c.y + stackY).toFixed(2)}px, ${-depth * 60}px) rotateZ(${(stackRot + flingRot).toFixed(2)}deg) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) scale(${stackScale})`;
+        `translate3d(${c.x.toFixed(2)}px, ${(c.y + stackY).toFixed(2)}px, ${-depth * 60}px) rotateZ(${stackRot.toFixed(2)}deg) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) scale(${stackScale})`;
       c.el.style.opacity = c.flying && (Math.abs(c.x) > innerWidth * 0.5 || Math.abs(c.y) > innerHeight * 0.5) ? '0.4' : '1';
     });
     if (!RM) requestAnimationFrame(tick);
@@ -194,6 +207,29 @@
   } else {
     requestAnimationFrame(tick);
   }
+})();
+</script>
+
+<script>
+/* ak-telemetry — posts real frame pacing to the parent (Explorer) via postMessage.
+   Parent listens for {type:'ak-telemetry'} and validates e.source === iframe.contentWindow.
+   Zero dependencies; silently no-ops when opened standalone. */
+(function () {
+  var last = performance.now(), ema = 16.7, drops = 0, frames = 0, acc = 0;
+  function frame(now) {
+    var d = now - last; last = now;
+    if (d > 0 && d < 1000) {
+      ema = ema * 0.94 + d * 0.06;
+      if (d > 40) drops++;
+      frames++; acc += d;
+    }
+    if (acc >= 600) {
+      try { parent.postMessage({ type: 'ak-telemetry', fps: Math.max(1, Math.round(1000 / ema)), ms: Math.round(ema * 10) / 10, dropped: drops, frames: frames }, '*'); } catch (e) { /* standalone */ }
+      acc = 0; frames = 0; drops = 0;
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
 })();
 </script>
 </body>

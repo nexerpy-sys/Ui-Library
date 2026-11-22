@@ -164,7 +164,7 @@ External deps ARE permitted in your own builds (three.js, GSAP) — the FX thems
 
 ## 12 computational motion graphics (/registry/motion-graphics/, registry.json → motionGraphics)
 01 Liquid Gooey Dock (SVG feGaussianBlur+feColorMatrix metaballs, spring magnification) · 02 Kinetic Variable Type Field (cursor-velocity repulsion, live wght axis) ·
-03 Magnetic Morph Cursor (velocity squash/stretch, bounding-box morph) · 04 Elastic Bezier String Divider (damped harmonic oscillator, ζ 0.16) ·
+03 Magnetic Morph Cursor (velocity squash/stretch, bounding-box morph) · 04 Elastic String Divider (46-node Verlet lattice — emergent harmonics, drag or cross to pluck) ·
 05 Particle Text Disintegration (offscreen getImageData sampler, shockwave dispersion, spring reassembly) · 06 3D Holographic Card Stack (perspective matrix, foil + chromatic aberration, flick-to-dismiss) ·
 07 WebGL Chromatic Liquid Glass (raw WebGL2 fragment shader — rounded-rect SDF refraction, RGB dispersion, frosted rim, pointer ripples; Canvas2D/CSS backdrop-filter fallback) · 08 Verlet Cloth Ribbon (2D verlet mesh, pin constraints, gusting wind, pointer dragging) ·
 09 Path-Subdivision Icon Morpher (arc-length resample + per-point spring interpolation; menu↔close↔arrow↔check↔spark) · 10 Gravitational Bento Lens (s/r² spacetime displacement of grid + cells, spring-restoring mass) ·
@@ -2034,38 +2034,135 @@ Code: MIT. Fonts: SIL OFL via Google Fonts (attribution per font). Kinetik name/
           paint(current);
         }
 
-        /* ---- Motion Graphics: single shared stage, iframe is destroyed on switch ---- */
-        let mgItems = [];
-        let mgCurrent = -1;
-        let mgTheme = "obsidian";
+        /* ---- Motion Graphics: shared stage · spring swap · in-iframe telemetry ----
+           Lifecycle: exit animation -> destroy iframe node (frees WebGL/canvas contexts)
+           -> fresh mount with a semi-implicit-Euler spring reveal. Exactly one frame live at a time. */
         const mgFrameHost = document.getElementById("xr-mg-stage");
         const mgList = document.getElementById("xr-mg-list");
         const mgName = document.getElementById("xr-mg-name");
         const mgEngine = document.getElementById("xr-mg-engine");
         const mgBest = document.getElementById("xr-mg-best");
+        const mgLoading = document.getElementById("xr-mg-loading");
+        const mgCruiseBtn = document.getElementById("xr-mg-cruise");
+        const mgRemountBtn = document.getElementById("xr-mg-remount");
+        const mgHud = {
+          fps: document.getElementById("xr-mg-fps"),
+          ms: document.getElementById("xr-mg-ms"),
+          drops: document.getElementById("xr-mg-drops"),
+          dpr: document.getElementById("xr-mg-dpr"),
+        };
+        const mgSpark = { el: document.getElementById("xr-mg-spark"), samples: [] };
+        const MG_SPARK_MAX = 150, MG_SPARK_CEIL = 50;   /* 150 frames, 50ms full-scale */
+        function drawMgSpark() {
+          const c = mgSpark.el; if (!c) return;
+          const ctx = c.getContext("2d"); if (!ctx) return;
+          const W = c.width, H = c.height, s0 = mgSpark.samples;
+          ctx.clearRect(0, 0, W, H);
+          /* 16.7ms frame budget — dashed reference */
+          const baseY = H - (16.7 / MG_SPARK_CEIL) * H;
+          ctx.strokeStyle = "rgba(244,242,236,0.22)"; ctx.lineWidth = 1; ctx.setLineDash([3, 4]);
+          ctx.beginPath(); ctx.moveTo(0, baseY); ctx.lineTo(W, baseY); ctx.stroke(); ctx.setLineDash([]);
+          if (!s0.length) return;
+          const stepX = W / (MG_SPARK_MAX - 1);
+          /* gradient stroke: ember when over budget, cyan when flying */
+          const latest = s0[s0.length - 1];
+          const grad = ctx.createLinearGradient(0, 0, W, 0);
+          grad.addColorStop(0, "rgba(0,240,255,0.25)");
+          grad.addColorStop(1, latest > 33 ? "#FF3D00" : latest > 16.7 ? "#E5A93C" : "#00F0FF");
+          ctx.strokeStyle = grad; ctx.lineWidth = 1.6;
+          ctx.beginPath();
+          s0.forEach((ms, i) => {
+            const x = W - (s0.length - i) * stepX;
+            const y = H - Math.min(ms, MG_SPARK_CEIL) / MG_SPARK_CEIL * H;
+            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+          });
+          ctx.stroke();
+          /* soft fill under the curve */
+          ctx.lineTo(W, H); ctx.lineTo(W - s0.length * stepX, H); ctx.closePath();
+          ctx.fillStyle = latest > 33 ? "rgba(255,61,0,0.10)" : "rgba(0,240,255,0.08)";
+          ctx.fill();
+        }
+        const mgPanel = document.getElementById("xr-panel-mg");
+        const MG_DWELL_MS = 9000;
+        const prefersReducedMotion = () =>
+          window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        let mgItems = [];
+        let mgCurrent = -1;
+        let mgTheme = "obsidian";
+        let mgTransitioning = false;
+        let mgPendingIndex = -1;
+        let mgCruise = false;
+        let mgCruiseTimer = 0;
+        let mgHovering = false;
+        let mgCancelSpring = null;
+
+        if (mgHud.dpr) mgHud.dpr.textContent = String(Math.min(window.devicePixelRatio || 1, 2));
+
+        function resetMgHud() {
+          if (mgHud.fps) {
+            mgHud.fps.textContent = "—";
+            mgHud.fps.classList.remove("is-good", "is-warn", "is-bad");
+          }
+          if (mgHud.ms) mgHud.ms.textContent = "—";
+          if (mgHud.drops) mgHud.drops.textContent = "—";
+          mgSpark.samples = [];
+          drawMgSpark();
+        }
+        function setMgHud(t) {
+          if (!t) return;
+          mgSpark.samples.push(Math.max(0, Number(t.ms) || 0));
+          if (mgSpark.samples.length > MG_SPARK_MAX) mgSpark.samples.shift();
+          drawMgSpark();
+          if (mgHud.fps) {
+            mgHud.fps.textContent = String(t.fps);
+            mgHud.fps.classList.toggle("is-good", t.fps >= 55);
+            mgHud.fps.classList.toggle("is-warn", t.fps >= 45 && t.fps < 55);
+            mgHud.fps.classList.toggle("is-bad", t.fps < 45);
+          }
+          if (mgHud.ms) mgHud.ms.textContent = String(t.ms);
+          if (mgHud.drops) mgHud.drops.textContent = String(t.dropped);
+        }
+
+        /* semi-implicit Euler spring — the same integrator family the registry graphics use.
+           k 170 / c 16 ≈ 8% overshoot; stable unconditionally at the 4x sub-step. */
+        function mgSpringTo(onUpdate, onDone) {
+          const k = 170, c = 16, DURATION_CAP = 1.5;
+          let x = 0, v = 0, elapsed = 0, last = performance.now(), raf = 0;
+          if (prefersReducedMotion()) { onUpdate(1); if (onDone) onDone(); return () => {}; }
+          const step = (now) => {
+            let dt = Math.min(Math.max((now - last) / 1000, 0), 1 / 30);
+            last = now; elapsed += dt;
+            for (let i = 0; i < 4; i++) {
+              const h = dt / 4;
+              const F = -k * (x - 1) - c * v;
+              v += F * h;
+              x += v * h;
+            }
+            onUpdate(x);
+            if ((Math.abs(x - 1) < 0.0008 && Math.abs(v) < 0.004) || elapsed > DURATION_CAP) {
+              onUpdate(1);
+              if (onDone) onDone();
+              return;
+            }
+            raf = requestAnimationFrame(step);
+          };
+          raf = requestAnimationFrame(step);
+          return () => cancelAnimationFrame(raf);
+        }
 
         function destroyMotionGraphic() {
-          /* dropping the iframe node frees its WebGL/canvas contexts — mobile GPUs safe */
+          /* Dropping the iframe node frees WebGL/canvas contexts — mobile GPUs stay safe. */
+          if (mgCancelSpring) { mgCancelSpring(); mgCancelSpring = null; }
           const frame = document.getElementById("xr-mg-frame");
           if (frame && frame.parentNode) frame.parentNode.removeChild(frame);
+          resetMgHud();
+          if (mgLoading) mgLoading.hidden = true;
         }
         function removePlaceholder() {
           const ph = document.querySelector(".xr-mg-frame-placeholder");
           if (ph && ph.parentNode) ph.parentNode.removeChild(ph);
         }
-        function mountMotionGraphic(index) {
-          const item = mgItems[index];
-          if (!item || !mgFrameHost) return;
-          mgCurrent = index;
-          destroyMotionGraphic();
-          removePlaceholder();
-          const frame = document.createElement("iframe");
-          frame.id = "xr-mg-frame";
-          frame.className = "xr-mg-frame";
-          frame.loading = "lazy";
-          frame.title = item.name + " — live preview";
-          frame.src = item.file + "?theme=" + encodeURIComponent(mgTheme);
-          mgFrameHost.appendChild(frame);
+        function updateMgReadouts(item, index) {
           if (mgName) mgName.textContent = item.name;
           if (mgEngine) mgEngine.textContent = item.engine || "canvas";
           if (mgBest) mgBest.textContent = item.bestFor || "Standalone · zero dependencies · copy-paste ready.";
@@ -2077,6 +2174,167 @@ Code: MIT. Fonts: SIL OFL via Google Fonts (attribution per font). Kinetik name/
             });
           }
         }
+        function mountMotionGraphic(index) {
+          const item = mgItems[index];
+          if (!item || !mgFrameHost) return;
+          if (mgTransitioning) { mgPendingIndex = index; return; }
+          mgCurrent = index;
+          mgTransitioning = true;
+          updateMgReadouts(item, index);
+          resetMgHud();
+          if (mgLoading) mgLoading.hidden = false;
+
+          const boot = () => {
+            destroyMotionGraphic();
+            removePlaceholder();
+            if (mgLoading) mgLoading.hidden = false;
+            const frame = document.createElement("iframe");
+            frame.id = "xr-mg-frame";
+            frame.className = "xr-mg-frame";
+            frame.loading = "eager"; /* it is the visible stage now, not below the fold */
+            frame.title = item.name + " — live preview";
+            frame.src = item.file + "?theme=" + encodeURIComponent(mgTheme) + "&_r=" + Date.now();
+            mgFrameHost.appendChild(frame);
+
+            /* watchdog: if load never fires (network/CSP failure), release the stage */
+            window.setTimeout(() => {
+              if (document.getElementById("xr-mg-frame") !== frame) return;
+              if (mgTransitioning) {
+                if (mgLoading) mgLoading.hidden = true;
+                frame.style.transform = ""; frame.style.clipPath = ""; frame.style.opacity = "";
+                mgTransitioning = false;
+                mgPendingIndex = -1;
+              }
+            }, 6000);
+
+            frame.addEventListener("load", () => {
+              if (mgLoading) mgLoading.hidden = true;
+              /* spring reveal: scale 0.90 -> 1 with slight overshoot + clip inset collapse */
+              mgCancelSpring = mgSpringTo((x) => {
+                const scale = 0.9 + 0.1 * x;
+                const insetY = Math.max(0, (1 - x) * 11);
+                const insetX = Math.max(0, (1 - x) * 6.5);
+                frame.style.transform = "scale(" + scale.toFixed(5) + ")";
+                frame.style.clipPath = "inset(" + insetY.toFixed(3) + "% " + insetX.toFixed(3) + "% round " + Math.max(0, 16 * (1 - x)).toFixed(2) + "px)";
+                frame.style.opacity = String(Math.min(1, 0.2 + x * 1.05));
+              }, () => {
+                /* settle exactly; clear inline props so the stage is layout-clean */
+                frame.style.transform = "";
+                frame.style.clipPath = "";
+                frame.style.opacity = "";
+                mgCancelSpring = null;
+                mgTransitioning = false;
+                if (mgPendingIndex >= 0 && mgPendingIndex !== mgCurrent) {
+                  const next = mgPendingIndex; mgPendingIndex = -1;
+                  mountMotionGraphic(next);
+                } else {
+                  mgPendingIndex = -1;
+                }
+              });
+            }, { once: true });
+          };
+
+          const existing = document.getElementById("xr-mg-frame");
+          if (existing && !prefersReducedMotion()) {
+            /* exit: short physical-eased drop, destroy the node before the fresh mount */
+            let exited = false;
+            const finishExit = () => { if (exited) return; exited = true; boot(); };
+            const anim = existing.animate(
+              [{ opacity: 1, transform: "scale(1)" }, { opacity: 0, transform: "scale(0.92)" }],
+              { duration: 150, easing: "cubic-bezier(0.4, 0, 0.2, 1)", fill: "forwards" }
+            );
+            anim.onfinish = finishExit;
+            window.setTimeout(finishExit, 340); /* safety: never strand the stage */
+          } else {
+            boot();
+          }
+        }
+
+        const mgCurrentIndex = () => (mgCurrent >= 0 ? mgCurrent : 0);
+        const currentMgItem = () => mgItems[mgCurrentIndex()] || mgItems[0];
+        const stepMg = (delta) => {
+          if (!mgItems.length) return;
+          mountMotionGraphic((mgCurrentIndex() + delta + mgItems.length) % mgItems.length);
+        };
+        const cycleMgTheme = () => {
+          const order = ["obsidian", "paper", "aegean"];
+          const next = order[(order.indexOf(mgTheme) + 1) % order.length];
+          const btn = document.querySelector('[data-mg-theme="' + next + '"]');
+          if (btn) btn.click();
+        };
+        const copyCurrentMg = (engineOnly) => {
+          const item = currentMgItem();
+          if (!item) return;
+          fetchImpl(item.file).then((res) => {
+            if (!res.ok) throw new Error("HTTP " + res.status);
+            return res.text();
+          }).then((text) => {
+            if (!engineOnly) { copyText(text, item.name + " — full standalone HTML"); return; }
+            /* engine slice: styles + every script EXCEPT the telemetry shim */
+            const styles = Array.from(text.matchAll(/<style>([\s\S]*?)<\/style>/g)).map((m) => m[1].trim());
+            const scripts = Array.from(text.matchAll(/<script>([\s\S]*?)<\/script>/g))
+              .map((m) => m[1].trim())
+              .filter((code) => code.indexOf("ak-telemetry") === -1);
+            const engine =
+              "/* ============ " + item.name + " — CSS engine ============ */\n" + styles.join("\n\n") +
+              "\n\n/* ============ " + item.name + " — JS engine ============ */\n" + scripts.join("\n\n");
+            copyText(engine, item.name + " — <script> + CSS engine");
+          }).catch(() => showToast("Could not read " + item.name));
+        };
+
+        /* auto-cruise: long dwell, paused by hidden tab / hover / mid-transition */
+        function syncCruiseButton() {
+          if (!mgCruiseBtn) return;
+          mgCruiseBtn.classList.toggle("is-on", mgCruise);
+          mgCruiseBtn.setAttribute("aria-pressed", mgCruise ? "true" : "false");
+          mgCruiseBtn.textContent = mgCruise ? "Cruising · on" : "Auto-cruise";
+        }
+        function setCruise(on) {
+          mgCruise = !!on;
+          syncCruiseButton();
+          window.clearInterval(mgCruiseTimer);
+          if (mgCruise) {
+            mgCruiseTimer = window.setInterval(() => {
+              if (document.hidden || mgHovering || mgTransitioning) return;
+              if (mgPanel && mgPanel.hidden) return; /* never mount into a hidden tab */
+              stepMg(1);
+            }, MG_DWELL_MS);
+            showToast("Auto-cruise on — 9 s dwell · hover pauses");
+          } else {
+            showToast("Auto-cruise off");
+          }
+        }
+
+        if (mgFrameHost) {
+          mgFrameHost.addEventListener("mouseenter", () => { mgHovering = true; });
+          mgFrameHost.addEventListener("mouseleave", () => { mgHovering = false; });
+        }
+        if (mgCruiseBtn) mgCruiseBtn.addEventListener("click", () => setCruise(!mgCruise));
+        if (mgRemountBtn) mgRemountBtn.addEventListener("click", () => { if (mgCurrent >= 0) mountMotionGraphic(mgCurrent); });
+
+        /* keyboard lab control — active only while the MG panel is visible */
+        document.addEventListener("keydown", (event) => {
+          if (!mgPanel || mgPanel.hidden) return;
+          const t = event.target;
+          if (t && t.closest && t.closest("input, select, textarea, [contenteditable=\"true\"]")) return;
+          const k = event.key;
+          if (k === "ArrowRight" || k === "j") { event.preventDefault(); stepMg(1); }
+          else if (k === "ArrowLeft" || k === "k") { event.preventDefault(); stepMg(-1); }
+          else if (k === "r" || k === "R") { event.preventDefault(); if (mgCurrent >= 0) mountMotionGraphic(mgCurrent); }
+          else if (k === "c" || k === "C") { event.preventDefault(); copyCurrentMg(false); }
+          else if (k === "t" || k === "T") { event.preventDefault(); cycleMgTheme(); }
+          else if (k === " ") { event.preventDefault(); setCruise(!mgCruise); }
+        });
+
+        /* in-iframe telemetry — the shim posts {type:'ak-telemetry', fps, ms, dropped} */
+        window.addEventListener("message", (event) => {
+          const d = event.data;
+          if (!d || d.type !== "ak-telemetry") return;
+          const frame = document.getElementById("xr-mg-frame");
+          if (!frame || event.source !== frame.contentWindow) return;
+          setMgHud(d);
+        });
+
         function buildMotionGraphics(items) {
           mgItems = Array.isArray(items) ? items : [];
           if (!mgList || !mgItems.length) return;
@@ -2095,31 +2353,8 @@ Code: MIT. Fonts: SIL OFL via Google Fonts (attribution per font). Kinetik name/
           });
           const fullBtn = document.getElementById("xr-mg-copy-full");
           const engineBtn = document.getElementById("xr-mg-copy-engine");
-          const currentItem = () => mgItems[mgCurrent] || mgItems[0];
-          if (fullBtn) fullBtn.addEventListener("click", () => {
-            const item = currentItem();
-            if (!item) return;
-            fetchImpl(item.file).then((res) => {
-              if (!res.ok) throw new Error("HTTP " + res.status);
-              return res.text();
-            }).then((text) => copyText(text, item.name + " — full standalone HTML"))
-              .catch(() => showToast("Could not read " + item.name));
-          });
-          if (engineBtn) engineBtn.addEventListener("click", () => {
-            const item = currentItem();
-            if (!item) return;
-            fetchImpl(item.file).then((res) => {
-              if (!res.ok) throw new Error("HTTP " + res.status);
-              return res.text();
-            }).then((text) => {
-              const styles = Array.from(text.matchAll(/<style>([\s\S]*?)<\/style>/g)).map((m) => m[1].trim());
-              const scripts = Array.from(text.matchAll(/<script>([\s\S]*?)<\/script>/g)).map((m) => m[1].trim());
-              const engine =
-                "/* ============ " + item.name + " — CSS engine ============ */\n" + styles.join("\n\n") +
-                "\n\n/* ============ " + item.name + " — JS engine ============ */\n" + scripts.join("\n\n");
-              copyText(engine, item.name + " — <script> + CSS engine");
-            }).catch(() => showToast("Could not read " + item.name));
-          });
+          if (fullBtn) fullBtn.addEventListener("click", () => copyCurrentMg(false));
+          if (engineBtn) engineBtn.addEventListener("click", () => copyCurrentMg(true));
           /* live token injection — the files listen for {type:'ak-theme'} */
           const themeButtons = root.querySelectorAll("[data-mg-theme]");
           themeButtons.forEach((btn) => {
@@ -2139,7 +2374,6 @@ Code: MIT. Fonts: SIL OFL via Google Fonts (attribution per font). Kinetik name/
           });
           activate._mgReady = true;
           /* deep-link edge case: MG panel already visible when the manifest resolves */
-          const mgPanel = document.getElementById("xr-panel-mg");
           if (mgPanel && !mgPanel.hidden && !document.getElementById("xr-mg-frame")) mountMotionGraphic(0);
         }
 

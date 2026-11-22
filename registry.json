@@ -4,7 +4,7 @@
   "version": "1.6.0",
   "released": "2026-11-22",
   "license": "Code MIT · Typography OFL (per-font, via Google Fonts) · Brand marks reserved",
-  "summary": "60 curated Google Fonts, 24 studio pairings, 3 fluid clamp() type scales, 6 audited semantic light/dark token systems, hue-locked 50-950 WCAG 2.1 scales, 12 named motion laws, 12 production micro-interaction snippets and 16 dependency-free 60fps canvas hero backgrounds.",
+  "summary": "60 curated Google Fonts, 24 studio pairings, 3 fluid clamp() type scales, 6 audited semantic light/dark token systems, hue-locked 50-950 WCAG 2.1 scales, 12 named motion laws, 24 production micro-interaction snippets and 16 dependency-free 60fps canvas hero backgrounds.",
   "audience": [
     "humans in a browser",
     "AI coding agents (ChatGPT, Claude, Gemini, Manus, Kimi, Qwen, DeepSeek, Emergent)",

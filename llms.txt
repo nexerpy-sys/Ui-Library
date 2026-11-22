@@ -4,7 +4,7 @@
 > Rule: fetch /llms.txt once, then pull ONLY what you need from /registry.json. Do not scrape /index.html for tokens — it is the showcase, not the contract.
 
 ## Endpoints
-- /index.html    : Interactive human playground (Live Forge, Pantheon, Registry, Motion Law). Humans first; agents read this for feel, not data.
+- /index.html    : Interactive human playground (Live Forge, Pantheon, Registry, Explorer, Motion Law). Humans first; agents read this for feel, not data.
 - /llms.txt      : This file. Orientation for LLM context windows.
 - /registry.json : Machine-readable manifest — every asset, measured audits, snippet code inline. Prefer this for programmatic use.
 - /registry/fx/*.html : 16 standalone zero-dependency canvas hero backgrounds (01..16). Iframe, inline, or lift canvas+script.

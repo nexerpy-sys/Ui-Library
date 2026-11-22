@@ -7,8 +7,9 @@ over a single Vercel URL.
 
 **Live showcase:** `/index.html` — an interactive single-page playground ("a pantheon
 of eight autonomous cursor agents drafts this page") with a live hero canvas, the Live
-Forge, the agent Pantheon, the copy-ready Registry, and the Motion Law easing studio.
-On mobile, tap the hamburger (top-right) for the fullscreen kinetic index menu.
+Forge, the agent Pantheon, the copy-ready Registry, the Registry Explorer, and the
+Motion Law easing studio. On mobile, tap the hamburger (top-right) for the fullscreen
+kinetic index menu. Assets are split out under `/assets/` — the HTML shell is ~39 KB.
 
 ## What's inside (v1.6.0)
 
@@ -18,7 +19,8 @@ On mobile, tap the hamburger (top-right) for the fullscreen kinetic index menu.
 | Machine manifest | `registry.json` | 60 Google Fonts + css2 URLs · 24 pairings · 3 fluid `clamp()` scales (computed) · 6 WCAG-2.1-audited light/dark token systems · 50–950 hue-locked scales (measured contrast) · 12 named motion laws + springs · **24** micro-interaction snippets (code inline) · 8 templates · 16 FX entries |
 | 60fps canvas FX | `registry/fx/01..16-*.html` | Self-contained, DPR-capped, adaptive-quality, reduced-motion-safe hero backgrounds — **zero dependencies** |
 | Section templates | `registry/templates/01..08-*.html` | 8 drop-in, standalone sections (hero, bento, pricing, feature split, stats, testimonials, CTA, FAQ) — Kinetik tokens inline, Google Fonts only |
-| Interactive showcase | `index.html` | The human playground; embeds the same spec served at `/llms.txt` |
+| Interactive showcase | `index.html` + `assets/` | The human playground; embeds the same spec served at `/llms.txt`. **Registry Explorer** (04): tabbed live gallery — templates, canvas FX, micro-interactions with one-click copy, and a 6-system theme switcher, all rendered from `/registry.json` with lazy iframes |
+| Static assets | `assets/obsidian-monolith.jpg`, `assets/app.css`, `assets/app.js` | Brand artwork + showcase styles/scripts, extracted from the former 1.29 MB single-file HTML (now ~39 KB shell) |
 
 ### Numbers that were measured, not asserted
 - All six semantic systems score **AAA on ink/bg** and ≥ AA on muted-ink/accent pairs (see `registry.json → color.systems[].audit`).
@@ -47,8 +49,6 @@ Static output — point Vercel at the repo root, no build command, output dir `.
 
 ## Roadmap
 
-- Grow FX to a full WebGL/three.js tier (heavy bundles permitted — deps are welcome).
+- Ship the WebGL/three.js FX tier (heavy bundles permitted — deps are welcome) and a GSAP motion-pack track.
 - Expand pairings to 60 and systems to 12 with full 50–950 coverage per system hue.
-- Ship the WebGL/three.js FX tier (heavy bundles permitted) and a GSAP motion-pack track.
-- Split `index.html`'s remaining inline payload (base64 artwork → CDN).
 - Replace CDN Tailwind with build-time atomic output.

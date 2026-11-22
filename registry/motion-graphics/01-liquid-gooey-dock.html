@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<!-- Atelier Kinetik · Motion Graphics 01 · Liquid Gooey Dock — feGaussianBlur+feColorMatrix metaball dock, spring-damped proximity magnification. Zero dependencies. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kinetik Motion — Liquid Gooey Dock</title>
+<style>
+  :root { --bg:#070709; --surface:#0D0D12; --elevated:#12121A; --ink:#F4F2EC; --muted:#8E8D8A;
+    --flame:#FF3D00; --cyan:#00F0FF; --gold:#E5A93C;
+    --line:rgba(244,242,236,.10); --line-strong:rgba(244,242,236,.24); --snap:cubic-bezier(.16,1,.3,1); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { height:100%; overflow:hidden; background:var(--bg); -webkit-font-smoothing:antialiased; }
+  body { display:flex; align-items:center; justify-content:center;
+    background:radial-gradient(72vw 60vh at 50% 118%, rgba(255,61,0,.14), transparent 62%), var(--bg); }
+  .stage { position:relative; width:min(92vw,720px); height:min(56vh,340px);
+    display:flex; align-items:flex-end; justify-content:center; padding-bottom:2.2rem; }
+  .hint { position:absolute; top:1.4rem; left:50%; transform:translateX(-50%);
+    font-family:"JetBrains Mono", ui-monospace, monospace; font-size:9px; letter-spacing:.28em;
+    text-transform:uppercase; color:var(--muted); white-space:nowrap; }
+  .hint b { color:var(--flame); font-weight:500; }
+  svg { width:100%; height:100%; overflow:visible; display:block; }
+  .glyph { stroke:var(--ink); stroke-width:1.7; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+  .dock-base { fill:rgba(13,13,18,.72); stroke:var(--line-strong); stroke-width:1; }
+</style>
+</head>
+<body>
+<script>/* Kinetik theming: parent explorer injects via postMessage or ?theme= — Obsidian/Paper/Aegean */
+(function(){var T={obsidian:{'--bg':'#070709','--surface':'#0D0D12','--elevated':'#12121A','--ink':'#F4F2EC','--muted':'#8E8D8A','--flame':'#FF3D00','--cyan':'#00F0FF','--gold':'#E5A93C','--line':'rgba(244,242,236,.10)','--line-strong':'rgba(244,242,236,.24)'},paper:{'--bg':'#FBFAF7','--surface':'#F4F2EC','--elevated':'#ECEAE3','--ink':'#171512','--muted':'#5F5D58','--flame':'#C93300','--cyan':'#0B7285','--gold':'#8A6A1F','--line':'rgba(23,21,18,.14)','--line-strong':'rgba(23,21,18,.30)'},aegean:{'--bg':'#081521','--surface':'#0F2231','--elevated':'#173043','--ink':'#E9F1F5','--muted':'#7E93A3','--flame':'#FF6B35','--cyan':'#3ED6FF','--gold':'#E5A93C','--line':'rgba(233,241,245,.12)','--line-strong':'rgba(233,241,245,.28)'}};function apply(n){var t=T[n];if(!t)return;var r=document.documentElement,k;for(k in t)r.style.setProperty(k,t[k]);}var q=new URLSearchParams(location.search).get('theme');if(q)apply(q);window.addEventListener('message',function(e){var d=e.data;if(d&&d.type==='ak-theme'){apply(d.theme);window.dispatchEvent(new CustomEvent('ak-theme-applied',{detail:d.theme}));}});})();</script>
+
+<div class="stage" id="stage" aria-label="Liquid dock demo. Move your pointer across the dock.">
+  <p class="hint"><b>00</b>&nbsp;&nbsp;Proximity-magnified meta dock — spring k 170 · c 13</p>
+  <svg id="svg" viewBox="0 0 720 320" role="presentation">
+    <defs>
+      <filter id="goo" x="-60%" y="-120%" width="220%" height="340%" color-interpolation-filters="sRGB">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="13" result="blur" />
+        <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -10.5" result="goo" />
+        <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+      </filter>
+      <linearGradient id="dockSheen" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="rgba(255,255,255,.10)" /><stop offset=".45" stop-color="rgba(255,255,255,0)" />
+      </linearGradient>
+    </defs>
+    <rect id="base" class="dock-base" x="60" y="248" width="600" height="54" rx="27" />
+    <rect id="baseSheen" x="60" y="248" width="600" height="27" rx="27" fill="url(#dockSheen)" opacity=".5" pointer-events="none" />
+    <g id="metaBalls" filter="url(#goo)"></g>
+    <g id="icons"></g>
+  </svg>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.getElementById('svg');
+  const metaLayer = document.getElementById('metaBalls');
+  const iconLayer = document.getElementById('icons');
+  const stage = document.getElementById('stage');
+
+  /* 7 inline glyphs (24×24, stroke) — registry, layers, bolt, grid, terminal, wave, orbit */
+  const GLYPHS = [
+    'M4 6.5h16M4 12h16M4 17.5h10',
+    'M12 3 21 8l-9 5-9-5 9-5ZM3.5 12.5 12 17l8.5-4.5',
+    'M13 2 5.5 13.5H11L9.5 22 17 10.5h-5.5L13 2Z',
+    'M4 4h6.5v6.5H4zM13.5 4H20v6.5h-6.5zM4 13.5h6.5V20H4zM13.5 13.5H20V20h-6.5z',
+    'M5 7l5 5-5 5M11.5 17H19',
+    'M3 12c2.2-4.4 4.4-4.4 6.6 0s4.4 4.4 6.6 0 3.3-3.3 4.8-1',
+    'M12 12m-3.6 0a3.6 3.6 0 1 0 7.2 0 3.6 3.6 0 1 0-7.2 0M12 2.8m-1.1 0a1.1 1.1 0 1 0 2.2 0 1.1 1.1 0 1 0-2.2 0'
+  ];
+  const N = GLYPHS.length, GAP = 78, BASE_R = 21, CY = 275;
+  const dockW = (N - 1) * GAP, x0 = (720 - dockW) / 2;
+
+  /* spring-damped proximity state per icon */
+  const icons = GLYPHS.map((d, i) => ({
+    home: x0 + i * GAP, x: x0 + i * GAP, s: 1, vs: 0,
+    drift: 0, vdrift: 0, d, el: null, glyphEl: null
+  }));
+
+  icons.forEach((ic) => {
+    const ball = document.createElementNS(NS, 'circle');
+    ball.setAttribute('r', String(BASE_R)); ball.setAttribute('cy', String(CY));
+    ball.setAttribute('fill', 'var(--elevated)'); ball.setAttribute('stroke', 'none');
+    metaLayer.appendChild(ball); ic.el = ball;
+
+    const g = document.createElementNS(NS, 'path');
+    g.setAttribute('d', ic.d); g.setAttribute('class', 'glyph');
+    g.setAttribute('transform', `translate(${ic.home - 12}, ${CY - 12})`);
+    iconLayer.appendChild(g); ic.glyphEl = g;
+  });
+
+  let pointerX = null, pointerActive = false, last = 0;
+  const K = 170, C = 13, SIGMA = 86, MAXG = 1.18, LIFT = 46;
+
+  function toView(clientX) {
+    const r = svg.getBoundingClientRect();
+    return (clientX - r.left) * (720 / r.width);
+  }
+  stage.addEventListener('pointermove', (e) => { pointerX = toView(e.clientX); pointerActive = true; });
+  stage.addEventListener('pointerdown', (e) => { pointerX = toView(e.clientX); pointerActive = true; });
+  stage.addEventListener('pointerleave', () => { pointerActive = false; });
+
+  function tick(t) {
+    const dt = Math.min(0.05, last ? (t - last) / 1000 : 0.016); last = t;
+    icons.forEach((ic) => {
+      const dx = pointerActive && pointerX != null ? ic.home - pointerX : 1e9;
+      const prox = Math.exp(-(dx * dx) / (2 * SIGMA * SIGMA));          /* gaussian proximity */
+      const targetS = pointerActive ? 1 + (MAXG - 1) * prox : 1;
+      const targetDrift = pointerActive ? (pointerX - ic.home) * 0.16 * prox : 0;
+      /* semi-implicit Euler on damped springs */
+      const aS = (targetS - ic.s) * K - ic.vs * C;
+      ic.vs += aS * dt; ic.s += ic.vs * dt;
+      const aD = (targetDrift - ic.drift) * K - ic.vdrift * C;
+      ic.vdrift += aD * dt; ic.drift += ic.vdrift * dt;
+      ic.x = ic.home + ic.drift;
+
+      const lift = (ic.s - 1) * LIFT;
+      const r = BASE_R * (0.72 + 0.62 * (ic.s - 1)) * ic.s;             /* goo ball grows faster than icon */
+      ic.el.setAttribute('cx', String(ic.x));
+      ic.el.setAttribute('cy', String(CY - lift * 0.6));
+      ic.el.setAttribute('r', String(Math.max(6, r)));
+      ic.glyphEl.setAttribute('transform',
+        `translate(${ic.x - 12}, ${CY - 12 - lift}) scale(${ic.s}) translate(${(-12 * (ic.s - 1)) / ic.s}, ${(-12 * (ic.s - 1)) / ic.s})`);
+    });
+    if (!RM) requestAnimationFrame(tick);
+  }
+  if (RM) {
+    icons.forEach((ic) => {
+      ic.el.setAttribute('cx', String(ic.home)); ic.el.setAttribute('cy', String(CY)); ic.el.setAttribute('r', String(BASE_R));
+      ic.glyphEl.setAttribute('transform', `translate(${ic.home - 12}, ${CY - 12})`);
+    });
+  } else {
+    requestAnimationFrame(tick);
+  }
+})();
+</script>
+</body>
+</html>

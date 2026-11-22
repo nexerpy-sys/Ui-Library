@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<!-- Atelier Kinetik · Motion Graphics 04 · Elastic Bezier String Divider — damped harmonic oscillation on two simulated control points; drag or cross to pluck. Zero dependencies. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kinetik Motion — Elastic Bezier String Divider</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#070709; --surface:#0D0D12; --ink:#F4F2EC; --muted:#8E8D8A;
+    --flame:#FF3D00; --cyan:#00F0FF; --gold:#E5A93C;
+    --line:rgba(244,242,236,.10); --line-strong:rgba(244,242,236,.24); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { height:100%; overflow:hidden; background:var(--bg); -webkit-font-smoothing:antialiased; }
+  body { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:radial-gradient(64vw 50vh at 50% -20%, rgba(255,61,0,.09), transparent 62%), var(--bg); }
+  .hud { position:absolute; top:1.1rem; left:1.25rem; font-family:"JetBrains Mono", monospace;
+    font-size:9px; letter-spacing:.26em; text-transform:uppercase; color:var(--muted); }
+  .hud b { color:var(--gold); font-weight:500; }
+  h1 { font-family:"Syne", sans-serif; font-weight:800; text-transform:uppercase; text-align:center;
+    font-size:clamp(1.6rem, 5.2vw, 3.6rem); letter-spacing:-.02em; line-height:.98; color:var(--ink); pointer-events:none; }
+  h1 span { display:block; font-family:"Instrument Serif", serif; font-style:italic; font-weight:400; text-transform:none; color:var(--muted); font-size:.52em; margin-top:.5em; }
+  #wire { display:block; width:100vw; height:200px; touch-action:none; }
+  .pin-hint { position:absolute; bottom:1.1rem; left:50%; transform:translateX(-50%);
+    font-family:"JetBrains Mono", monospace; font-size:8.5px; letter-spacing:.3em; text-transform:uppercase; color:var(--muted); white-space:nowrap; }
+</style>
+</head>
+<body>
+<script>/* Kinetik theming: parent explorer injects via postMessage or ?theme= — Obsidian/Paper/Aegean */
+(function(){var T={obsidian:{'--bg':'#070709','--surface':'#0D0D12','--elevated':'#12121A','--ink':'#F4F2EC','--muted':'#8E8D8A','--flame':'#FF3D00','--cyan':'#00F0FF','--gold':'#E5A93C','--line':'rgba(244,242,236,.10)','--line-strong':'rgba(244,242,236,.24)'},paper:{'--bg':'#FBFAF7','--surface':'#F4F2EC','--elevated':'#ECEAE3','--ink':'#171512','--muted':'#5F5D58','--flame':'#C93300','--cyan':'#0B7285','--gold':'#8A6A1F','--line':'rgba(23,21,18,.14)','--line-strong':'rgba(23,21,18,.30)'},aegean:{'--bg':'#081521','--surface':'#0F2231','--elevated':'#173043','--ink':'#E9F1F5','--muted':'#7E93A3','--flame':'#FF6B35','--cyan':'#3ED6FF','--gold':'#E5A93C','--line':'rgba(233,241,245,.12)','--line-strong':'rgba(233,241,245,.28)'}};function apply(n){var t=T[n];if(!t)return;var r=document.documentElement,k;for(k in t)r.style.setProperty(k,t[k]);}var q=new URLSearchParams(location.search).get('theme');if(q)apply(q);window.addEventListener('message',function(e){var d=e.data;if(d&&d.type==='ak-theme'){apply(d.theme);window.dispatchEvent(new CustomEvent('ak-theme-applied',{detail:d.theme}));}});})();</script>
+
+<p class="hud"><b>03</b>&nbsp;&nbsp;Damped harmonic oscillator · ζ ≈ 0.16 · drag the wire</p>
+<h1>Pull the line<span>Everything in the registry snaps back.</span></h1>
+<svg id="wire" role="separator" aria-orientation="horizontal" aria-label="Elastic divider — drag vertically to pluck">
+  <path id="path" fill="none" stroke="var(--line-strong)" stroke-width="1.5" />
+  <path id="pathGlow" fill="none" stroke="var(--gold)" stroke-opacity=".35" stroke-width="4.5" stroke-linecap="round" stroke-dasharray="0.5 14" />
+  <circle id="pinL" r="4" fill="var(--flame)" />
+  <circle id="pinR" r="4" fill="var(--flame)" />
+  <circle id="grab" r="7" fill="var(--bg)" stroke="var(--gold)" stroke-width="1.6" style="cursor:grab" />
+</svg>
+<p class="pin-hint">Grab the center node · or just cross the wire fast</p>
+
+<script>
+(() => {
+  'use strict';
+  const RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const svg = document.getElementById('wire');
+  const path = document.getElementById('path');
+  const glow = document.getElementById('pathGlow');
+  const grab = document.getElementById('grab');
+  const pinL = document.getElementById('pinL'), pinR = document.getElementById('pinR');
+
+  /* Damped harmonic oscillator: x'' = -ω₀²x - 2ζω₀x' (underdamped, ζ≈0.16) */
+  const W0 = 11.5, ZETA = 0.16;
+  const state = { y1: 0, v1: 0, y2: 0, v2: 0, x1: 0, vx1: 0, x2: 0, vx2: 0 };
+  let W = 0, H = 200, baseY = 100, pad = 44;
+  let dragging = false, grabY = 0, lastPointerY = 0, lastMoveT = 0, lastCrossSign = 0;
+
+  function resize() {
+    W = Math.max(320, innerWidth);
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    pinL.setAttribute('cx', String(pad)); pinL.setAttribute('cy', String(baseY));
+    pinR.setAttribute('cx', String(W - pad)); pinR.setAttribute('cy', String(baseY));
+    render();
+  }
+  function wireYAt(t) {
+    /* cubic bezier with P0,P3 on baseline, dynamic control offsets */
+    const mt = 1 - t;
+    const c1x = W * 0.33 + state.x1, c1y = baseY + state.y1;
+    const c2x = W * 0.66 + state.x2, c2y = baseY + state.y2;
+    const y = mt*mt*mt*baseY + 3*mt*mt*t*c1y + 3*mt*t*t*c2y + t*t*t*baseY;
+    const x = mt*mt*mt*pad + 3*mt*mt*t*c1x + 3*mt*t*t*c2x + t*t*t*(W - pad);
+    return { x, y };
+  }
+  function render() {
+    const c1x = W * 0.33 + state.x1, c2x = W * 0.66 + state.x2;
+    const d = `M ${pad} ${baseY} C ${c1x.toFixed(2)} ${(baseY + state.y1).toFixed(2)} ${c2x.toFixed(2)} ${(baseY + state.y2).toFixed(2)} ${W - pad} ${baseY}`;
+    path.setAttribute('d', d);
+    glow.setAttribute('d', d);
+    const mid = wireYAt(0.5);
+    grab.setAttribute('cx', String(mid.x)); grab.setAttribute('cy', String(mid.y));
+  }
+  function physics(dt) {
+    const acc = (y, v) => -(W0 * W0) * y - 2 * ZETA * W0 * v;
+    if (!dragging) {
+      state.v1 += acc(state.y1, state.v1) * dt; state.y1 += state.v1 * dt;
+      state.v2 += acc(state.y2, state.v2) * dt; state.y2 += state.v2 * dt;
+      state.vx1 += acc(state.x1, state.vx1) * 0.8 * dt; state.x1 += state.vx1 * dt;
+      state.vx2 += acc(state.x2, state.vx2) * 0.8 * dt; state.x2 += state.vx2 * dt;
+    } else {
+      /* control points chase the pointer with a stiff spring — release triggers oscillation */
+      const target = grabY - baseY;
+      state.v1 += ((target * 0.9 - state.y1) * 180 - state.v1 * 18) * dt; state.y1 += state.v1 * dt;
+      state.v2 += ((target * 0.9 - state.y2) * 180 - state.v2 * 18) * dt; state.y2 += state.v2 * dt;
+    }
+  }
+  window.addEventListener('resize', resize);
+
+  svg.addEventListener('pointerdown', (e) => {
+    const r = svg.getBoundingClientRect();
+    const y = e.clientY - r.top;
+    if (Math.abs(y - baseY) < 90 || e.target === grab) {
+      dragging = true; grabY = y; svg.setPointerCapture(e.pointerId);
+      grab.style.cursor = 'grabbing';
+    }
+  });
+  svg.addEventListener('pointermove', (e) => {
+    const r = svg.getBoundingClientRect();
+    const y = e.clientY - r.top;
+    const now = performance.now();
+    if (dragging) { grabY = y; }
+    else {
+      /* crossing the wire at speed = pluck */
+      const sign = Math.sign(y - baseY);
+      const dt = Math.max(8, now - lastMoveT) / 1000;
+      const vy = (y - lastPointerY) / dt;
+      if (sign !== 0 && lastCrossSign !== 0 && sign !== lastCrossSign && Math.abs(vy) > 260) {
+        state.v1 += vy * 0.45; state.v2 += vy * 0.45;
+        state.vx1 -= vy * 0.02; state.vx2 += vy * 0.02;
+      }
+      lastCrossSign = sign || lastCrossSign;
+      lastPointerY = y; lastMoveT = now;
+    }
+    lastPointerY = y; lastMoveT = now;
+  });
+  function endDrag(e) {
+    dragging = false; grab.style.cursor = 'grab';
+    try { svg.releasePointerCapture(e.pointerId); } catch (err) {}
+  }
+  svg.addEventListener('pointerup', endDrag);
+  svg.addEventListener('pointercancel', endDrag);
+
+  let last = 0;
+  function tick(t) {
+    const dt = Math.min(0.05, last ? (t - last) / 1000 : 0.016); last = t;
+    physics(dt); render();
+    if (!RM) requestAnimationFrame(tick);
+  }
+  resize();
+  if (!RM) requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

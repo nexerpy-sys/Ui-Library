@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<!-- Atelier Kinetik · Motion Graphics 07 · WebGL2 Chromatic Liquid Glass — raw fragment-shader refraction: dispersion, frosted rim, pointer ripples. Canvas2D + CSS backdrop-filter fallback. Zero dependencies. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kinetik Motion — WebGL Chromatic Liquid Glass</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#070709; --surface:#0D0D12; --elevated:#12121A; --ink:#F4F2EC; --muted:#8E8D8A;
+    --flame:#FF3D00; --cyan:#00F0FF; --gold:#E5A93C;
+    --line:rgba(244,242,236,.10); --line-strong:rgba(244,242,236,.24); --snap:cubic-bezier(.16,1,.3,1); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { height:100%; overflow:hidden; background:var(--bg); -webkit-font-smoothing:antialiased; }
+  body { position:relative;
+    background:radial-gradient(62vw 52vh at 82% -12%, rgba(255,61,0,.10), transparent 60%), var(--bg); }
+  canvas#gl { position:fixed; inset:0; width:100vw; height:100vh; display:block; }
+  .hud { position:absolute; top:1.1rem; left:1.25rem; z-index:2; font-family:"JetBrains Mono", monospace;
+    font-size:9px; letter-spacing:.26em; text-transform:uppercase; color:var(--muted); pointer-events:none; }
+  .hud b { color:var(--cyan); font-weight:500; }
+  .badge { position:absolute; top:1.1rem; right:1.25rem; z-index:2; font-family:"JetBrains Mono", monospace;
+    font-size:8.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--gold);
+    border:1px solid color-mix(in srgb, var(--gold) 40%, transparent); border-radius:999px; padding:5px 12px; pointer-events:none; }
+  /* Fallback — shown only when WebGL2 is unavailable */
+  #fallback { position:absolute; inset:0; display:none; align-items:center; justify-content:center; z-index:1; }
+  #fallback .type-layer { position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; padding-left:7vw; }
+  #fallback .type-layer p { font-family:"Syne", sans-serif; font-weight:800; text-transform:uppercase; color:var(--ink);
+    font-size:clamp(2.4rem, 9vw, 7rem); line-height:.92; letter-spacing:-.03em; }
+  #fallback .fallback-card { position:relative; width:min(44vw, 340px); aspect-ratio:3/4; border-radius:24px;
+    background:rgba(13,13,18,.42); border:1px solid var(--line-strong);
+    backdrop-filter:blur(18px) saturate(1.3); -webkit-backdrop-filter:blur(18px) saturate(1.3);
+    box-shadow:0 40px 90px -40px rgba(0,0,0,.85), inset 0 1px 0 rgba(255,255,255,.08); }
+  #fallback .fallback-card span { position:absolute; left:18px; bottom:16px; font-family:"JetBrains Mono", monospace;
+    font-size:8.5px; letter-spacing:.24em; text-transform:uppercase; color:var(--muted); }
+</style>
+</head>
+<body>
+<script>/* Kinetik theming: parent explorer injects via postMessage or ?theme= — Obsidian/Paper/Aegean */
+(function(){var T={obsidian:{'--bg':'#070709','--surface':'#0D0D12','--elevated':'#12121A','--ink':'#F4F2EC','--muted':'#8E8D8A','--flame':'#FF3D00','--cyan':'#00F0FF','--gold':'#E5A93C','--line':'rgba(244,242,236,.10)','--line-strong':'rgba(244,242,236,.24)'},paper:{'--bg':'#FBFAF7','--surface':'#F4F2EC','--elevated':'#ECEAE3','--ink':'#171512','--muted':'#5F5D58','--flame':'#C93300','--cyan':'#0B7285','--gold':'#8A6A1F','--line':'rgba(23,21,18,.14)','--line-strong':'rgba(23,21,18,.30)'},aegean:{'--bg':'#081521','--surface':'#0F2231','--elevated':'#173043','--ink':'#E9F1F5','--muted':'#7E93A3','--flame':'#FF6B35','--cyan':'#3ED6FF','--gold':'#E5A93C','--line':'rgba(233,241,245,.12)','--line-strong':'rgba(233,241,245,.28)'}};function apply(n){var t=T[n];if(!t)return;var r=document.documentElement,k;for(k in t)r.style.setProperty(k,t[k]);}var q=new URLSearchParams(location.search).get('theme');if(q)apply(q);window.addEventListener('message',function(e){var d=e.data;if(d&&d.type==='ak-theme'){apply(d.theme);window.dispatchEvent(new CustomEvent('ak-theme-applied',{detail:d.theme}));}});})();</script>
+
+<p class="hud"><b>06</b>&nbsp;&nbsp;WebGL2 fragment shader · dispersion + ripple refraction</p>
+<p class="badge" id="engineBadge">WebGL2</p>
+<canvas id="gl" role="img" aria-label="Glass panel refracting kinetic typography with chromatic dispersion"></canvas>
+
+<div id="fallback" aria-hidden="true">
+  <div class="type-layer"><p>Kin<br>etik</p></div>
+  <div class="fallback-card"><span>Glass · fallback</span></div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+  const RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const cv = document.getElementById('gl');
+  const badge = document.getElementById('engineBadge');
+  const fallback = document.getElementById('fallback');
+
+  const PAL = { bg:'#070709', surface:'#0D0D12', ink:'#F4F2EC', muted:'#8E8D8A', flame:'#FF3D00', cyan:'#00F0FF', gold:'#E5A93C' };
+  function tk(){ try { const cs = getComputedStyle(document.documentElement);
+    ['bg','surface','ink','muted','flame','cyan','gold'].forEach(k => { const v = cs.getPropertyValue('--' + k); if (v) PAL[k] = v.trim(); }); } catch (e) {} }
+  tk();
+
+  function showFallback(reason) {
+    cv.style.display = 'none';
+    fallback.style.display = 'flex';
+    fallback.setAttribute('aria-hidden', 'false');
+    badge.textContent = 'Fallback';
+    badge.style.color = 'var(--muted)';
+    console.info('[kinetik glass] WebGL2 unavailable:', reason);
+  }
+
+  /* ---------- bake the backdrop scene into an offscreen canvas ---------- */
+  const scene = document.createElement('canvas');
+  function bake() {
+    const w = Math.min(1600, Math.max(2, window.innerWidth));
+    const h = Math.min(1100, Math.max(2, window.innerHeight));
+    scene.width = w; scene.height = h;
+    const s = scene.getContext('2d');
+    s.fillStyle = PAL.bg; s.fillRect(0, 0, w, h);
+    let g = s.createRadialGradient(w * 0.84, h * 0.10, 0, w * 0.84, h * 0.10, w * 0.5);
+    g.addColorStop(0, 'rgba(255,61,0,0.30)'); g.addColorStop(1, 'rgba(255,61,0,0)');
+    s.fillStyle = g; s.fillRect(0, 0, w, h);
+    g = s.createRadialGradient(w * 0.06, h * 0.96, 0, w * 0.06, h * 0.96, w * 0.55);
+    g.addColorStop(0, 'rgba(0,240,255,0.16)'); g.addColorStop(1, 'rgba(0,240,255,0)');
+    s.fillStyle = g; s.fillRect(0, 0, w, h);
+    s.fillStyle = PAL.ink;
+    s.font = '800 ' + Math.round(h * 0.34) + 'px Syne, "Hanken Grotesk", sans-serif';
+    s.textAlign = 'left'; s.textBaseline = 'alphabetic';
+    s.globalAlpha = 0.92;
+    s.fillText('KIN', w * 0.075, h * 0.42);
+    s.fillText('ETIK', w * 0.075, h * 0.76);
+    s.globalAlpha = 1;
+    s.fillStyle = PAL.flame;
+    s.beginPath(); s.arc(w * 0.775, h * 0.60, h * 0.115, 0, Math.PI * 2); s.fill();
+    s.fillStyle = PAL.gold;
+    s.beginPath(); s.arc(w * 0.155, h * 0.19, h * 0.035, 0, Math.PI * 2); s.fill();
+    s.fillStyle = PAL.muted;
+    s.font = '500 ' + Math.round(h * 0.026) + 'px "JetBrains Mono", monospace';
+    s.fillText('ATELIER KINETIK — AI-FIRST REGISTRY', w * 0.075, h * 0.92);
+    s.strokeStyle = 'rgba(244,242,236,0.20)'; s.lineWidth = 2;
+    s.beginPath(); s.moveTo(w * 0.62, h * 0.13); s.lineTo(w * 0.94, h * 0.13); s.stroke();
+  }
+
+  /* ---------- GL boilerplate ---------- */
+  let gl = null;
+  try { gl = cv.getContext('webgl2', { antialias: false, alpha: false, powerPreference: 'high-performance' }); } catch (e) { gl = null; }
+  if (!gl) { showFallback('getContext(webgl2) returned null'); return; }
+
+  const VERT = '#version 300 es\nin vec2 aPos;\nvoid main(){ gl_Position = vec4(aPos, 0.0, 1.0); }\n';
+  const FRAG = `#version 300 es
+precision highp float;
+out vec4 frag;
+uniform sampler2D uTex;
+uniform vec2 uRes;
+uniform vec2 uCard;
+uniform vec2 uCardHalf;
+uniform float uRadius;
+uniform vec2 uPointer;
+uniform float uRipple;
+uniform float uTime;
+
+float sdRoundRect(vec2 p, vec2 halfSize, float r) {
+  vec2 q = abs(p) - (halfSize - r);
+  return length(max(q, vec2(0.0))) + min(max(q.x, q.y), 0.0) - r;
+}
+void main() {
+  vec2 uv = gl_FragCoord.xy / uRes;
+  vec3 scene = texture(uTex, uv).rgb;
+
+  vec2 p = (uv - uCard) * uRes;
+  vec2 h = uCardHalf * uRes;
+  float sd = sdRoundRect(p, h, uRadius);
+  float inside = 1.0 - smoothstep(0.0, 1.6, sd);
+  if (inside <= 0.002) { frag = vec4(scene, 1.0); return; }
+
+  /* pointer ripple — a decaying ring wave from the pointer position */
+  vec2 dUv = uv - uPointer;
+  vec2 dPx = dUv * uRes;
+  float r = length(dPx);
+  float wave = sin(r * 0.055 - uTime * 6.5) * exp(-r * 0.012) * uRipple;
+  vec2 dir = r > 1.0 ? dUv / r : vec2(0.0, 0.0);
+  vec2 refractUv = uv + dir * wave * 0.045;
+
+  /* frosted rim — refraction pulls toward card center at the edge */
+  float frost = 1.0 - smoothstep(0.0, uRadius * 2.1, -sd);
+  refractUv = refractUv + (uCard - uv) * 0.085 * frost;
+
+  /* chromatic dispersion — RGB sampled at stepped offsets */
+  vec2 cd = dir * (0.0035 + 0.011 * uRipple * exp(-r * 0.010) + 0.0038 * frost);
+  float cr = texture(uTex, refractUv + cd).r;
+  float cg = texture(uTex, refractUv).g;
+  float cb = texture(uTex, refractUv - cd).b;
+  vec3 refr = vec3(cr, cg, cb);
+
+  /* 9-tap ring blur, weighted by frost */
+  float br = (7.5 * frost + 0.6) / uRes.x;
+  vec3 acc = refr;
+  acc += texture(uTex, refractUv + vec2( br,  0.0)).rgb;
+  acc += texture(uTex, refractUv + vec2(-br,  0.0)).rgb;
+  acc += texture(uTex, refractUv + vec2( 0.0,  br)).rgb;
+  acc += texture(uTex, refractUv + vec2( 0.0, -br)).rgb;
+  acc += texture(uTex, refractUv + vec2( br * 0.7071,  br * 0.7071)).rgb;
+  acc += texture(uTex, refractUv + vec2(-br * 0.7071,  br * 0.7071)).rgb;
+  acc += texture(uTex, refractUv + vec2( br * 0.7071, -br * 0.7071)).rgb;
+  acc += texture(uTex, refractUv + vec2(-br * 0.7071, -br * 0.7071)).rgb;
+  refr = mix(refr, acc / 9.0, clamp(frost, 0.0, 1.0) * 0.85);
+
+  /* diagonal specular sheen sweeping slowly */
+  float sheenBand = 1.0 - abs((uv.x + uv.y) * 0.5 - 0.40 - sin(uTime * 0.21) * 0.045) * 2.4;
+  float sheen = pow(clamp(sheenBand, 0.0, 1.0), 7.0) * 0.38;
+
+  /* inner rim light on the glass edge */
+  float rim = smoothstep(2.6, 0.7, abs(sd));
+
+  vec3 col = refr * vec3(0.90, 0.96, 1.06);
+  col += vec3(sheen);
+  col += vec3(rim * 0.55, rim * 0.72, rim * 0.95) * (0.55 + 0.45 * frost);
+  col += vec3(0.028, 0.034, 0.044) * uv.y;
+
+  frag = vec4(mix(scene, col, inside), 1.0);
+}`;
+
+  function compile(type, src) {
+    const sh = gl.createShader(type);
+    gl.shaderSource(sh, src); gl.compileShader(sh);
+    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+      const log = gl.getShaderInfoLog(sh); gl.deleteShader(sh);
+      throw new Error('shader: ' + log);
+    }
+    return sh;
+  }
+  let program = null;
+  try {
+    program = gl.createProgram();
+    gl.attachShader(program, compile(gl.VERTEX_SHADER, VERT));
+    gl.attachShader(program, compile(gl.FRAGMENT_SHADER, FRAG));
+    gl.linkProgram(program);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      throw new Error('link: ' + gl.getProgramInfoLog(program));
+    }
+  } catch (err) {
+    showFallback(String(err && err.message || err));
+    return;
+  }
+  gl.useProgram(program);
+
+  const posLoc = gl.getAttribLocation(program, 'aPos');
+  const uRes = gl.getUniformLocation(program, 'uRes');
+  const uCard = gl.getUniformLocation(program, 'uCard');
+  const uCardHalf = gl.getUniformLocation(program, 'uCardHalf');
+  const uRadius = gl.getUniformLocation(program, 'uRadius');
+  const uPointer = gl.getUniformLocation(program, 'uPointer');
+  const uRipple = gl.getUniformLocation(program, 'uRipple');
+  const uTime = gl.getUniformLocation(program, 'uTime');
+  gl.getUniformLocation(program, 'uTex');
+
+  const vbo = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(posLoc);
+  gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+  const tex = gl.createTexture();
+  function uploadTexture() {
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, scene);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  }
+  function rebake() { tk(); bake(); resizeViewport(); uploadTexture(); }
+
+  function resizeViewport() {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    cv.width = Math.max(2, Math.round(window.innerWidth * dpr * 0.72));   /* soft cap — shader is resolution-independent */
+    cv.height = Math.max(2, Math.round(window.innerHeight * dpr * 0.72));
+    gl.viewport(0, 0, cv.width, cv.height);
+  }
+
+  /* pointer → uv (y flipped: gl_FragCoord origin is bottom-left) */
+  let pointerUv = { x: 0.5, y: 0.5 }, ripple = 0;
+  window.addEventListener('pointermove', (e) => {
+    pointerUv = { x: e.clientX / window.innerWidth, y: 1 - e.clientY / window.innerHeight };
+    ripple = Math.min(1, ripple + 0.09);
+  }, { passive: true });
+  window.addEventListener('pointerdown', (e) => {
+    pointerUv = { x: e.clientX / window.innerWidth, y: 1 - e.clientY / window.innerHeight };
+    ripple = 1;
+  }, { passive: true });
+  window.addEventListener('ak-theme-applied', rebake);
+  window.addEventListener('resize', () => { bake(); resizeViewport(); uploadTexture(); });
+
+  let frames = 0;
+  function frame(t) {
+    const small = Math.min(1, window.innerWidth / 900);
+    const cardHalf = { x: 0.235 * (0.8 + 0.2 * small) + 0.055, y: 0.315 };
+    gl.uniform2f(uRes, cv.width, cv.height);
+    gl.uniform2f(uCard, 0.62, 0.47);
+    gl.uniform2f(uCardHalf, cardHalf.x, cardHalf.y);
+    gl.uniform1f(uRadius, Math.min(cv.width, cv.height) * 0.055);
+    gl.uniform2f(uPointer, pointerUv.x, pointerUv.y);
+    gl.uniform1f(uRipple, RM ? 0 : ripple);
+    gl.uniform1f(uTime, t * 0.001);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    ripple *= 0.945;
+    frames += 1;
+    if (!RM) requestAnimationFrame(frame);
+    else if (frames < 2) requestAnimationFrame(frame);
+  }
+
+  const boot = () => { bake(); resizeViewport(); uploadTexture(); requestAnimationFrame(frame); };
+  if (document.fonts && document.fonts.ready) {
+    Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 900))]).then(boot);
+  } else {
+    boot();
+  }
+})();
+</script>
+</body>
+</html>

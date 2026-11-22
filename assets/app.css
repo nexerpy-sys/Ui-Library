@@ -735,3 +735,69 @@
     @media (prefers-reduced-motion: reduce) {
       .xr-card, .xr-snippet, .xr-preview, .xr-veil, .xr-mock-btn, .xr-swatch { transition: none !important; }
     }
+
+    /* =========================================================
+       04 · REGISTRY EXPLORER — Motion Graphics tab (stage + pick list)
+       ========================================================= */
+    .xr-mg {
+      display: grid;
+      grid-template-columns: 1.52fr 1fr;
+      gap: 1px;
+      background: var(--line);
+      min-height: 430px;
+    }
+    .xr-mg-stagecol { display: flex; flex-direction: column; background: var(--surface); min-width: 0; }
+    .xr-mg-stage {
+      position: relative;
+      aspect-ratio: 16 / 10;
+      min-height: 240px;
+      overflow: hidden;
+      background: #050507;
+      border-bottom: 1px solid var(--line);
+    }
+    .xr-mg-frame { width: 100%; height: 100%; border: 0; display: block; background: var(--bg); }
+    .xr-mg-loading {
+      position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+      font-size: 9px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); margin: 0;
+    }
+    .xr-mg-bar { display: flex; flex-direction: column; gap: 10px; padding: 16px 18px 18px; flex: 1; }
+    .xr-mg-name { font-size: 17px; font-weight: 800; color: var(--ink); line-height: 1.15; }
+    .xr-mg-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 2px; }
+    .xr-mg-actions .chip { display: inline-flex; align-items: center; gap: 6px; }
+    .xr-mg-themes {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      margin-top: auto; padding-top: 12px; border-top: 1px solid var(--line);
+    }
+    .xr-mg-theme { cursor: pointer; }
+    .xr-mg-theme.is-on { background: var(--cyan); border-color: var(--cyan); color: #03242B; }
+    .xr-mg-live { color: var(--emerald); margin-left: auto; }
+    .xr-mg-list {
+      list-style: none; margin: 0; padding: 0; background: var(--surface);
+      display: flex; flex-direction: column; max-height: 560px; overflow-y: auto;
+      scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent;
+    }
+    .xr-mg-item {
+      display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px;
+      width: 100%; text-align: left; padding: 13px 16px;
+      background: transparent; border: 0; border-bottom: 1px solid var(--line);
+      cursor: pointer; transition: background-color 0.3s;
+    }
+    .xr-mg-item:hover { background: #111118; }
+    .xr-mg-item:focus-visible { outline: 2px solid var(--flame); outline-offset: -2px; }
+    .xr-mg-item.is-on { background: color-mix(in srgb, var(--flame) 12%, transparent); box-shadow: inset 3px 0 0 var(--flame); }
+    .xr-mg-num { font-size: 10px; letter-spacing: 0.18em; color: var(--muted); }
+    .xr-mg-item.is-on .xr-mg-num { color: var(--flame); }
+    .xr-mg-item-name { font-family: "Syne", sans-serif; font-size: 12px; font-weight: 700; color: var(--ink); line-height: 1.3; }
+    .xr-mg-item-tag { font-size: 8px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+    .xr-mg-item.is-on .xr-mg-item-tag { color: var(--cyan); }
+
+    @media (max-width: 900px) {
+      .xr-mg { grid-template-columns: 1fr; }
+      .xr-mg-list { max-height: 260px; }
+      .xr-mg-live { margin-left: 0; flex-basis: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .xr-mg-item, .xr-mg-theme { transition: none !important; }
+    }
+
+    .xr-mg-frame-placeholder { opacity: 0.35; background: repeating-linear-gradient(135deg, #0d0d12 0 14px, #101017 14px 28px); }

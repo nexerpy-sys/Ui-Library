@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<!-- Atelier Kinetik · Motion Graphics 03 · Magnetic Morph Cursor — velocity-squashed fluid dot; morphs into button bounding boxes with data-cursor labels. Zero dependencies. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kinetik Motion — Magnetic Morph Cursor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#070709; --surface:#0D0D12; --elevated:#12121A; --ink:#F4F2EC; --muted:#8E8D8A;
+    --flame:#FF3D00; --cyan:#00F0FF; --gold:#E5A93C;
+    --line:rgba(244,242,236,.10); --line-strong:rgba(244,242,236,.24); --snap:cubic-bezier(.16,1,.3,1); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { height:100%; overflow:hidden; background:var(--bg); -webkit-font-smoothing:antialiased; }
+  body { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2.2rem;
+    cursor:none; background:radial-gradient(58vw 50vh at 80% -10%, rgba(255,61,0,.10), transparent 60%), var(--bg); }
+  .hud { position:absolute; top:1.1rem; left:1.25rem; font-family:"JetBrains Mono", monospace;
+    font-size:9px; letter-spacing:.26em; text-transform:uppercase; color:var(--muted); cursor:none; }
+  .hud b { color:var(--flame); font-weight:500; }
+  h1 { font-family:"Syne", sans-serif; font-weight:800; text-transform:uppercase; text-align:center;
+    font-size:clamp(1.9rem, 6.4vw, 4.6rem); line-height:.95; letter-spacing:-.03em; color:var(--ink); cursor:none; }
+  h1 em { font-family:"Instrument Serif", serif; font-style:italic; text-transform:none; font-weight:400; color:var(--flame); letter-spacing:-.01em; }
+  .row { display:flex; gap:1rem; flex-wrap:wrap; justify-content:center; }
+  .pill { font-family:"JetBrains Mono", monospace; font-size:10px; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--ink); background:var(--surface); border:1px solid var(--line-strong); border-radius:999px;
+    padding:1rem 1.8rem; text-decoration:none; cursor:none; }
+  .pill--flame { background:var(--flame); border-color:var(--flame); color:#160800; }
+  .pill--ghost { background:transparent; color:var(--muted); }
+  /* The morphing cursor */
+  #dot { position:fixed; left:0; top:0; z-index:50; pointer-events:none;
+    width:18px; height:18px; border-radius:999px; background:var(--ink);
+    mix-blend-mode:difference; display:flex; align-items:center; justify-content:center;
+    will-change:transform, width, height, border-radius, background; }
+  #dot .dot-label { font-family:"JetBrains Mono", monospace; font-size:9px; letter-spacing:.22em;
+    text-transform:uppercase; color:var(--ink); opacity:0; transform:translateY(2px); transition:opacity .25s var(--snap), transform .35s var(--snap); }
+  #dot.morphing { background:var(--flame); mix-blend-mode:normal; }
+  #dot.morphing .dot-label { opacity:1; transform:none; color:#160800; }
+  @media (prefers-reduced-motion: reduce) { body, .pill, .hud, h1 { cursor:auto; } #dot { display:none; } }
+</style>
+</head>
+<body>
+<script>/* Kinetik theming: parent explorer injects via postMessage or ?theme= — Obsidian/Paper/Aegean */
+(function(){var T={obsidian:{'--bg':'#070709','--surface':'#0D0D12','--elevated':'#12121A','--ink':'#F4F2EC','--muted':'#8E8D8A','--flame':'#FF3D00','--cyan':'#00F0FF','--gold':'#E5A93C','--line':'rgba(244,242,236,.10)','--line-strong':'rgba(244,242,236,.24)'},paper:{'--bg':'#FBFAF7','--surface':'#F4F2EC','--elevated':'#ECEAE3','--ink':'#171512','--muted':'#5F5D58','--flame':'#C93300','--cyan':'#0B7285','--gold':'#8A6A1F','--line':'rgba(23,21,18,.14)','--line-strong':'rgba(23,21,18,.30)'},aegean:{'--bg':'#081521','--surface':'#0F2231','--elevated':'#173043','--ink':'#E9F1F5','--muted':'#7E93A3','--flame':'#FF6B35','--cyan':'#3ED6FF','--gold':'#E5A93C','--line':'rgba(233,241,245,.12)','--line-strong':'rgba(233,241,245,.28)'}};function apply(n){var t=T[n];if(!t)return;var r=document.documentElement,k;for(k in t)r.style.setProperty(k,t[k]);}var q=new URLSearchParams(location.search).get('theme');if(q)apply(q);window.addEventListener('message',function(e){var d=e.data;if(d&&d.type==='ak-theme'){apply(d.theme);window.dispatchEvent(new CustomEvent('ak-theme-applied',{detail:d.theme}));}});})();</script>
+
+<p class="hud"><b>02</b>&nbsp;&nbsp;Velocity-squashed fluid cursor → bounding-box morph</p>
+<h1>The cursor<br><em>has a will.</em></h1>
+<div class="row">
+  <a class="pill pill--flame" href="#" data-cursor="Ship">Ship registry</a>
+  <a class="pill" href="#" data-cursor="View">View tokens</a>
+  <a class="pill pill--ghost" href="#" data-cursor="Read">Read llms.txt</a>
+</div>
+<div id="dot" aria-hidden="true"><span class="dot-label"></span></div>
+
+<script>
+(() => {
+  'use strict';
+  const RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (RM) return;                       /* native cursor restored by media query */
+  const dot = document.getElementById('dot');
+  const label = dot.querySelector('.dot-label');
+
+  /* spring state: position + size morph. k/c tuned per scalar group */
+  const state = { x: innerWidth / 2, y: innerHeight / 2, vx: 0, vy: 0, w: 18, h: 18, vw: 0, vh: 0 };
+  let px = state.x, py = state.y, morphTarget = null, heading = 0, speed = 0;
+
+  window.addEventListener('pointermove', (e) => {
+    const nx = e.clientX, ny = e.clientY;
+    const dx = nx - px, dy = ny - py;
+    speed = speed * 0.72 + Math.hypot(dx, dy) * 0.28;
+    if (Math.hypot(dx, dy) > 0.6) heading = Math.atan2(dy, dx);
+    px = nx; py = ny;
+  }, { passive: true });
+
+  document.querySelectorAll('[data-cursor]').forEach((el) => {
+    el.addEventListener('pointerenter', () => { morphTarget = el; label.textContent = el.dataset.cursor; dot.classList.add('morphing'); });
+    el.addEventListener('pointerleave', () => { morphTarget = null; dot.classList.remove('morphing'); });
+  });
+
+  function spring(cur, vel, target, k, c, dt) {
+    vel += ((target - cur) * k - vel * c) * dt;
+    return [cur + vel * dt, vel];
+  }
+
+  let last = 0;
+  function tick(t) {
+    const dt = Math.min(0.05, last ? (t - last) / 1000 : 0.016); last = t;
+
+    /* resolve morph destination */
+    let tx = px, ty = py, tw = 18, th = 18, k = 300, c = 26;
+    if (morphTarget) {
+      const r = morphTarget.getBoundingClientRect();
+      tx = r.left + r.width / 2; ty = r.top + r.height / 2;
+      tw = r.width + 28; th = r.height + 18;
+      k = 220; c = 22;                  /* looser spring while embodied */
+    }
+    [state.x, state.vx] = spring(state.x, state.vx, tx, k, c, dt);
+    [state.y, state.vy] = spring(state.y, state.vy, ty, k, c, dt);
+    [state.w, state.vw] = spring(state.w, state.vw, tw, 240, 24, dt);
+    [state.h, state.vh] = spring(state.h, state.vh, th, 240, 24, dt);
+
+    speed *= 0.94;
+    if (!morphTarget) {
+      /* velocity-along-trajectory squash & stretch */
+      const stretch = Math.min(0.9, speed * 0.012);
+      const sx = 1 + stretch, sy = 1 - stretch * 0.52;
+      dot.style.width = state.w.toFixed(1) + 'px';
+      dot.style.height = state.h.toFixed(1) + 'px';
+      dot.style.borderRadius = '999px';
+      dot.style.transform = `translate3d(${(state.x - state.w / 2).toFixed(2)}px, ${(state.y - state.h / 2).toFixed(2)}px, 0) rotate(${heading}rad) scale(${sx.toFixed(3)}, ${sy.toFixed(3)}) rotate(${-heading}rad)`;
+    } else {
+      dot.style.width = state.w.toFixed(1) + 'px';
+      dot.style.height = state.h.toFixed(1) + 'px';
+      dot.style.borderRadius = '999px';
+      dot.style.transform = `translate3d(${(state.x - state.w / 2).toFixed(2)}px, ${(state.y - state.h / 2).toFixed(2)}px, 0)`;
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

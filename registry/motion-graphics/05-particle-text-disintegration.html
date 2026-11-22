@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<!-- Atelier Kinetik · Motion Graphics 05 · Particle Text Disintegration — offscreen getImageData glyph sampler (2000+ particles), shockwave dispersion, spring reassembly. Zero dependencies. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kinetik Motion — Particle Text Disintegration</title>
+<style>
+  :root { --bg:#070709; --surface:#0D0D12; --ink:#F4F2EC; --muted:#8E8D8A;
+    --flame:#FF3D00; --cyan:#00F0FF; --gold:#E5A93C;
+    --line:rgba(244,242,236,.10); --line-strong:rgba(244,242,236,.24); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { height:100%; overflow:hidden; background:var(--bg); -webkit-font-smoothing:antialiased; }
+  body { position:relative; cursor:crosshair;
+    background:radial-gradient(70vw 56vh at 50% 120%, rgba(255,61,0,.12), transparent 62%), var(--bg); }
+  canvas { display:block; width:100vw; height:100vh; }
+  .hud { position:absolute; top:1.1rem; left:1.25rem; font-family:"JetBrains Mono", monospace;
+    font-size:9px; letter-spacing:.26em; text-transform:uppercase; color:var(--muted); pointer-events:none; }
+  .hud b { color:var(--flame); font-weight:500; }
+  .strike { position:absolute; bottom:1.15rem; left:50%; transform:translateX(-50%);
+    font-family:"JetBrains Mono", monospace; font-size:8.5px; letter-spacing:.3em; text-transform:uppercase; color:var(--muted); pointer-events:none; }
+</style>
+</head>
+<body>
+<script>/* Kinetik theming: parent explorer injects via postMessage or ?theme= — Obsidian/Paper/Aegean */
+(function(){var T={obsidian:{'--bg':'#070709','--surface':'#0D0D12','--elevated':'#12121A','--ink':'#F4F2EC','--muted':'#8E8D8A','--flame':'#FF3D00','--cyan':'#00F0FF','--gold':'#E5A93C','--line':'rgba(244,242,236,.10)','--line-strong':'rgba(244,242,236,.24)'},paper:{'--bg':'#FBFAF7','--surface':'#F4F2EC','--elevated':'#ECEAE3','--ink':'#171512','--muted':'#5F5D58','--flame':'#C93300','--cyan':'#0B7285','--gold':'#8A6A1F','--line':'rgba(23,21,18,.14)','--line-strong':'rgba(23,21,18,.30)'},aegean:{'--bg':'#081521','--surface':'#0F2231','--elevated':'#173043','--ink':'#E9F1F5','--muted':'#7E93A3','--flame':'#FF6B35','--cyan':'#3ED6FF','--gold':'#E5A93C','--line':'rgba(233,241,245,.12)','--line-strong':'rgba(233,241,245,.28)'}};function apply(n){var t=T[n];if(!t)return;var r=document.documentElement,k;for(k in t)r.style.setProperty(k,t[k]);}var q=new URLSearchParams(location.search).get('theme');if(q)apply(q);window.addEventListener('message',function(e){var d=e.data;if(d&&d.type==='ak-theme'){apply(d.theme);window.dispatchEvent(new CustomEvent('ak-theme-applied',{detail:d.theme}));}});})();</script>
+
+<p class="hud"><b>04</b>&nbsp;&nbsp;Offscreen glyph sampler · 2,000+ spring-bound particles</p>
+<canvas id="c" role="img" aria-label="Kinetic headline disintegrates into particles on strike and reassembles"></canvas>
+<p class="strike">Strike the type — shockwave dispersion, spring reassembly</p>
+
+<script>
+(() => {
+  'use strict';
+  const RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const cv = document.getElementById('c');
+  const ctx = cv.getContext('2d');
+  if (!ctx) { cv.style.display = 'none'; return; }
+  let W = 0, H = 0, dpr = 1, particles = [], waves = [];
+  const PAL = { ink:'#F4F2EC', flame:'#FF3D00', cyan:'#00F0FF', bg:'#070709' };
+  function tk(){ try { const cs = getComputedStyle(document.documentElement);
+    PAL.ink = (cs.getPropertyValue('--ink') || PAL.ink).trim();
+    PAL.flame = (cs.getPropertyValue('--flame') || PAL.flame).trim();
+    PAL.cyan = (cs.getPropertyValue('--cyan') || PAL.cyan).trim();
+    PAL.bg = (cs.getPropertyValue('--bg') || PAL.bg).trim(); } catch (e) {} }
+  tk(); window.addEventListener('ak-theme-applied', tk);
+
+  function sample() {
+    particles = [];
+    const off = document.createElement('canvas');
+    off.width = Math.max(2, W); off.height = Math.max(2, H);
+    const octx = off.getContext('2d', { willReadFrequently: true });
+    octx.fillStyle = '#000'; octx.fillRect(0, 0, W, H);
+    const size = Math.min(W * 0.24, H * 0.42);
+    octx.fillStyle = '#fff';
+    octx.font = '800 ' + size.toFixed(0) + 'px Syne, "Hanken Grotesk", system-ui, sans-serif';
+    octx.textAlign = 'center'; octx.textBaseline = 'middle';
+    octx.fillText('KINETIK', W / 2, H * 0.47);
+    const data = octx.getImageData(0, 0, W, H).data;
+    const stride = 3;
+    for (let y = 0; y < H; y += stride) {
+      for (let x = 0; x < W; x += stride) {
+        if (data[(y * W + x) * 4 + 3] > 128) {
+          const roll = Math.random();
+          particles.push({
+            hx: x + (Math.random() - 0.5) * stride, hy: y + (Math.random() - 0.5) * stride,
+            x, y, vx: 0, vy: 0,
+            col: roll < 0.12 ? PAL.flame : roll < 0.17 ? PAL.cyan : PAL.ink,
+            r: Math.random() < 0.08 ? 2.4 : 1.5
+          });
+        }
+      }
+    }
+  }
+  function resize() {
+    dpr = Math.min(2, window.devicePixelRatio || 1);
+    W = window.innerWidth; H = window.innerHeight;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    sample();
+  }
+  function frame(t) {
+    ctx.fillStyle = PAL.bg;
+    ctx.fillRect(0, 0, W, H);
+    /* expanding shockwave rings from strikes */
+    waves = waves.filter((w) => t - w.t0 < 900);
+    const K = 64, D = 11.5;                    /* spring-damper toward home */
+    for (let i = 0; i < particles.length; i++) {
+      const p = particles[i];
+      let fx = (p.hx - p.x) * K - p.vx * D;
+      let fy = (p.hy - p.y) * K - p.vy * D;
+      for (let j = 0; j < waves.length; j++) {
+        const w = waves[j];
+        const age = (t - w.t0) / 1000;
+        const radius = age * 880;
+        const dx = p.x - w.x, dy = p.y - w.y;
+        const dist = Math.hypot(dx, dy) || 1;
+        const band = Math.exp(-((dist - radius) * (dist - radius)) / (2 * 64 * 64));
+        const decay = Math.max(0, 1 - age / 0.9);
+        const push = band * decay * 46;
+        fx += (dx / dist) * push * 30;
+        fy += (dy / dist) * push * 30;
+      }
+      p.vx += fx * 0.016; p.vy += fy * 0.016;
+      p.x += p.vx * 0.016; p.y += p.vy * 0.016;
+      ctx.fillStyle = p.col;
+      ctx.fillRect(p.x, p.y, p.r, p.r);
+    }
+    if (!RM) requestAnimationFrame(frame);
+  }
+  cv.addEventListener('pointerdown', (e) => {
+    waves.push({ x: e.clientX, y: e.clientY, t0: performance.now() });
+    for (const p of particles) {
+      const dx = p.x - e.clientX, dy = p.y - e.clientY;
+      const dist = Math.hypot(dx, dy) || 1;
+      const kick = 340 * Math.exp(-dist / 170);
+      p.vx += (dx / dist) * kick; p.vy += (dy / dist) * kick;
+    }
+  });
+  resize();
+  window.addEventListener('resize', resize);
+  if (document.fonts && document.fonts.ready) {
+    Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 900))]).then(sample);
+  }
+  if (RM) { frame(0); } else { requestAnimationFrame(frame); }
+})();
+</script>
+</body>
+</html>

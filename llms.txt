@@ -1,5 +1,5 @@
 # ATELIER KINETIK — AI-READABLE PRODUCTION DESIGN & MOTION REGISTRY
-> Release: 1.6.0 · 2026-11-22 · 60 fonts · 24 pairings · 6 audited token systems · 3 fluid scales · 12 motion laws · 24 micro-interactions · 8 templates · 16 canvas FX
+> Release: 1.8.0 · 2026-11-22 · 60 fonts · 24 pairings · 6 audited token systems · 3 fluid scales · 12 motion laws · 24 micro-interactions · 8 templates · 16 canvas FX · 12 motion graphics
 > Purpose: structured, copy-paste-ready design tokens, fluid type, semantic color, motion and 60fps canvas FX for ChatGPT, Claude, Gemini, Manus, Kimi, Qwen, DeepSeek, Emergent — and human engineers.
 > Rule: fetch /llms.txt once, then pull ONLY what you need from /registry.json. Do not scrape /index.html for tokens — it is the showcase, not the contract.
 
@@ -9,6 +9,7 @@
 - /registry.json : Machine-readable manifest — every asset, measured audits, snippet code inline. Prefer this for programmatic use.
 - /registry/fx/*.html : 16 standalone zero-dependency canvas hero backgrounds (01..16). Iframe, inline, or lift canvas+script.
 - /registry/templates/*.html : 8 standalone, drop-in section templates (hero, bento, pricing, feature split, stats bar, testimonials, CTA band, FAQ). Google Fonts only, no JS frameworks.
+- /registry/motion-graphics/*.html : 12 standalone computational UI motion graphics (01..12) — analytical springs, Verlet integration, simplex noise, getImageData sampling, SVG filter matrices, raw WebGL2 (Canvas2D fallback). Iframe, inline, or lift the engine.
 
 ## Token conventions
 --bg · --surface · --elevated · --ink · --muted-ink · --hairline · --hairline-strong · --accent · --accent-hover · --on-accent
@@ -69,13 +70,23 @@ Templates are patterns, not prisons: retoken accents, keep the pairing disciplin
 All adaptive (auto-degrade past ~21ms/frame), all DPR≤2, all reduced-motion safe. Dependencies: NONE.
 External deps ARE permitted in your own builds (three.js, GSAP) — the FX themselves stay dependency-free so they paste anywhere.
 
+## 12 computational motion graphics (/registry/motion-graphics/, registry.json → motionGraphics)
+01 Liquid Gooey Dock (SVG feGaussianBlur+feColorMatrix metaballs, spring magnification) · 02 Kinetic Variable Type Field (cursor-velocity repulsion, live wght axis) ·
+03 Magnetic Morph Cursor (velocity squash/stretch, bounding-box morph) · 04 Elastic Bezier String Divider (damped harmonic oscillator, ζ 0.16) ·
+05 Particle Text Disintegration (offscreen getImageData sampler, shockwave dispersion, spring reassembly) · 06 3D Holographic Card Stack (perspective matrix, foil + chromatic aberration, flick-to-dismiss) ·
+07 WebGL Chromatic Liquid Glass (raw WebGL2 fragment shader — rounded-rect SDF refraction, RGB dispersion, frosted rim, pointer ripples; Canvas2D/CSS backdrop-filter fallback) · 08 Verlet Cloth Ribbon (2D verlet mesh, pin constraints, gusting wind, pointer dragging) ·
+09 Path-Subdivision Icon Morpher (arc-length resample + per-point spring interpolation; menu↔close↔arrow↔check↔spark) · 10 Gravitational Bento Lens (s/r² spacetime displacement of grid + cells, spring-restoring mass) ·
+11 Harmonic AI Voice Orb (3-octave simplex polar spline; idle/listening/thinking/speaking state machine) · 12 FLIP Shared-Element Portal (First/Last/Invert/Play, transform + clip-path only, zero layout thrash).
+Each file: DPR≤2, 60fps, adaptive where applicable, prefers-reduced-motion safe, Google Fonts only (some pure vanilla), zero JS dependencies.
+Every motion graphic accepts theme injection — postMessage {type:'ak-theme', theme:'obsidian'|'paper'|'aegean'} re-skins it live — or ?theme=paper in the URL.
+
 ## Anti-slop checklist for agents generating UI
 1. Never ship default Tailwind blue/purple — pick Obsidian/Paper/Aegean, or build a ramp from registry.json → color.scales.
 2. Fluid clamp() for type, never fixed breakpoint font-sizes (use typography.typeScale output).
 3. One Kinetic-snap entrance per view, max; everything else Celestial-drift or static.
 4. Hairlines at rgba 10%/24%, never #333. Grain over gradients. Ink #F4F2EC on #070709 is AAA — don't improvise contrast.
 5. Pair display+serif+body+mono from the 24 pairings; do not mix more than one display face per view.
-6. Ship prefers-reduced-motion fallbacks and keyboard access — the registry's own FX/snippets demonstrate the pattern.
+6. Ship prefers-reduced-motion fallbacks and keyboard access — the registry's own FX/snippets/motion-graphics demonstrate the pattern.
 7. CLS = 0: transforms and opacity only for motion; reserve space for media.
 
 ## Licensing

@@ -91,7 +91,7 @@
       }
 
       const LLMS_SPEC = `# ATELIER KINETIK — AI-READABLE PRODUCTION DESIGN & MOTION REGISTRY
-> Release: 1.6.0 · 2026-11-22 · 60 fonts · 24 pairings · 6 audited token systems · 3 fluid scales · 12 motion laws · 24 micro-interactions · 8 templates · 16 canvas FX
+> Release: 1.8.0 · 2026-11-22 · 60 fonts · 24 pairings · 6 audited token systems · 3 fluid scales · 12 motion laws · 24 micro-interactions · 8 templates · 16 canvas FX · 12 motion graphics
 > Purpose: structured, copy-paste-ready design tokens, fluid type, semantic color, motion and 60fps canvas FX for ChatGPT, Claude, Gemini, Manus, Kimi, Qwen, DeepSeek, Emergent — and human engineers.
 > Rule: fetch /llms.txt once, then pull ONLY what you need from /registry.json. Do not scrape /index.html for tokens — it is the showcase, not the contract.
 
@@ -101,6 +101,7 @@
 - /registry.json : Machine-readable manifest — every asset, measured audits, snippet code inline. Prefer this for programmatic use.
 - /registry/fx/*.html : 16 standalone zero-dependency canvas hero backgrounds (01..16). Iframe, inline, or lift canvas+script.
 - /registry/templates/*.html : 8 standalone, drop-in section templates (hero, bento, pricing, feature split, stats bar, testimonials, CTA band, FAQ). Google Fonts only, no JS frameworks.
+- /registry/motion-graphics/*.html : 12 standalone computational UI motion graphics (01..12) — analytical springs, Verlet integration, simplex noise, getImageData sampling, SVG filter matrices, raw WebGL2 (Canvas2D fallback). Iframe, inline, or lift the engine.
 
 ## Token conventions
 --bg · --surface · --elevated · --ink · --muted-ink · --hairline · --hairline-strong · --accent · --accent-hover · --on-accent
@@ -161,13 +162,23 @@ Templates are patterns, not prisons: retoken accents, keep the pairing disciplin
 All adaptive (auto-degrade past ~21ms/frame), all DPR≤2, all reduced-motion safe. Dependencies: NONE.
 External deps ARE permitted in your own builds (three.js, GSAP) — the FX themselves stay dependency-free so they paste anywhere.
 
+## 12 computational motion graphics (/registry/motion-graphics/, registry.json → motionGraphics)
+01 Liquid Gooey Dock (SVG feGaussianBlur+feColorMatrix metaballs, spring magnification) · 02 Kinetic Variable Type Field (cursor-velocity repulsion, live wght axis) ·
+03 Magnetic Morph Cursor (velocity squash/stretch, bounding-box morph) · 04 Elastic Bezier String Divider (damped harmonic oscillator, ζ 0.16) ·
+05 Particle Text Disintegration (offscreen getImageData sampler, shockwave dispersion, spring reassembly) · 06 3D Holographic Card Stack (perspective matrix, foil + chromatic aberration, flick-to-dismiss) ·
+07 WebGL Chromatic Liquid Glass (raw WebGL2 fragment shader — rounded-rect SDF refraction, RGB dispersion, frosted rim, pointer ripples; Canvas2D/CSS backdrop-filter fallback) · 08 Verlet Cloth Ribbon (2D verlet mesh, pin constraints, gusting wind, pointer dragging) ·
+09 Path-Subdivision Icon Morpher (arc-length resample + per-point spring interpolation; menu↔close↔arrow↔check↔spark) · 10 Gravitational Bento Lens (s/r² spacetime displacement of grid + cells, spring-restoring mass) ·
+11 Harmonic AI Voice Orb (3-octave simplex polar spline; idle/listening/thinking/speaking state machine) · 12 FLIP Shared-Element Portal (First/Last/Invert/Play, transform + clip-path only, zero layout thrash).
+Each file: DPR≤2, 60fps, adaptive where applicable, prefers-reduced-motion safe, Google Fonts only (some pure vanilla), zero JS dependencies.
+Every motion graphic accepts theme injection — postMessage {type:'ak-theme', theme:'obsidian'|'paper'|'aegean'} re-skins it live — or ?theme=paper in the URL.
+
 ## Anti-slop checklist for agents generating UI
 1. Never ship default Tailwind blue/purple — pick Obsidian/Paper/Aegean, or build a ramp from registry.json → color.scales.
 2. Fluid clamp() for type, never fixed breakpoint font-sizes (use typography.typeScale output).
 3. One Kinetic-snap entrance per view, max; everything else Celestial-drift or static.
 4. Hairlines at rgba 10%/24%, never #333. Grain over gradients. Ink #F4F2EC on #070709 is AAA — don't improvise contrast.
 5. Pair display+serif+body+mono from the 24 pairings; do not mix more than one display face per view.
-6. Ship prefers-reduced-motion fallbacks and keyboard access — the registry's own FX/snippets demonstrate the pattern.
+6. Ship prefers-reduced-motion fallbacks and keyboard access — the registry's own FX/snippets/motion-graphics demonstrate the pattern.
 7. CLS = 0: transforms and opacity only for motion; reserve space for media.
 
 ## Licensing
@@ -191,7 +202,7 @@ Code: MIT. Fonts: SIL OFL via Google Fonts (attribution per font). Kinetik name/
       const curveD = ([a, b, c, d]) => `M0 100 C${a * 100} ${100 - b * 100} ${c * 100} ${100 - d * 100} 100 0`;
 
       // Editorial Marquee
-      const MARQUEE_WORDS = ["Atelier Kinetik", "60 typefaces", "24 micro-interactions", "Zero layout shift", "The agents never rest"];
+      const MARQUEE_WORDS = ["Atelier Kinetik", "60 typefaces", "24 micro-interactions", "12 motion graphics", "Zero layout shift", "The agents never rest"];
       const logoSvg = `<svg viewBox="0 0 32 32" class="h-8 w-8 text-[var(--flame)] sm:h-12 sm:w-12 shrink-0" aria-hidden="true"><circle cx="16" cy="16" r="10.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-dasharray="54 12" transform="rotate(-38 16 16)"/><path d="M16 1.5v7M16 23.5v7M1.5 16h7M23.5 16h7" stroke="currentColor" stroke-width="1.6"/><path d="M10.5 21.5 22 10l-4.2 8.6Z" fill="#FF3D00"/></svg>`;
       const marqueeRow = MARQUEE_WORDS.map((w, i) =>
         `<span class="flex items-center gap-10 pr-10"><span class="${i % 2 ? "f-serif italic text-[var(--ink)]" : "f-display font-extrabold uppercase text-transparent [-webkit-text-stroke:1px_rgba(244,242,236,.45)]"}">${w}</span>${logoSvg}</span>`
@@ -346,7 +357,7 @@ Code: MIT. Fonts: SIL OFL via Google Fonts (attribution per font). Kinetik name/
             </div>
             <p data-build="text" class="f-display mt-5 text-6xl font-extrabold text-[var(--ink)]">$48<span class="f-serif text-2xl font-normal italic text-[var(--muted)]"> / seat</span></p>
             <div data-build="line" class="my-6 h-px w-full bg-[var(--line-strong)]"></div>
-            <p data-build="text" class="mb-3 flex items-center gap-3 text-sm text-[var(--ink)]"><span class="h-1.5 w-1.5 rounded-full bg-[var(--flame)]"></span>All 150 registry entries</p>
+            <p data-build="text" class="mb-3 flex items-center gap-3 text-sm text-[var(--ink)]"><span class="h-1.5 w-1.5 rounded-full bg-[var(--flame)]"></span>All 162 registry entries</p>
             <p data-build="text" class="mb-3 flex items-center gap-3 text-sm text-[var(--ink)]"><span class="h-1.5 w-1.5 rounded-full bg-[var(--flame)]"></span>Master AI prompt export</p>
             <p data-build="text" class="mb-3 flex items-center gap-3 text-sm text-[var(--ink)]"><span class="h-1.5 w-1.5 rounded-full bg-[var(--flame)]"></span>Bezier &amp; spring studio</p>
             <span data-build="box" class="mt-4 block rounded-full bg-[var(--flame)] py-3.5 text-center text-sm font-semibold text-white">Claim the tier</span>
@@ -1891,6 +1902,7 @@ Code: MIT. Fonts: SIL OFL via Google Fonts (attribution per font). Kinetik name/
         const panels = {
           templates: document.getElementById("xr-panel-templates"),
           fx: document.getElementById("xr-panel-fx"),
+          mg: document.getElementById("xr-panel-mg"),
           motion: document.getElementById("xr-panel-motion"),
           systems: document.getElementById("xr-panel-systems"),
         };
@@ -1902,6 +1914,11 @@ Code: MIT. Fonts: SIL OFL via Google Fonts (attribution per font). Kinetik name/
             t.tabIndex = on ? 0 : -1;
           });
           Object.keys(panels).forEach((k) => { if (panels[k]) panels[k].hidden = k !== name; });
+          if (name !== "mg") {
+            destroyMotionGraphic();
+          } else if (activate._mgReady && mgItems.length && !document.getElementById("xr-mg-frame")) {
+            mountMotionGraphic(0);
+          }
           if (focusTab) {
             const target = tabs.find((t) => t.dataset.xrTab === name);
             if (target) target.focus();
@@ -2017,6 +2034,115 @@ Code: MIT. Fonts: SIL OFL via Google Fonts (attribution per font). Kinetik name/
           paint(current);
         }
 
+        /* ---- Motion Graphics: single shared stage, iframe is destroyed on switch ---- */
+        let mgItems = [];
+        let mgCurrent = -1;
+        let mgTheme = "obsidian";
+        const mgFrameHost = document.getElementById("xr-mg-stage");
+        const mgList = document.getElementById("xr-mg-list");
+        const mgName = document.getElementById("xr-mg-name");
+        const mgEngine = document.getElementById("xr-mg-engine");
+        const mgBest = document.getElementById("xr-mg-best");
+
+        function destroyMotionGraphic() {
+          /* dropping the iframe node frees its WebGL/canvas contexts — mobile GPUs safe */
+          const frame = document.getElementById("xr-mg-frame");
+          if (frame && frame.parentNode) frame.parentNode.removeChild(frame);
+        }
+        function removePlaceholder() {
+          const ph = document.querySelector(".xr-mg-frame-placeholder");
+          if (ph && ph.parentNode) ph.parentNode.removeChild(ph);
+        }
+        function mountMotionGraphic(index) {
+          const item = mgItems[index];
+          if (!item || !mgFrameHost) return;
+          mgCurrent = index;
+          destroyMotionGraphic();
+          removePlaceholder();
+          const frame = document.createElement("iframe");
+          frame.id = "xr-mg-frame";
+          frame.className = "xr-mg-frame";
+          frame.loading = "lazy";
+          frame.title = item.name + " — live preview";
+          frame.src = item.file + "?theme=" + encodeURIComponent(mgTheme);
+          mgFrameHost.appendChild(frame);
+          if (mgName) mgName.textContent = item.name;
+          if (mgEngine) mgEngine.textContent = item.engine || "canvas";
+          if (mgBest) mgBest.textContent = item.bestFor || "Standalone · zero dependencies · copy-paste ready.";
+          if (mgList) {
+            mgList.querySelectorAll(".xr-mg-item").forEach((btn) => {
+              const on = btn.getAttribute("data-mg-index") === String(index);
+              btn.classList.toggle("is-on", on);
+              btn.setAttribute("aria-pressed", on ? "true" : "false");
+            });
+          }
+        }
+        function buildMotionGraphics(items) {
+          mgItems = Array.isArray(items) ? items : [];
+          if (!mgList || !mgItems.length) return;
+          mgList.innerHTML = mgItems.map((item, i) => `
+            <li role="listitem">
+              <button type="button" class="xr-mg-item" data-mg-index="${i}" aria-pressed="false">
+                <span class="xr-mg-num f-mono">${String(i + 1).padStart(2, "0")}</span>
+                <span class="xr-mg-item-name">${esc(item.name)}</span>
+                <span class="xr-mg-item-tag f-mono">${esc((item.tags && item.tags[0]) || "motion")}</span>
+              </button>
+            </li>`).join("");
+          mgList.addEventListener("click", (event) => {
+            const btn = event.target.closest("[data-mg-index]");
+            if (!btn) return;
+            mountMotionGraphic(Number(btn.getAttribute("data-mg-index")));
+          });
+          const fullBtn = document.getElementById("xr-mg-copy-full");
+          const engineBtn = document.getElementById("xr-mg-copy-engine");
+          const currentItem = () => mgItems[mgCurrent] || mgItems[0];
+          if (fullBtn) fullBtn.addEventListener("click", () => {
+            const item = currentItem();
+            if (!item) return;
+            fetchImpl(item.file).then((res) => {
+              if (!res.ok) throw new Error("HTTP " + res.status);
+              return res.text();
+            }).then((text) => copyText(text, item.name + " — full standalone HTML"))
+              .catch(() => showToast("Could not read " + item.name));
+          });
+          if (engineBtn) engineBtn.addEventListener("click", () => {
+            const item = currentItem();
+            if (!item) return;
+            fetchImpl(item.file).then((res) => {
+              if (!res.ok) throw new Error("HTTP " + res.status);
+              return res.text();
+            }).then((text) => {
+              const styles = Array.from(text.matchAll(/<style>([\s\S]*?)<\/style>/g)).map((m) => m[1].trim());
+              const scripts = Array.from(text.matchAll(/<script>([\s\S]*?)<\/script>/g)).map((m) => m[1].trim());
+              const engine =
+                "/* ============ " + item.name + " — CSS engine ============ */\n" + styles.join("\n\n") +
+                "\n\n/* ============ " + item.name + " — JS engine ============ */\n" + scripts.join("\n\n");
+              copyText(engine, item.name + " — <script> + CSS engine");
+            }).catch(() => showToast("Could not read " + item.name));
+          });
+          /* live token injection — the files listen for {type:'ak-theme'} */
+          const themeButtons = root.querySelectorAll("[data-mg-theme]");
+          themeButtons.forEach((btn) => {
+            btn.addEventListener("click", () => {
+              mgTheme = btn.getAttribute("data-mg-theme") || "obsidian";
+              themeButtons.forEach((b) => {
+                const on = b === btn;
+                b.classList.toggle("is-on", on);
+                b.setAttribute("aria-pressed", on ? "true" : "false");
+              });
+              const frame = document.getElementById("xr-mg-frame");
+              if (frame && frame.contentWindow) {
+                frame.contentWindow.postMessage({ type: "ak-theme", theme: mgTheme }, "*");
+                showToast(mgTheme.charAt(0).toUpperCase() + mgTheme.slice(1) + " tokens injected");
+              }
+            });
+          });
+          activate._mgReady = true;
+          /* deep-link edge case: MG panel already visible when the manifest resolves */
+          const mgPanel = document.getElementById("xr-panel-mg");
+          if (mgPanel && !mgPanel.hidden && !document.getElementById("xr-mg-frame")) mountMotionGraphic(0);
+        }
+
         /* ---- Fetch the manifest once, render everything ---- */
         if (!fetchImpl) {
           const err = document.getElementById("xr-error");
@@ -2052,6 +2178,7 @@ Code: MIT. Fonts: SIL OFL via Google Fonts (attribution per font). Kinetik name/
               });
             }
             buildSystems((reg.color && reg.color.systems) || []);
+            buildMotionGraphics(reg.motionGraphics || []);
             wireFileCopyButtons(root);
           })
           .catch(() => {

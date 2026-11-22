@@ -1,10 +1,10 @@
 {
   "$schema": "https://schemas.atelierkinetik.dev/registry.v1.json",
   "name": "Atelier Kinetik — AI-First Design & Motion Registry",
-  "version": "1.6.0",
+  "version": "1.8.0",
   "released": "2026-11-22",
   "license": "Code MIT · Typography OFL (per-font, via Google Fonts) · Brand marks reserved",
-  "summary": "60 curated Google Fonts, 24 studio pairings, 3 fluid clamp() type scales, 6 audited semantic light/dark token systems, hue-locked 50-950 WCAG 2.1 scales, 12 named motion laws, 24 production micro-interaction snippets and 16 dependency-free 60fps canvas hero backgrounds.",
+  "summary": "60 curated Google Fonts, 24 studio pairings, 3 fluid clamp() type scales, 6 audited semantic light/dark token systems, hue-locked 50-950 WCAG 2.1 scales, 12 named motion laws, 24 production micro-interaction snippets, 8 section templates, 16 dependency-free canvas FX and 12 computational motion graphics (analytical springs, Verlet integration, simplex noise, getImageData sampling, raw WebGL2 with Canvas2D fallback) — every motion graphic is a standalone, zero-dependency file.",
   "audience": [
     "humans in a browser",
     "AI coding agents (ChatGPT, Claude, Gemini, Manus, Kimi, Qwen, DeepSeek, Emergent)",
@@ -15,7 +15,8 @@
     "llmsTxt": "/llms.txt",
     "registryJson": "/registry.json",
     "fxDirectory": "/registry/fx/",
-    "templatesDirectory": "/registry/templates/"
+    "templatesDirectory": "/registry/templates/",
+    "motionGraphicsDirectory": "registry/motion-graphics"
   },
   "usage": [
     "Fetch /llms.txt first for orientation, then pull only the assets you need from this manifest.",
@@ -2908,5 +2909,211 @@
   "auditing": {
     "wcag": "2.1 AA threshold 4.5 (normal text) / 3.0 (large text/graphics) / 7.0 (AAA). All ratios in this file are computed, not asserted.",
     "method": "relative luminance per WCAG 2.1 (sRGB → linear, 0.2126/0.7152/0.0722)"
-  }
+  },
+  "motionGraphics": [
+    {
+      "id": "liquid-gooey-dock",
+      "name": "Liquid Gooey Dock",
+      "file": "registry/motion-graphics/01-liquid-gooey-dock.html",
+      "tags": [
+        "svg-filter",
+        "metaballs",
+        "springs",
+        "dock"
+      ],
+      "math": "Gaussian proximity falloff · semi-implicit Euler spring (k 170, c 13) · feGaussianBlur + feColorMatrix alpha threshold",
+      "bestFor": "App docks & launchers — icons fluidly merge, stretch and snap with proximity magnification",
+      "engine": "svg-filter",
+      "fps": 60,
+      "reducedMotionSafe": true,
+      "dependencies": "none"
+    },
+    {
+      "id": "kinetic-variable-type-field",
+      "name": "Kinetic Variable Type Field",
+      "file": "registry/motion-graphics/02-kinetic-variable-type-field.html",
+      "tags": [
+        "variable-font",
+        "springs",
+        "cursor-velocity",
+        "typography"
+      ],
+      "math": "Cursor velocity vector · gaussian influence radius · damped spring per glyph (k 120, c 14) · live font-variation wght axis",
+      "bestFor": "Display heroes & kinetic headlines — glyphs repel, skew and shift weight from pointer velocity",
+      "engine": "dom-variable-font",
+      "fps": 60,
+      "reducedMotionSafe": true,
+      "dependencies": "Google Fonts (Hanken Grotesk variable)"
+    },
+    {
+      "id": "magnetic-morph-cursor",
+      "name": "Magnetic Morph Cursor",
+      "file": "registry/motion-graphics/03-magnetic-morph-cursor.html",
+      "tags": [
+        "cursor",
+        "springs",
+        "morphing",
+        "mix-blend-mode"
+      ],
+      "math": "Strain-rate tensor stretch/squash from velocity magnitude+heading · bounding-box spring morph (k 220-300) · EMA velocity smoothing",
+      "bestFor": "Portfolio & product sites — fluid cursor that morphs into button pills with data-cursor labels",
+      "engine": "dom-transform",
+      "fps": 60,
+      "reducedMotionSafe": true,
+      "dependencies": "none"
+    },
+    {
+      "id": "elastic-bezier-string-divider",
+      "name": "Elastic Bezier String Divider",
+      "file": "registry/motion-graphics/04-elastic-bezier-string-divider.html",
+      "tags": [
+        "svg",
+        "harmonic-oscillator",
+        "bezier",
+        "divider"
+      ],
+      "math": "Damped harmonic oscillator (ω₀ 11.5, ζ 0.16) on two simulated control points · cubic-Bezier wire · speed-crossing impulse",
+      "bestFor": "Section dividers — pluckable hairline that rings like a real wire",
+      "engine": "svg",
+      "fps": 60,
+      "reducedMotionSafe": true,
+      "dependencies": "none"
+    },
+    {
+      "id": "particle-text-disintegration",
+      "name": "Particle Text Disintegration",
+      "file": "registry/motion-graphics/05-particle-text-disintegration.html",
+      "tags": [
+        "particles",
+        "getImageData",
+        "shockwave",
+        "typography"
+      ],
+      "math": "Offscreen glyph sampler (stride-3, alpha>128) · expanding ring shockwave (Gaussian band, 880px/s) · per-particle spring reassembly (k 64, c 11.5)",
+      "bestFor": "Hero moments — headline shatters into 2,000+ particles on strike and springs back",
+      "engine": "canvas-2d",
+      "fps": 60,
+      "reducedMotionSafe": true,
+      "dependencies": "none"
+    },
+    {
+      "id": "3d-holographic-card-stack",
+      "name": "3D Holographic Card Stack",
+      "file": "registry/motion-graphics/06-3d-holographic-card-stack.html",
+      "tags": [
+        "css-3d",
+        "perspective",
+        "foil",
+        "chromatic-aberration"
+      ],
+      "math": "Pointer-tracked rotateX/rotateY perspective matrix · conic-gradient foil · fling physics with gravity arc + deck recycle (k 170, c 17)",
+      "bestFor": "Pricing, tiers & collection galleries — holographic foil cards with flick-to-dismiss",
+      "engine": "css-3d",
+      "fps": 60,
+      "reducedMotionSafe": true,
+      "dependencies": "none"
+    },
+    {
+      "id": "webgl-chromatic-liquid-glass",
+      "name": "WebGL Chromatic Liquid Glass",
+      "file": "registry/motion-graphics/07-webgl-chromatic-liquid-glass.html",
+      "tags": [
+        "webgl2",
+        "glsl",
+        "refraction",
+        "dispersion"
+      ],
+      "math": "Rounded-rect SDF · ring ripple wave (exp-decay) · RGB dispersion sampling · 9-tap frosted blur weighted by rim distance · specular sheen sweep",
+      "bestFor": "Statement heroes & product cards — real refraction warping baked kinetic typography",
+      "engine": "webgl2 (Canvas2D + backdrop-filter fallback)",
+      "fps": 60,
+      "reducedMotionSafe": true,
+      "dependencies": "none"
+    },
+    {
+      "id": "verlet-cloth-ribbon-banner",
+      "name": "Verlet Cloth Ribbon Banner",
+      "file": "registry/motion-graphics/08-verlet-cloth-ribbon-banner.html",
+      "tags": [
+        "verlet",
+        "cloth-sim",
+        "constraints",
+        "hero"
+      ],
+      "math": "2D verlet integration · structural + shear constraint relaxation ×3 · gravity 1500px/s² · sinusoidal wind turbulence with gusting envelope · pin constraints",
+      "bestFor": "Launch banners & announcements — physical fabric with draggable weave",
+      "engine": "canvas-2d",
+      "fps": 60,
+      "reducedMotionSafe": true,
+      "dependencies": "Google Fonts (Syne)"
+    },
+    {
+      "id": "svg-flubber-icon-morpher",
+      "name": "Path-Subdivision Icon Morpher",
+      "file": "registry/motion-graphics/09-svg-flubber-icon-morpher.html",
+      "tags": [
+        "icon-morph",
+        "path-subdivision",
+        "springs",
+        "canvas"
+      ],
+      "math": "Arc-length resampling to 4×12 normalized points · per-point spring interpolation (k 190, c 15) · zero-spread subpath elision",
+      "bestFor": "Stateful UI — menu↔close↔arrow↔check↔spark morphing on spring timelines",
+      "engine": "canvas-2d",
+      "fps": 60,
+      "reducedMotionSafe": true,
+      "dependencies": "none"
+    },
+    {
+      "id": "gravitational-bento-lens",
+      "name": "Gravitational Bento Lens",
+      "file": "registry/motion-graphics/10-gravitational-bento-lens.html",
+      "tags": [
+        "lens",
+        "grid",
+        "spacetime",
+        "bento"
+      ],
+      "math": "Radial s/r² displacement with softening length · per-vertex grid tessellation (9px) · spring-restoring pointer mass (k 120, c 13) + lissajous autopilot",
+      "bestFor": "Bento-grid heroes — cell & hairline grid warp around the visitor like a gravity well",
+      "engine": "canvas-2d",
+      "fps": 60,
+      "reducedMotionSafe": true,
+      "dependencies": "Google Fonts (JetBrains Mono)"
+    },
+    {
+      "id": "harmonic-ai-voice-orb",
+      "name": "Harmonic AI Voice Orb",
+      "file": "registry/motion-graphics/11-harmonic-ai-voice-orb.html",
+      "tags": [
+        "simplex-noise",
+        "orb",
+        "state-machine",
+        "ai-ui"
+      ],
+      "math": "3-octave simplex noise on a polar spline (150 verts) · harmonic parameter crossfade (exp approach) · incommensurable-sine speech envelope · echo-ring emitter",
+      "bestFor": "AI-native interfaces — idle/listening/thinking/speaking orb with keyboard state control",
+      "engine": "canvas-2d",
+      "fps": 60,
+      "reducedMotionSafe": true,
+      "dependencies": "none"
+    },
+    {
+      "id": "flip-shared-element-portal",
+      "name": "FLIP Shared-Element Portal",
+      "file": "registry/motion-graphics/12-flip-shared-element-portal.html",
+      "tags": [
+        "flip",
+        "layout-animation",
+        "shared-element",
+        "modal"
+      ],
+      "math": "First/Last/Invert/Play — rect delta → inverse transform + clip-path · WAAPI playback (cubic-bezier .16,1,.3,1) · zero layout thrash (transform/clip only)",
+      "bestFor": "Galleries & detail views — card expands into fullscreen editorial modal at 60fps",
+      "engine": "dom-flip",
+      "fps": 60,
+      "reducedMotionSafe": true,
+      "dependencies": "none"
+    }
+  ]
 }

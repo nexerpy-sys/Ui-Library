@@ -203,7 +203,7 @@
         <div data-build="line" class="h-px w-full bg-[var(--line-strong)]"></div>
         <dl class="grid grid-cols-2 md:grid-cols-4">
           <div class="py-5 pr-4">
-            <dd data-build="text" class="f-display text-3xl font-bold text-[var(--ink)] sm:text-4xl"><span class="ak-count" data-to="150">150</span></dd>
+            <dd data-build="text" class="f-display text-3xl font-bold text-[var(--ink)] sm:text-4xl"><span class="ak-count" data-to="162">162</span></dd>
             <dt data-build="text" class="f-mono mt-1 text-[10px] uppercase tracking-[0.18em] text-[var(--muted)]">Production assets</dt>
           </div>
           <div class="py-5 pl-5 pr-4 md:pl-6">
@@ -328,12 +328,12 @@
       </div>
 
       <div class="grid grid-cols-1 gap-px md:grid-cols-6 md:auto-rows-[minmax(265px,auto)]">
-        <!-- 150 Total Assets -->
+        <!-- 162 Total Assets -->
         <article data-build="box" class="cell spot flex min-h-[300px] flex-col justify-between p-7 md:col-span-2 md:row-span-2" style="--tint:#FF3D00">
           <span data-build="text" class="f-mono text-[10px] uppercase tracking-[0.2em] text-[var(--muted)]">Total production assets</span>
           <div>
-            <p data-build="text" class="f-display text-[clamp(4.4rem,9vw,8.2rem)] font-extrabold leading-[0.85] text-[var(--ink)]"><span class="ak-count" data-to="150">150</span></p>
-            <p data-build="text" class="mt-5 max-w-xs text-sm leading-relaxed text-[var(--muted)]">60 fonts · 24 pairings · 6 audited systems · 12 motion laws · 24 snippets · 8 templates · 16 canvas FX — zero dependencies, copy-ready as HTML, Tailwind or an AI system prompt.</p>
+            <p data-build="text" class="f-display text-[clamp(4.4rem,9vw,8.2rem)] font-extrabold leading-[0.85] text-[var(--ink)]"><span class="ak-count" data-to="162">162</span></p>
+            <p data-build="text" class="mt-5 max-w-xs text-sm leading-relaxed text-[var(--muted)]">60 fonts · 24 pairings · 6 audited systems · 12 motion laws · 24 snippets · 8 templates · 16 canvas FX · 12 motion graphics — zero dependencies, copy-ready as HTML, Tailwind or an AI system prompt.</p>
           </div>
         </article>
 
@@ -401,7 +401,8 @@
 /registry.json  machine-readable manifest
 
 fonts: 60 · colour systems: 6
-interactions: 24 · templates: 8 · hero scenes: 16</pre>
+interactions: 24 · templates: 8 · FX: 16
+motion graphics: 12 (springs · verlet · WebGL2)</pre>
         </article>
       </div>
     </section>
@@ -429,6 +430,7 @@ interactions: 24 · templates: 8 · hero scenes: 16</pre>
         <div class="explorer-tabs" role="tablist" aria-label="Registry explorer">
           <button type="button" role="tab" class="explorer-tab chip is-on f-mono rounded-full px-5 py-2.5 text-[10px] uppercase tracking-[0.16em]" id="xr-tab-templates" aria-selected="true" aria-controls="xr-panel-templates" data-xr-tab="templates">Templates <sup>8</sup></button>
           <button type="button" role="tab" class="explorer-tab chip f-mono rounded-full px-5 py-2.5 text-[10px] uppercase tracking-[0.16em]" id="xr-tab-fx" aria-selected="false" aria-controls="xr-panel-fx" data-xr-tab="fx" tabindex="-1">Canvas FX <sup>16</sup></button>
+          <button type="button" role="tab" class="explorer-tab chip f-mono rounded-full px-5 py-2.5 text-[10px] uppercase tracking-[0.16em]" id="xr-tab-mg" aria-selected="false" aria-controls="xr-panel-mg" data-xr-tab="mg" tabindex="-1">Motion Graphics <sup>12</sup></button>
           <button type="button" role="tab" class="explorer-tab chip f-mono rounded-full px-5 py-2.5 text-[10px] uppercase tracking-[0.16em]" id="xr-tab-motion" aria-selected="false" aria-controls="xr-panel-motion" data-xr-tab="motion" tabindex="-1">Micro-interactions <sup>24</sup></button>
           <button type="button" role="tab" class="explorer-tab chip f-mono rounded-full px-5 py-2.5 text-[10px] uppercase tracking-[0.16em]" id="xr-tab-systems" aria-selected="false" aria-controls="xr-panel-systems" data-xr-tab="systems" tabindex="-1">Theme switcher <sup>6</sup></button>
         </div>
@@ -440,6 +442,36 @@ interactions: 24 · templates: 8 · hero scenes: 16</pre>
         <div class="explorer-panel" role="tabpanel" id="xr-panel-fx" aria-labelledby="xr-tab-fx" tabindex="0" hidden>
           <div class="xr-grid" id="xr-fx" aria-live="polite"></div>
         </div>
+        <div class="explorer-panel" role="tabpanel" id="xr-panel-mg" aria-labelledby="xr-tab-mg" tabindex="0" hidden>
+          <div class="xr-mg">
+            <div class="xr-mg-stagecol">
+              <div class="xr-mg-stage" id="xr-mg-stage">
+                <iframe class="xr-mg-frame xr-mg-frame-placeholder" title="Motion graphic slot — mounts on selection" loading="lazy" src="about:blank" tabindex="-1" aria-hidden="true"></iframe>
+                <p class="xr-mg-loading f-mono" id="xr-mg-loading" hidden>mounting preview…</p>
+              </div>
+              <div class="xr-mg-bar">
+                <div class="xr-line">
+                  <h3 class="xr-mg-name f-display" id="xr-mg-name">Motion Graphics</h3>
+                  <span class="xr-badge f-mono" id="xr-mg-engine">WebGL2</span>
+                </div>
+                <p class="xr-best" id="xr-mg-best">Pick a graphic — every file is standalone, zero-dependency and copy-paste ready.</p>
+                <div class="xr-mg-actions">
+                  <button type="button" class="chip chip-on f-mono rounded-full px-4 py-2 text-[10px] uppercase tracking-[0.14em]" id="xr-mg-copy-full">⧉ Copy Full Standalone HTML</button>
+                  <button type="button" class="chip f-mono rounded-full px-4 py-2 text-[10px] uppercase tracking-[0.14em]" id="xr-mg-copy-engine">⧉ Copy &lt;script&gt; + CSS Engine Only</button>
+                </div>
+                <div class="xr-mg-themes" role="group" aria-label="Preview token theme">
+                  <span class="xr-lang f-mono">Token theme</span>
+                  <button type="button" class="chip xr-mg-theme f-mono rounded-full px-4 py-1.5 text-[9px] uppercase tracking-[0.14em] is-on" data-mg-theme="obsidian" aria-pressed="true">Obsidian</button>
+                  <button type="button" class="chip xr-mg-theme f-mono rounded-full px-4 py-1.5 text-[9px] uppercase tracking-[0.14em]" data-mg-theme="paper" aria-pressed="false">Paper</button>
+                  <button type="button" class="chip xr-mg-theme f-mono rounded-full px-4 py-1.5 text-[9px] uppercase tracking-[0.14em]" data-mg-theme="aegean" aria-pressed="false">Aegean</button>
+                  <span class="xr-lang f-mono xr-mg-live" id="xr-mg-live">● live injection</span>
+                </div>
+              </div>
+            </div>
+            <ol class="xr-mg-list" id="xr-mg-list" aria-label="Twelve computational motion graphics"></ol>
+          </div>
+        </div>
+
         <div class="explorer-panel" role="tabpanel" id="xr-panel-motion" aria-labelledby="xr-tab-motion" tabindex="0" hidden>
           <div class="xr-snippets" id="xr-motion" aria-live="polite"></div>
         </div>

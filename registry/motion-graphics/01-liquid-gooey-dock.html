@@ -101,7 +101,7 @@
   /* spring-damped proximity state per icon */
   const icons = GLYPHS.map((d, i) => ({
     home: x0 + i * GAP, x: x0 + i * GAP, s: 1, vs: 0,
-    drift: 0, vdrift: 0, d, el: null, glyphEl: null
+    drift: 0, vdrift: 0, rot: 0, vrot: 0, d, el: null, glyphEl: null
   }));
 
   icons.forEach((ic) => {
@@ -146,8 +146,18 @@
       ic.el.setAttribute('cx', String(ic.x));
       ic.el.setAttribute('cy', String(CY - lift * 0.6));
       ic.el.setAttribute('r', String(Math.max(6, r)));
+      /* torsional pendulum — rotational spring driven by drift velocity,
+         the icon physically lags its own magnetism */
+      const lean = Math.max(-0.22, Math.min(0.22, -ic.vdrift * 0.00042));
+      const aR = (lean - ic.rot) * 95 - ic.vrot * 13;
+      ic.vrot += aR * dt; ic.rot += ic.vrot * dt;
+      /* volume-preserving squash — magnification widens AND flattens,
+         perceived area holds, like a droplet */
+      const sxs = ic.s * (1 + (ic.s - 1) * 0.42);
+      const sys = ic.s * (1 - (ic.s - 1) * 0.24);
+      const deg = ic.rot * 57.29578;
       ic.glyphEl.setAttribute('transform',
-        `translate(${ic.x - 12}, ${CY - 12 - lift}) scale(${ic.s}) translate(${(-12 * (ic.s - 1)) / ic.s}, ${(-12 * (ic.s - 1)) / ic.s})`);
+        `translate(${ic.x.toFixed(2)} ${(CY - lift).toFixed(2)}) rotate(${deg.toFixed(2)}) scale(${sxs.toFixed(3)} ${sys.toFixed(3)}) translate(-12 -12)`);
     });
     if (!RM) requestAnimationFrame(tick);
   }

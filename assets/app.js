@@ -2051,6 +2051,37 @@ Code: MIT. Fonts: SIL OFL via Google Fonts (attribution per font). Kinetik name/
           drops: document.getElementById("xr-mg-drops"),
           dpr: document.getElementById("xr-mg-dpr"),
         };
+        const mgSpark = { el: document.getElementById("xr-mg-spark"), samples: [] };
+        const MG_SPARK_MAX = 150, MG_SPARK_CEIL = 50;   /* 150 frames, 50ms full-scale */
+        function drawMgSpark() {
+          const c = mgSpark.el; if (!c) return;
+          const ctx = c.getContext("2d"); if (!ctx) return;
+          const W = c.width, H = c.height, s0 = mgSpark.samples;
+          ctx.clearRect(0, 0, W, H);
+          /* 16.7ms frame budget — dashed reference */
+          const baseY = H - (16.7 / MG_SPARK_CEIL) * H;
+          ctx.strokeStyle = "rgba(244,242,236,0.22)"; ctx.lineWidth = 1; ctx.setLineDash([3, 4]);
+          ctx.beginPath(); ctx.moveTo(0, baseY); ctx.lineTo(W, baseY); ctx.stroke(); ctx.setLineDash([]);
+          if (!s0.length) return;
+          const stepX = W / (MG_SPARK_MAX - 1);
+          /* gradient stroke: ember when over budget, cyan when flying */
+          const latest = s0[s0.length - 1];
+          const grad = ctx.createLinearGradient(0, 0, W, 0);
+          grad.addColorStop(0, "rgba(0,240,255,0.25)");
+          grad.addColorStop(1, latest > 33 ? "#FF3D00" : latest > 16.7 ? "#E5A93C" : "#00F0FF");
+          ctx.strokeStyle = grad; ctx.lineWidth = 1.6;
+          ctx.beginPath();
+          s0.forEach((ms, i) => {
+            const x = W - (s0.length - i) * stepX;
+            const y = H - Math.min(ms, MG_SPARK_CEIL) / MG_SPARK_CEIL * H;
+            if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+          });
+          ctx.stroke();
+          /* soft fill under the curve */
+          ctx.lineTo(W, H); ctx.lineTo(W - s0.length * stepX, H); ctx.closePath();
+          ctx.fillStyle = latest > 33 ? "rgba(255,61,0,0.10)" : "rgba(0,240,255,0.08)";
+          ctx.fill();
+        }
         const mgPanel = document.getElementById("xr-panel-mg");
         const MG_DWELL_MS = 9000;
         const prefersReducedMotion = () =>
@@ -2074,9 +2105,14 @@ Code: MIT. Fonts: SIL OFL via Google Fonts (attribution per font). Kinetik name/
           }
           if (mgHud.ms) mgHud.ms.textContent = "—";
           if (mgHud.drops) mgHud.drops.textContent = "—";
+          mgSpark.samples = [];
+          drawMgSpark();
         }
         function setMgHud(t) {
           if (!t) return;
+          mgSpark.samples.push(Math.max(0, Number(t.ms) || 0));
+          if (mgSpark.samples.length > MG_SPARK_MAX) mgSpark.samples.shift();
+          drawMgSpark();
           if (mgHud.fps) {
             mgHud.fps.textContent = String(t.fps);
             mgHud.fps.classList.toggle("is-good", t.fps >= 55);

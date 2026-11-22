@@ -39,6 +39,12 @@
   #dot.morphing .dot-label { opacity:1; transform:none; color:#160800; }
   @media (prefers-reduced-motion: reduce) { body, .pill, .hud, h1 { cursor:auto; } #dot { display:none; } }
 </style>
+<style>
+  /* kinetic comet — seven spring-chained ghosts, screen-blended */
+  .ak-ghost { position: fixed; left: 0; top: 0; z-index: 49; border-radius: 50%;
+    background: radial-gradient(circle at 38% 36%, rgba(0,240,255,.9), rgba(0,240,255,.28) 62%, transparent 72%);
+    mix-blend-mode: screen; pointer-events: none; will-change: transform; }
+</style>
 <style id="ak-grade">
   /* ✦ Atelier Kinetik · cinematic grade — vignette + animated film grain */
   body::after{ content:""; position:fixed; inset:0; z-index:9998; pointer-events:none;
@@ -72,9 +78,23 @@
   const dot = document.getElementById('dot');
   const label = dot.querySelector('.dot-label');
 
+
   /* spring state: position + size morph. k/c tuned per scalar group */
   const state = { x: innerWidth / 2, y: innerHeight / 2, vx: 0, vy: 0, w: 18, h: 18, vw: 0, vh: 0 };
   let px = state.x, py = state.y, morphTarget = null, heading = 0, speed = 0;
+
+  /* rope-of-springs comet — each ghost is a damped spring chained to the
+     previous node; stiffness decays k 150→42 down the tail */
+  const ghosts = Array.from({ length: 7 }, (_, i) => {
+    const el = document.createElement('span');
+    el.className = 'ak-ghost';
+    const sz = 15 - i * 1.9;
+    el.style.width = sz.toFixed(1) + 'px';
+    el.style.height = sz.toFixed(1) + 'px';
+    el.style.opacity = (0.55 - i * 0.072).toFixed(3);
+    document.body.appendChild(el);
+    return { el, x: state.x, y: state.y, vx: 0, vy: 0, k: 150 - i * 18, c: 17 - i * 1.6 };
+  });
 
   window.addEventListener('pointermove', (e) => {
     const nx = e.clientX, ny = e.clientY;
@@ -125,6 +145,14 @@
       dot.style.height = state.h.toFixed(1) + 'px';
       dot.style.borderRadius = '999px';
       dot.style.transform = `translate3d(${(state.x - state.w / 2).toFixed(2)}px, ${(state.y - state.h / 2).toFixed(2)}px, 0)`;
+    }
+    /* integrate the comet: node i springs toward node i-1 */
+    let leadX = state.x, leadY = state.y;
+    for (const g of ghosts) {
+      g.vx += ((leadX - g.x) * g.k - g.vx * g.c) * dt; g.x += g.vx * dt;
+      g.vy += ((leadY - g.y) * g.k - g.vy * g.c) * dt; g.y += g.vy * dt;
+      g.el.style.transform = `translate3d(${g.x.toFixed(2)}px, ${g.y.toFixed(2)}px, 0) translate(-50%, -50%)`;
+      leadX = g.x; leadY = g.y;
     }
     requestAnimationFrame(tick);
   }

@@ -846,3 +846,11 @@
     @media (prefers-reduced-motion: reduce) {
       .xr-mg-cruise, .xr-mg-remount, .xr-mg-frame { transition: none !important; animation: none !important; }
     }
+
+    .xr-mg-spark {
+      width: 176px; height: 40px; border-radius: 9px;
+      border: 1px solid var(--line); background: #050507;
+      display: block;
+    }
+    @media (max-width: 1100px) { .xr-mg-spark { width: 120px; } }
+    @media (max-width: 700px) { .xr-mg-spark { display: none; } }
